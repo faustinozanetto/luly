@@ -5,4 +5,3 @@ include_dirs["glad"] = "%{wks.location}/third_party/glad/include"
 include_dirs["glm"] = "%{wks.location}/third_party/glm"
 
 library_dirs = {}
-release/PhysXPvdSDK_static_64.lib"
