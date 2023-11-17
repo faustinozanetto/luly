@@ -23,7 +23,7 @@ namespace luly::renderer
     {
     public:
         vertex_buffer_object();
-        ~vertex_buffer_object();
+        ~vertex_buffer_object() override;
 
         /* Getters*/
         uint32_t get_handle_id() const { return m_handle; }

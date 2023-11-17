@@ -2,11 +2,12 @@
 
 #include "window/window.h"
 
-#include <luly.h>
-
+#include <memory>
 #include <glm/glm.hpp>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
+#include "arrays/vertex_array_object.h"
 
 namespace luly::renderer
 {
@@ -15,6 +16,18 @@ namespace luly::renderer
         std::shared_ptr<window> window;
         glm::vec4 clear_color;
     };
+
+    enum class renderer_draw_mode
+    {
+        points,
+        line_strip,
+        line_loop,
+        lines,
+        triangle_strip,
+        triangle_fan,
+        triangles
+    };
+
 
     class renderer
     {
@@ -26,6 +39,14 @@ namespace luly::renderer
         static bool get_should_close();
         static void clear_screen();
         static void set_clear_color(const glm::vec4& clear_color);
+
+        /* Render Commands */
+        static void submit_arrays(int count, renderer_draw_mode draw_mode = renderer_draw_mode::triangles);
+        static void submit_vao(const std::shared_ptr<vertex_array_object>& vertex_array_object, int count,
+                               renderer_draw_mode draw_mode = renderer_draw_mode::triangles);
+
+        /* Utils */
+        static uint32_t get_renderer_draw_mode_to_opengl(renderer_draw_mode draw_mode);
 
     private:
         static void initialize_data();

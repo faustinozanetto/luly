@@ -27,6 +27,7 @@ namespace luly::core
         {
             renderer::renderer::clear_screen();
 
+            on_update();
 
             renderer::renderer::poll_input();
             renderer::renderer::swap_buffers();

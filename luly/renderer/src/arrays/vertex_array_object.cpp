@@ -98,4 +98,11 @@ namespace luly::renderer
 
         m_vertex_buffers.push_back(vertex_buffer);
     }
+
+    void vertex_array_object::set_element_buffer(const std::shared_ptr<element_buffer_object>& element_buffer)
+    {
+        bind();
+        element_buffer->bind();
+        m_element_buffer = element_buffer;
+    }
 }

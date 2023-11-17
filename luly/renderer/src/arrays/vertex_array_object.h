@@ -1,6 +1,7 @@
 ﻿#pragma once
 
-#include "buffers/vertex_buffer_object.h"
+#include "buffers/vertex/vertex_buffer_object.h"
+#include "buffers/elements/element_buffer_object.h"
 
 #include <vector>
 #include <memory>
@@ -23,15 +24,18 @@ namespace luly::renderer
             return m_vertex_buffers;
         }
 
+        const std::shared_ptr<element_buffer_object>& get_element_buffer() const { return m_element_buffer; }
+
         void bind() override;
         void un_bind() override;
 
         void add_vertex_buffer(const std::shared_ptr<vertex_buffer_object>& vertex_buffer);
+        void set_element_buffer(const std::shared_ptr<element_buffer_object>& element_buffer);
 
     private:
         uint32_t m_handle;
         uint32_t m_vbo_index;
         std::vector<std::shared_ptr<vertex_buffer_object>> m_vertex_buffers;
-        std::shared_ptr<vertex_buffer_object> m_index_buffer;
+        std::shared_ptr<element_buffer_object> m_element_buffer;
     };
 }

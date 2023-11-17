@@ -43,6 +43,19 @@ namespace luly::renderer
         glClearColor(s_data.clear_color.r, s_data.clear_color.g, s_data.clear_color.b, s_data.clear_color.a);
     }
 
+    void renderer::submit_arrays(int count, renderer_draw_mode draw_mode)
+    {
+        glDrawArrays(get_renderer_draw_mode_to_opengl(draw_mode), 0, count);
+    }
+
+    void renderer::submit_vao(const std::shared_ptr<vertex_array_object>& vertex_array_object, int count,
+                              renderer_draw_mode draw_mode)
+    {
+        vertex_array_object->bind();
+        submit_arrays(count, draw_mode);
+        vertex_array_object->un_bind();
+    }
+
     void renderer::initialize_data()
     {
         core::application& application = core::application::get();
@@ -54,5 +67,28 @@ namespace luly::renderer
         const int glad_initialize_status = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
         LY_ASSERT_MSG(glad_initialize_status, "Failed to initialize glad!")
         LY_TRACE("Glad initialized successfully!");
+    }
+
+    uint32_t renderer::get_renderer_draw_mode_to_opengl(renderer_draw_mode draw_mode)
+    {
+        switch (draw_mode)
+        {
+        case renderer_draw_mode::line_loop:
+            return GL_LINE_LOOP;
+        case renderer_draw_mode::line_strip:
+            return GL_LINE_STRIP;
+        case renderer_draw_mode::lines:
+            return GL_LINES;
+        case renderer_draw_mode::points:
+            return GL_POINTS;
+        case renderer_draw_mode::triangle_fan:
+            return GL_TRIANGLE_FAN;
+        case renderer_draw_mode::triangle_strip:
+            return GL_TRIANGLE_STRIP;
+        case renderer_draw_mode::triangles:
+            return GL_TRIANGLES;
+        }
+        LY_ASSERT_MSG(false, "Unknown renderer draw mode!");
+        return -1;
     }
 }
