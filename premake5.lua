@@ -23,6 +23,7 @@ group ""
 
 group "luly"
 include "luly/core"
+include "luly/renderer"
 group ""
 
 group "examples"

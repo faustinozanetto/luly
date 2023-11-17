@@ -1,13 +1,10 @@
-project "luly-core"
+project "luly-renderer"
 kind "SharedLib"
 language "C++"
 cppdialect "C++20"
 
 targetdir("%{_WORKING_DIR}/binaries/" .. output_dir .. "/%{prj.name}")
 objdir("%{_WORKING_DIR}/intermediates/" .. output_dir .. "/%{prj.name}")
-
-pchheader "lypch.h"
-pchsource "src/lypch.cpp"
 
 editandcontinue "Off"
 
@@ -19,6 +16,7 @@ files {
 includedirs
 {
     "src",
+    "%{_WORKING_DIR}/luly/core/src",
     "%{include_dirs.glfw}",
     "%{include_dirs.glad}",
     "%{include_dirs.glm}",
