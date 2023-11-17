@@ -1,5 +1,5 @@
-project "luly-renderer"
-    kind "StaticLib"
+project "basic"
+    kind "ConsoleApp"
     language "C++"
     cppdialect "C++20"
     
@@ -14,6 +14,7 @@ project "luly-renderer"
     includedirs {
         "src",
         "%{_WORKING_DIR}/luly/core/src",
+        "%{_WORKING_DIR}/luly/renderer/src",
         "%{include_dirs.glfw}",
         "%{include_dirs.glad}",
         "%{include_dirs.glm}",
@@ -21,9 +22,8 @@ project "luly-renderer"
     }
     
     links {
-        "glfw",
-        "glad",
-        "luly-core"
+        "luly-core",
+        "luly-renderer",
     }
     
     filter "configurations:debug"

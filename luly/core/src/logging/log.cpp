@@ -13,7 +13,7 @@ namespace luly::core
     {
         const auto& console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
         const auto& file_sink = std::make_shared<
-            spdlog::sinks::rotating_file_sink_mt>("logs/retro.log", 1048576 * 5, 3);
+            spdlog::sinks::rotating_file_sink_mt>("logs/luly.log", 1048576 * 5, 3);
 
         console_sink->set_pattern("[%H:%M:%S %z] [%n] [thread %t] %v");
         console_sink->set_color(spdlog::level::trace, 37); // White
@@ -28,11 +28,11 @@ namespace luly::core
         sinks.emplace_back(console_sink);
         sinks.emplace_back(file_sink);
 
-        s_logger_instance = std::make_shared<spdlog::logger>("RETRO", begin(sinks), end(sinks));
+        s_logger_instance = std::make_shared<spdlog::logger>("LULY", begin(sinks), end(sinks));
         spdlog::register_logger(s_logger_instance);
         spdlog::set_pattern("%^[%T] %n: %v%$");
         s_logger_instance->set_level(spdlog::level::trace);
-        //s_logger_instance->flush_on(spdlog::level::trace);
+        s_logger_instance->flush_on(spdlog::level::trace);
     }
 
     void log::add_sink(spdlog::sink_ptr& sink)
