@@ -22,7 +22,7 @@ include "third_party/glad"
 group ""
 
 group "luly"
-include "core"
+include "luly/core"
 group ""
 
 group "examples"
