@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include <string>
-
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -28,7 +27,7 @@ namespace luly::renderer
         ~window();
 
         /* Getters */
-        const GLFWwindow* get_native_handle() const { return m_handle; }
+        GLFWwindow* get_native_handle() const { return m_handle; }
         const window_data& get_data() const { return m_data; }
 
     private:
@@ -37,6 +36,7 @@ namespace luly::renderer
         void setup_glfw_hints();
         void create_glfw_handle();
         void setup_glfw_callbacks();
+        void make_current();
 
         GLFWwindow* m_handle;
         window_data m_data;

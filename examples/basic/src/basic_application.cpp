@@ -1,5 +1,7 @@
 ﻿#include "basic_application.h"
 
+#include <application/entry_point.h>
+
 basic_application::basic_application(const luly::renderer::window_specification& window_specification) : application(
     window_specification)
 {

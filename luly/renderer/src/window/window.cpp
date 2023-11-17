@@ -1,6 +1,7 @@
 ﻿#include "window.h"
 
-#include "logging/log.h"
+#include <logging/log.h>
+#include <utils/assert.h>
 
 namespace luly::renderer
 {
@@ -19,19 +20,16 @@ namespace luly::renderer
 
     void window::initialize()
     {
-        LY_TRACE("Started initializaing window...");
+        LY_TRACE("Started initializing window...");
 
-        // Initialize glfw
         initialize_glfw();
-
-        // GLFW window hints
         setup_glfw_hints();
-
-        // Window handle creation
         create_glfw_handle();
 
-        // Store data pointer
         glfwSetWindowUserPointer(m_handle, &m_data);
+
+        setup_glfw_callbacks();
+        make_current();
         LY_TRACE("Window initialized successfully!");
     }
 
@@ -64,5 +62,17 @@ namespace luly::renderer
 
     void window::setup_glfw_callbacks()
     {
+        // 1. Resize callback
+        glfwSetWindowSizeCallback(m_handle, [](GLFWwindow* native_window, int width, int height)
+        {
+            window_data& data = *static_cast<window_data*>(glfwGetWindowUserPointer(native_window));
+            data.width = width;
+            data.height = height;
+        });
+    }
+
+    void window::make_current()
+    {
+        glfwMakeContextCurrent(m_handle);
     }
 }

@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "window/window.h"
+
 #include <memory>
 
 // Entry point used in applications.
@@ -14,7 +15,9 @@ namespace luly::core
         application(const renderer::window_specification& window_specification);
         virtual ~application();
 
+        /* Getters */
         static application& get() { return *s_instance; }
+        std::shared_ptr<renderer::window>& get_window() { return m_window; };
 
     private:
         void run();
