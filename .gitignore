@@ -1,0 +1,21 @@
+# Binaries and Intermedaites
+**/binaries
+**/intermediates
+*.exe
+*.dll
+*.lib
+*.log
+
+# IntelliJ
+*.idea/
+
+# VSCode
+*.vscode/
+
+# Visual Studio files and folder
+.vs/
+**.sln
+**.vcxproj
+**.vcxproj.filters
+**.vcxproj.user
+**.csproj
