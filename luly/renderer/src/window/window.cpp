@@ -49,15 +49,15 @@ namespace luly::renderer
 
     void window::create_glfw_handle()
     {
-        LY_INFO("Creating GLFW window: ");
-        LY_INFO("   - Title: " + m_data.title);
-        LY_INFO(std::format("   - Width: {} px", m_data.width));
-        LY_INFO(std::format("   - Height: {} px", m_data.height));
+        LY_TRACE("Creating GLFW window: ");
+        LY_TRACE("   - Title: " + m_data.title);
+        LY_TRACE(std::format("   - Width: {} px", m_data.width));
+        LY_TRACE(std::format("   - Height: {} px", m_data.height));
 
         m_handle = glfwCreateWindow(m_data.width, m_data.height, m_data.title.c_str(), nullptr, nullptr);
         LY_ASSERT_MSG(m_handle != nullptr, "Failed to create GLFW window!");
 
-        LY_INFO("GLFW window created successfully!");
+        LY_TRACE("GLFW window created successfully!");
     }
 
     void window::setup_glfw_callbacks()

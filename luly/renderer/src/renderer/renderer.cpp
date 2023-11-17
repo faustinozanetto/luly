@@ -10,11 +10,11 @@ namespace luly::renderer
 
     void renderer::initialize()
     {
-        LY_INFO("Started initializing renderer...");
+        LY_TRACE("Started initializing renderer...");
         initialize_data();
         initialize_glad();
 
-        LY_INFO("Renderer initialized successfully!");
+        LY_TRACE("Renderer initialized successfully!");
     }
 
     void renderer::swap_buffers()
@@ -53,6 +53,6 @@ namespace luly::renderer
     {
         const int glad_initialize_status = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
         LY_ASSERT_MSG(glad_initialize_status, "Failed to initialize glad!")
-        LY_INFO("Glad initialized successfully!");
+        LY_TRACE("Glad initialized successfully!");
     }
 }

@@ -11,7 +11,7 @@ namespace luly::core
     {
         s_instance = this;
 
-        LY_INFO("Started creating application...");
+        LY_TRACE("Started creating application...");
         m_window = std::make_shared<renderer::window>(window_specification);
 
         renderer::renderer::initialize();
