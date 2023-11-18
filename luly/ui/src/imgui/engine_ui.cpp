@@ -79,7 +79,6 @@ namespace luly::ui
         colors[ImGuiCol_NavWindowingDimBg] = ImVec4(1.00f, 0.00f, 0.00f, 0.20f);
         colors[ImGuiCol_ModalWindowDimBg] = ImVec4(1.00f, 0.00f, 0.00f, 0.35f);
 
-
         ImGuiStyle& style = ImGui::GetStyle();
         style.WindowPadding = ImVec2(6.00f, 6.00f);
         style.FramePadding = ImVec2(5.00f, 2.00f);

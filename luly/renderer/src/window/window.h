@@ -35,15 +35,15 @@ namespace luly::renderer
         const window_data& get_data() const { return m_data; }
 
         /* Setters */
-        void set_event_function(std::function<void(events::base_event&)> func);
+        void set_event_function(const std::function<void(events::base_event&)>& func);
 
     private:
         void initialize();
         void initialize_glfw();
         void setup_glfw_hints();
         void create_glfw_handle();
-        void setup_glfw_callbacks();
-        void make_current();
+        void setup_glfw_callbacks() const;
+        void make_current() const;
 
         GLFWwindow* m_handle;
         window_data m_data;
