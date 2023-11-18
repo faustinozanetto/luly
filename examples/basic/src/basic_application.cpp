@@ -27,7 +27,6 @@ basic_application::~basic_application()
 void basic_application::on_update()
 {
     m_shader->bind();
-    //  luly::renderer::renderer::submit_vao(m_triangle_vao, 6);
     glBindTextureUnit(0, m_texture->get_handle_id());
     luly::renderer::renderer::submit_model(m_model);
     m_shader->un_bind();

@@ -4,6 +4,8 @@
 #include "logging/log.h"
 #include "utils/assert.h"
 
+#include <glm/gtc/type_ptr.hpp>
+
 namespace luly::renderer
 {
     shader::shader(const std::unordered_map<shader_type, std::string>& shader_contents)
@@ -37,6 +39,56 @@ namespace luly::renderer
         glUseProgram(0);
     }
 
+    void shader::set_int(const std::string& uniform_name, int value)
+    {
+        glUniform1i(get_uniform_location(uniform_name), value);
+    }
+
+    void shader::set_vec_int2(const std::string& uniform_name, const glm::ivec2& value)
+    {
+        glUniform2i(get_uniform_location(uniform_name), value.x, value.y);
+    }
+
+    void shader::set_vec_int3(const std::string& uniform_name, const glm::ivec3& value)
+    {
+        glUniform3i(get_uniform_location(uniform_name), value.x, value.y, value.z);
+    }
+
+    void shader::set_vec_int4(const std::string& uniform_name, const glm::ivec4& value)
+    {
+        glUniform4i(get_uniform_location(uniform_name), value.x, value.y, value.z, value.w);
+    }
+
+    void shader::set_float(const std::string& uniform_name, float value)
+    {
+        glUniform1f(get_uniform_location(uniform_name), value);
+    }
+
+    void shader::set_vec_float2(const std::string& uniform_name, const glm::vec2& value)
+    {
+        glUniform2f(get_uniform_location(uniform_name), value.x, value.y);
+    }
+
+    void shader::set_vec_float3(const std::string& uniform_name, const glm::vec3& value)
+    {
+        glUniform3f(get_uniform_location(uniform_name), value.x, value.y, value.z);
+    }
+
+    void shader::set_vec_float4(const std::string& uniform_name, const glm::vec4& value)
+    {
+        glUniform4f(get_uniform_location(uniform_name), value.x, value.y, value.z, value.w);
+    }
+
+    void shader::set_mat3(const std::string& uniform_name, const glm::mat3& value)
+    {
+        glUniformMatrix3fv(get_uniform_location(uniform_name), 1, GL_FALSE, glm::value_ptr(value));
+    }
+
+    void shader::set_mat4(const std::string& uniform_name, const glm::mat4& value)
+    {
+        glUniformMatrix4fv(get_uniform_location(uniform_name), 1, GL_FALSE, glm::value_ptr(value));
+    }
+
     void shader::initialize()
     {
         LY_TRACE("Started initializing shader...");
@@ -54,7 +106,7 @@ namespace luly::renderer
         m_handle = glCreateProgram();
     }
 
-    std::vector<uint32_t> shader::create_shaders()
+    std::vector<uint32_t> shader::create_shaders() const
     {
         std::vector<uint32_t> shader_ids;
         int shader_index = 0;
@@ -81,7 +133,7 @@ namespace luly::renderer
                 auto error_message = std::string(
                     infoLog.begin(), infoLog.end());
                 LY_ERROR("An error occurred while compiling shader '{}'", error_message);
-                LY_ASSERT_MSG(false, "Shader compilation failed!");
+                LY_ASSERT_MSG(false, "Shader compilation failed!")
             }
 
             LY_TRACE("  - Shader '{}' compiled successfully.", shader_utils::get_shader_type_to_string(shader.first));
@@ -121,7 +173,7 @@ namespace luly::renderer
             auto error_message = std::string(
                 infoLog.begin(), infoLog.end());
             LY_ERROR("An error ocurred while linking shader '{}'", error_message);
-            LY_ASSERT_MSG(false, "Shader linking failed!");
+            LY_ASSERT_MSG(false, "Shader linking failed!")
         }
 
         for (const auto id : shader_ids)
