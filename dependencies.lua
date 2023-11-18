@@ -6,6 +6,7 @@ include_dirs["glm"] = "%{wks.location}/third_party/glm"
 include_dirs["spdlog"] = "%{wks.location}/third_party/spdlog/include"
 include_dirs["assimp"] = "%{wks.location}/third_party/assimp/include"
 include_dirs["stb"] = "%{wks.location}/third_party/stb"
+include_dirs["imgui"] = "%{wks.location}/third_party/imgui"
 include_dirs["entt"] = "%{wks.location}/third_party/entt/single_include"
 
 library_dirs = {}

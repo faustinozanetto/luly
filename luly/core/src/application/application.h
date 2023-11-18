@@ -2,6 +2,7 @@
 
 #include "window/window.h"
 #include "events/base_event.h"
+#include "scene/scene_manager.h"
 
 #include <memory>
 
@@ -19,6 +20,7 @@ namespace luly::core
         /* Getters */
         static application& get() { return *s_instance; }
         std::shared_ptr<renderer::window>& get_window() { return m_window; }
+        std::shared_ptr<scene::scene_manager>& get_scene_manager() { return m_scene_manager; }
 
         /* Virtual Methods */
         virtual void on_update() = 0;
@@ -28,6 +30,7 @@ namespace luly::core
         void run();
 
         std::shared_ptr<renderer::window> m_window;
+        std::shared_ptr<scene::scene_manager> m_scene_manager;
 
         friend int ::main(int argc, char** argv);
         static application* s_instance;

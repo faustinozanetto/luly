@@ -20,6 +20,7 @@ project "luly-renderer"
         "%{include_dirs.spdlog}",
         "%{include_dirs.assimp}",
         "%{include_dirs.stb}",
+        "%{include_dirs.entt}",
     }
     
     links {

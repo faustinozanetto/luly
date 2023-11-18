@@ -2,6 +2,7 @@
 
 #include <application/entry_point.h>
 
+#include "../../../third_party/imgui/imgui.h"
 #include "models/model_factory.h"
 #include "renderer/renderer.h"
 #include "shaders/shader.h"
@@ -31,6 +32,8 @@ void basic_application::on_update()
     glBindTextureUnit(0, m_texture->get_handle_id());
     luly::renderer::renderer::submit_model(m_model);
     m_shader->un_bind();
+
+    ImGui::ShowDemoWindow();
 }
 
 void basic_application::on_handle_event(luly::events::base_event& event)

@@ -1,8 +1,8 @@
 ﻿#include "lypch.h"
 #include "application.h"
 
+#include "../../../ui/src/imgui/engine_ui.h"
 #include "events/event_dispatcher.h"
-#include "events/window/window_resize_event.h"
 #include "renderer/renderer.h"
 
 namespace luly::core
@@ -15,8 +15,10 @@ namespace luly::core
 
         LY_TRACE("Started creating application...");
         m_window = std::make_shared<renderer::window>(window_specification);
-
         renderer::renderer::initialize();
+        ui::engine_ui::initialize();
+
+        m_scene_manager = std::make_shared<scene::scene_manager>();
     }
 
     application::~application()
@@ -29,11 +31,14 @@ namespace luly::core
         {
             renderer::renderer::clear_screen();
 
+            ui::engine_ui::begin_frame();
+
             on_update();
+
+            ui::engine_ui::end_frame();
 
             renderer::renderer::poll_input();
             renderer::renderer::swap_buffers();
         }
     }
-    
 }

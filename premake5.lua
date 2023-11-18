@@ -20,11 +20,13 @@ group "dependencies"
     include "third_party/glfw"
     include "third_party/glad"
     include "third_party/stb"
+    include "third_party/imgui"
 group ""
 
 group "luly"
     include "luly/core"
     include "luly/renderer"
+    include "luly/ui"
 group ""
 
 group "examples"

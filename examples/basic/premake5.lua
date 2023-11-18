@@ -26,6 +26,7 @@ project "basic"
     links {
         "luly-core",
         "luly-renderer",
+        "luly-ui"
     }
     
     filter "configurations:debug"
