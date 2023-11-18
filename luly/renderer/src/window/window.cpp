@@ -72,6 +72,8 @@ namespace luly::renderer
             data.height = height;
 
             // Dispatch event.
+            if (!data.event_func) return;
+
             events::window_resize_event event({width, height});
             data.event_func(event);
         });

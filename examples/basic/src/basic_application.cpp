@@ -2,6 +2,7 @@
 
 #include <application/entry_point.h>
 
+#include "models/model_factory.h"
 #include "renderer/renderer.h"
 #include "shaders/shader.h"
 #include "shaders/shader_factory.h"
@@ -11,6 +12,8 @@ basic_application::basic_application(const luly::renderer::window_specification&
 {
     m_shader = luly::renderer::shader_factory::create_shader_from_file(
         "assets/shaders/test_shader.lsh");
+
+    auto model = luly::renderer::model_factory::load_model_from_file("assets/models/cube.obj");
 
     setup_triangle();
 }

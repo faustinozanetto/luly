@@ -20,7 +20,8 @@ project "luly-core"
         "%{include_dirs.glfw}",
         "%{include_dirs.glad}",
         "%{include_dirs.glm}",
-        "%{include_dirs.spdlog}"
+        "%{include_dirs.spdlog}",
+        "%{include_dirs.assimp}",
     }
     
     links {

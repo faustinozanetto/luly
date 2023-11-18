@@ -17,7 +17,8 @@ project "luly-renderer"
         "%{include_dirs.glfw}",
         "%{include_dirs.glad}",
         "%{include_dirs.glm}",
-        "%{include_dirs.spdlog}"
+        "%{include_dirs.spdlog}",
+        "%{include_dirs.assimp}",
     }
     
     links {
@@ -30,8 +31,14 @@ project "luly-renderer"
         defines "LY_DEBUG"
         runtime "Debug"
         symbols "on"
+        links {
+            "%{library_dirs.assimp_debug}"
+        }
     
     filter "configurations:release"
         defines "LY_RELEASE;NDEBUG"
         runtime "Release"
         optimize "on"
+        links {
+            "%{library_dirs.assimp_release}"
+        } 
