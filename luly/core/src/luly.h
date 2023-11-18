@@ -17,3 +17,8 @@
 #include "scene/actor/scene_actor.h"
 #include "scene/actor/components/base_component.h"
 #include "scene/actor/components/name_component.h"
+
+// Input Include
+#include "input/input_manager.h"
+#include "input/mouse_codes.h"
+#include "input/key_codes.h"
