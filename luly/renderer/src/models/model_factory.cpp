@@ -28,7 +28,7 @@ namespace luly::renderer
         return created_model;
     }
 
-     std::shared_ptr<model> model_factory::load_model_using_assimp(const std::string& file_path)
+    std::shared_ptr<model> model_factory::load_model_using_assimp(const std::string& file_path)
     {
         Assimp::Importer import;
         const aiScene* assimp_scene = import.ReadFile(
@@ -50,14 +50,14 @@ namespace luly::renderer
     void model_factory::parse_assimp_node(const aiScene* assimp_scene, aiNode* assimp_node,
                                           std::vector<std::shared_ptr<mesh>>& model_meshes)
     {
-        // process all the node's meshes (if any)
-        for (int i = 0; i < assimp_node->mNumMeshes; i++)
+        // Process all the node's meshes (if any)
+        for (unsigned int i = 0; i < assimp_node->mNumMeshes; i++)
         {
             aiMesh* mesh = assimp_scene->mMeshes[assimp_node->mMeshes[i]];
             model_meshes.push_back(parse_assimp_mesh(mesh, assimp_scene));
         }
-        // then do the same for each of its children
-        for (int i = 0; i < assimp_node->mNumChildren; i++)
+        // Then do the same for each of its children
+        for (unsigned int i = 0; i < assimp_node->mNumChildren; i++)
         {
             parse_assimp_node(assimp_scene, assimp_node->mChildren[i], model_meshes);
         }
@@ -68,7 +68,7 @@ namespace luly::renderer
         std::vector<mesh_vertex> vertices;
         std::vector<mesh_index> indices;
 
-        for (int i = 0; i < assimp_mesh->mNumVertices; i++)
+        for (unsigned int i = 0; i < assimp_mesh->mNumVertices; i++)
         {
             mesh_vertex vertex;
 
@@ -107,11 +107,11 @@ namespace luly::renderer
             vertices.push_back(vertex);
         }
 
-        for (int i = 0; i < assimp_mesh->mNumFaces; i++)
+        for (unsigned int i = 0; i < assimp_mesh->mNumFaces; i++)
         {
             aiFace face = assimp_mesh->mFaces[i];
             // Retrieve all indices of the face and store them in the indices vector.
-            for (int j = 0; j < face.mNumIndices; j++)
+            for (unsigned int j = 0; j < face.mNumIndices; j++)
             {
                 indices.push_back(face.mIndices[j]);
             }

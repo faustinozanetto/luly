@@ -1,13 +1,13 @@
 ﻿#pragma once
 
 #include "window/window.h"
+#include "arrays/vertex_array_object.h"
+#include "models/model.h"
 
 #include <memory>
 #include <glm/glm.hpp>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
-#include "arrays/vertex_array_object.h"
 
 namespace luly::renderer
 {
@@ -50,6 +50,16 @@ namespace luly::renderer
                                renderer_draw_mode draw_mode = renderer_draw_mode::triangles);
         static void submit_vao_instanced(const std::shared_ptr<vertex_array_object>& vao, int count, int instance_count,
                                          renderer_draw_mode draw_mode = renderer_draw_mode::triangles);
+
+        /* Mesh Rendering */
+        static void submit_mesh(const std::shared_ptr<mesh>& mesh,
+                                renderer_draw_mode draw_mode = renderer_draw_mode::triangles);
+
+        /* Model Rendering */
+        static void submit_model(const std::shared_ptr<model>& model,
+                                 renderer_draw_mode draw_mode = renderer_draw_mode::triangles);
+        static void submit_model_instanced(const std::shared_ptr<model>& model, int instance_count,
+                                           renderer_draw_mode draw_mode = renderer_draw_mode::triangles);
 
         /* Utils */
         static uint32_t get_renderer_draw_mode_to_opengl(renderer_draw_mode draw_mode);

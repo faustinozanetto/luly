@@ -4,6 +4,7 @@
 
 #include <arrays/vertex_array_object.h>
 #include <shaders/shader.h>
+#include <models/model.h>
 
 class basic_application : public luly::core::application
 {
@@ -19,4 +20,5 @@ private:
 
     std::shared_ptr<luly::renderer::vertex_array_object> m_triangle_vao;
     std::shared_ptr<luly::renderer::shader> m_shader;
+    std::shared_ptr<luly::renderer::model> m_model;
 };

@@ -13,7 +13,7 @@ basic_application::basic_application(const luly::renderer::window_specification&
     m_shader = luly::renderer::shader_factory::create_shader_from_file(
         "assets/shaders/test_shader.lsh");
 
-    auto model = luly::renderer::model_factory::load_model_from_file("assets/models/cube.obj");
+    m_model = luly::renderer::model_factory::load_model_from_file("assets/models/cube.obj");
 
     setup_triangle();
 }
@@ -25,7 +25,8 @@ basic_application::~basic_application()
 void basic_application::on_update()
 {
     m_shader->bind();
-    luly::renderer::renderer::submit_vao(m_triangle_vao, 6);
+    //  luly::renderer::renderer::submit_vao(m_triangle_vao, 6);
+    luly::renderer::renderer::submit_model(m_model);
     m_shader->un_bind();
 }
 

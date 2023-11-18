@@ -15,12 +15,12 @@ namespace luly::renderer
 
     void element_buffer_object::bind()
     {
-        glBindBuffer(GL_ARRAY_BUFFER, m_handle);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_handle);
     }
 
     void element_buffer_object::un_bind()
     {
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
     void element_buffer_object::set_data(int size, const void* data)
