@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "window/window.h"
+#include "events/base_event.h"
 
 #include <memory>
 
@@ -17,9 +18,11 @@ namespace luly::core
 
         /* Getters */
         static application& get() { return *s_instance; }
-        std::shared_ptr<renderer::window>& get_window() { return m_window; };
+        std::shared_ptr<renderer::window>& get_window() { return m_window; }
 
+        /* Virtual Methods */
         virtual void on_update() = 0;
+        virtual void on_handle_event(events::base_event& event) = 0;
 
     private:
         void run();

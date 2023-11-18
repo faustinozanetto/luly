@@ -1,5 +1,7 @@
 ﻿#include "window.h"
 
+#include "events/window/window_resize_event.h"
+
 #include <logging/log.h>
 #include <utils/assert.h>
 
@@ -68,11 +70,20 @@ namespace luly::renderer
             window_data& data = *static_cast<window_data*>(glfwGetWindowUserPointer(native_window));
             data.width = width;
             data.height = height;
+
+            // Dispatch event.
+            events::window_resize_event event({width, height});
+            data.event_func(event);
         });
     }
 
     void window::make_current()
     {
         glfwMakeContextCurrent(m_handle);
+    }
+
+    void window::set_event_function(const std::function<void(events::base_event&)> func)
+    {
+        m_data.event_func = func;
     }
 }

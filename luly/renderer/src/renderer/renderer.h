@@ -28,7 +28,6 @@ namespace luly::renderer
         triangles
     };
 
-
     class renderer
     {
     public:
@@ -40,10 +39,17 @@ namespace luly::renderer
         static void clear_screen();
         static void set_clear_color(const glm::vec4& clear_color);
 
-        /* Render Commands */
+        /* Primitive Rendering */
         static void submit_arrays(int count, renderer_draw_mode draw_mode = renderer_draw_mode::triangles);
+        static void submit_arrays_instanced(int count, int instance_count,
+                                            renderer_draw_mode draw_mode = renderer_draw_mode::triangles);
+        static void submit_elements(int count, renderer_draw_mode draw_mode = renderer_draw_mode::triangles);
+
+        /* VAO Rendering */
         static void submit_vao(const std::shared_ptr<vertex_array_object>& vertex_array_object, int count,
                                renderer_draw_mode draw_mode = renderer_draw_mode::triangles);
+        static void submit_vao_instanced(const std::shared_ptr<vertex_array_object>& vao, int count, int instance_count,
+                                         renderer_draw_mode draw_mode = renderer_draw_mode::triangles);
 
         /* Utils */
         static uint32_t get_renderer_draw_mode_to_opengl(renderer_draw_mode draw_mode);

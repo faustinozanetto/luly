@@ -48,12 +48,29 @@ namespace luly::renderer
         glDrawArrays(get_renderer_draw_mode_to_opengl(draw_mode), 0, count);
     }
 
-    void renderer::submit_vao(const std::shared_ptr<vertex_array_object>& vertex_array_object, int count,
-                              renderer_draw_mode draw_mode)
+    void renderer::submit_arrays_instanced(int count, int instance_count, renderer_draw_mode draw_mode)
     {
-        vertex_array_object->bind();
+        glDrawArraysInstanced(get_renderer_draw_mode_to_opengl(draw_mode), 0, count, instance_count);
+    }
+
+    void renderer::submit_elements(int count, renderer_draw_mode draw_mode)
+    {
+        glDrawElements(get_renderer_draw_mode_to_opengl(draw_mode), count, GL_UNSIGNED_INT, 0);
+    }
+
+    void renderer::submit_vao(const std::shared_ptr<vertex_array_object>& vao, int count, renderer_draw_mode draw_mode)
+    {
+        vao->bind();
         submit_arrays(count, draw_mode);
-        vertex_array_object->un_bind();
+        vao->un_bind();
+    }
+
+    void renderer::submit_vao_instanced(const std::shared_ptr<vertex_array_object>& vao,
+                                        int count, int instance_count, renderer_draw_mode draw_mode)
+    {
+        vao->bind();
+        submit_arrays_instanced(count, instance_count, draw_mode);
+        vao->un_bind();
     }
 
     void renderer::initialize_data()

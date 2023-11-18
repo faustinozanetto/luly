@@ -1,6 +1,8 @@
 ﻿#include "lypch.h"
 #include "application.h"
 
+#include "events/event_dispatcher.h"
+#include "events/window/window_resize_event.h"
 #include "renderer/renderer.h"
 
 namespace luly::core
@@ -33,4 +35,5 @@ namespace luly::core
             renderer::renderer::swap_buffers();
         }
     }
+    
 }
