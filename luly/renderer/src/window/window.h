@@ -35,7 +35,7 @@ namespace luly::renderer
         const window_data& get_data() const { return m_data; }
 
         /* Setters */
-        void set_event_function(const std::function<void(events::base_event&)> func);
+        void set_event_function(std::function<void(events::base_event&)> func);
 
     private:
         void initialize();

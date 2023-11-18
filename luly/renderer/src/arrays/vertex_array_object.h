@@ -14,7 +14,7 @@ namespace luly::renderer
     {
     public:
         vertex_array_object();
-        ~vertex_array_object();
+        ~vertex_array_object() override;
 
         /* Getters */
         uint32_t get_handle() const { return m_handle; }

@@ -26,6 +26,10 @@ void basic_application::on_update()
     m_shader->un_bind();
 }
 
+void basic_application::on_handle_event(luly::events::base_event& event)
+{
+}
+
 void basic_application::setup_triangle()
 {
     const std::vector vertices = {

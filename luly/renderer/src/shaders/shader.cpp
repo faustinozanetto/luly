@@ -78,7 +78,7 @@ namespace luly::renderer
 
                 glDeleteShader(shader_id);
 
-                std::string error_message = std::string(
+                auto error_message = std::string(
                     infoLog.begin(), infoLog.end());
                 LY_ERROR("An error occurred while compiling shader '{}'", error_message);
                 LY_ASSERT_MSG(false, "Shader compilation failed!");
@@ -118,7 +118,7 @@ namespace luly::renderer
                 glDeleteShader(id);
             }
 
-            std::string error_message = std::string(
+            auto error_message = std::string(
                 infoLog.begin(), infoLog.end());
             LY_ERROR("An error ocurred while linking shader '{}'", error_message);
             LY_ASSERT_MSG(false, "Shader linking failed!");

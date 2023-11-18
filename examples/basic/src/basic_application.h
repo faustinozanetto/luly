@@ -12,6 +12,7 @@ public:
     ~basic_application() override;
 
     void on_update() override;
+    void on_handle_event(luly::events::base_event& event) override;
 
 private:
     void setup_triangle();

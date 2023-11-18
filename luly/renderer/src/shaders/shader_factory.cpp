@@ -50,7 +50,7 @@ namespace luly::renderer
         const size_t shader_type_token_len = strlen(SHADER_TYPE_TOKEN);
         size_t pos = shader_source.find(SHADER_TYPE_TOKEN, 0);
 
-        shader_type current_type = shader_type::fragment;
+        auto current_type = shader_type::fragment;
 
         while (pos != std::string::npos)
         {
