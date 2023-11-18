@@ -19,11 +19,13 @@ project "luly-renderer"
         "%{include_dirs.glm}",
         "%{include_dirs.spdlog}",
         "%{include_dirs.assimp}",
+        "%{include_dirs.stb}",
     }
     
     links {
         "glfw",
         "glad",
+        "stb",
         "luly-core"
     }
     

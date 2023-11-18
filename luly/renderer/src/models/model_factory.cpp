@@ -7,18 +7,18 @@
 
 namespace luly::renderer
 {
-    std::shared_ptr<model> model_factory::load_model_from_file(const std::string& file_path)
+    std::shared_ptr<model> model_factory::create_model_from_file(const std::string& file_path)
     {
         LY_TRACE("Started loading model from file...");
         LY_TRACE("  - File Path: '{0}'", file_path);
 
-        const auto& created_model = load_model_using_assimp(file_path);
+        const auto& created_model = create_model_using_assimp(file_path);
 
         LY_TRACE("Model loaded from file successfully!");
         return created_model;
     }
 
-    std::shared_ptr<model> model_factory::load_model_from_meshes(const std::vector<std::shared_ptr<mesh>>& meshes)
+    std::shared_ptr<model> model_factory::create_model_from_meshes(const std::vector<std::shared_ptr<mesh>>& meshes)
     {
         LY_TRACE("Started loading model from meshes...");
 
@@ -28,7 +28,7 @@ namespace luly::renderer
         return created_model;
     }
 
-    std::shared_ptr<model> model_factory::load_model_using_assimp(const std::string& file_path)
+    std::shared_ptr<model> model_factory::create_model_using_assimp(const std::string& file_path)
     {
         Assimp::Importer import;
         const aiScene* assimp_scene = import.ReadFile(
@@ -38,7 +38,7 @@ namespace luly::renderer
         // Check for loading errors.
         if (!assimp_scene || assimp_scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !assimp_scene->mRootNode)
         {
-            LY_ASSERT_MSG(false, "An error occurred while loading model from file.");
+            LY_ASSERT_MSG(false, "An error occurred while loading model from file.")
         }
 
         std::vector<std::shared_ptr<mesh>> model_meshes;
@@ -47,14 +47,14 @@ namespace luly::renderer
         return std::make_shared<model>(model_meshes);
     }
 
-    void model_factory::parse_assimp_node(const aiScene* assimp_scene, aiNode* assimp_node,
+    void model_factory::parse_assimp_node(const aiScene* assimp_scene, const aiNode* assimp_node,
                                           std::vector<std::shared_ptr<mesh>>& model_meshes)
     {
         // Process all the node's meshes (if any)
         for (unsigned int i = 0; i < assimp_node->mNumMeshes; i++)
         {
             aiMesh* mesh = assimp_scene->mMeshes[assimp_node->mMeshes[i]];
-            model_meshes.push_back(parse_assimp_mesh(mesh, assimp_scene));
+            model_meshes.push_back(parse_assimp_mesh(mesh));
         }
         // Then do the same for each of its children
         for (unsigned int i = 0; i < assimp_node->mNumChildren; i++)
@@ -63,7 +63,7 @@ namespace luly::renderer
         }
     }
 
-    std::shared_ptr<mesh> model_factory::parse_assimp_mesh(aiMesh* assimp_mesh, const aiScene* assimp_scene)
+    std::shared_ptr<mesh> model_factory::parse_assimp_mesh(aiMesh* assimp_mesh)
     {
         std::vector<mesh_vertex> vertices;
         std::vector<mesh_index> indices;

@@ -6,6 +6,7 @@
 #include "renderer/renderer.h"
 #include "shaders/shader.h"
 #include "shaders/shader_factory.h"
+#include "textures/texture_factory.h"
 
 basic_application::basic_application(const luly::renderer::window_specification& window_specification) : application(
     window_specification)
@@ -13,8 +14,9 @@ basic_application::basic_application(const luly::renderer::window_specification&
     m_shader = luly::renderer::shader_factory::create_shader_from_file(
         "assets/shaders/test_shader.lsh");
 
-    m_model = luly::renderer::model_factory::load_model_from_file("assets/models/cube.obj");
+    m_model = luly::renderer::model_factory::create_model_from_file("assets/models/cube.obj");
 
+    m_texture = luly::renderer::texture_factory::create_texture_from_file("assets/textures/test.png");
     setup_triangle();
 }
 
@@ -26,6 +28,7 @@ void basic_application::on_update()
 {
     m_shader->bind();
     //  luly::renderer::renderer::submit_vao(m_triangle_vao, 6);
+    glBindTextureUnit(0, m_texture->get_handle_id());
     luly::renderer::renderer::submit_model(m_model);
     m_shader->un_bind();
 }

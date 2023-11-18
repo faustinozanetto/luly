@@ -26,7 +26,7 @@ project "luly-core"
     
     links {
         "glfw",
-        "glad"
+        "glad",
     }
     
     filter "configurations:debug"
