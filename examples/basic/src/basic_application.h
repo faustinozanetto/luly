@@ -6,6 +6,7 @@
 #include <shaders/shader.h>
 #include <models/model.h>
 
+#include "framebuffer/frame_buffer.h"
 #include "textures/texture.h"
 
 class basic_application : public luly::core::application
@@ -19,9 +20,11 @@ public:
 
 private:
     void setup_triangle();
+    void setup_fbo();
 
     std::shared_ptr<luly::renderer::vertex_array_object> m_triangle_vao;
     std::shared_ptr<luly::renderer::shader> m_shader;
     std::shared_ptr<luly::renderer::model> m_model;
     std::shared_ptr<luly::renderer::texture> m_texture;
+    std::shared_ptr<luly::renderer::frame_buffer> m_fbo;
 };

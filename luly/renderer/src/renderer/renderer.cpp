@@ -43,6 +43,11 @@ namespace luly::renderer
         glClearColor(s_data.clear_color.r, s_data.clear_color.g, s_data.clear_color.b, s_data.clear_color.a);
     }
 
+    glm::ivec2 renderer::get_viewport_size()
+    {
+        return glm::ivec2(s_data.window->get_data().width, s_data.window->get_data().height);
+    }
+
     void renderer::submit_arrays(int count, renderer_draw_mode draw_mode)
     {
         glDrawArrays(get_renderer_draw_mode_to_opengl(draw_mode), 0, count);

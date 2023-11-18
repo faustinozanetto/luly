@@ -18,6 +18,7 @@ basic_application::basic_application(const luly::renderer::window_specification&
 
     m_texture = luly::renderer::texture_factory::create_texture_from_file("assets/textures/test.png");
     setup_triangle();
+    setup_fbo();
 }
 
 basic_application::~basic_application()
@@ -63,6 +64,26 @@ void basic_application::setup_triangle()
     triangle_vbo->set_layout_descriptor(vbo_layout_descriptor);
 
     m_triangle_vao->add_vertex_buffer(triangle_vbo);
+}
+
+void basic_application::setup_fbo()
+{
+    auto viewport_size = luly::renderer::renderer::get_viewport_size();
+
+    std::vector<luly::renderer::frame_buffer_attachment> attachments = {
+        {
+            luly::renderer::texture_internal_format::rgba16f,
+            luly::renderer::texture_filtering::linear,
+            luly::renderer::texture_wrapping::clamp_to_edge, viewport_size
+        },
+    };
+    luly::renderer::frame_buffer_attachment depth_attachment = {
+        luly::renderer::texture_internal_format::depth_component32f,
+        luly::renderer::texture_filtering::linear,
+        luly::renderer::texture_wrapping::clamp_to_edge, viewport_size
+    };
+    m_fbo = std::make_shared<luly::renderer::frame_buffer>(
+        viewport_size.x, viewport_size.y, attachments, depth_attachment);
 }
 
 luly::core::application* luly::core::create_application()
