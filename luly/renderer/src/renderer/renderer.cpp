@@ -14,6 +14,10 @@ namespace luly::renderer
         initialize_data();
         initialize_glad();
 
+        glEnable(GL_DEPTH_TEST);
+        glFrontFace(GL_CW);
+        glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+        
         LY_TRACE("Renderer initialized successfully!");
     }
 

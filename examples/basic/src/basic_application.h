@@ -6,6 +6,7 @@
 #include <shaders/shader.h>
 #include <models/model.h>
 
+#include "camera/perspective_camera.h"
 #include "framebuffer/frame_buffer.h"
 #include "textures/texture.h"
 
@@ -19,12 +20,12 @@ public:
     void on_handle_event(luly::events::base_event& event) override;
 
 private:
-    void setup_triangle();
     void setup_fbo();
+    void setup_camera();
 
-    std::shared_ptr<luly::renderer::vertex_array_object> m_triangle_vao;
     std::shared_ptr<luly::renderer::shader> m_shader;
     std::shared_ptr<luly::renderer::model> m_model;
     std::shared_ptr<luly::renderer::texture> m_texture;
     std::shared_ptr<luly::renderer::frame_buffer> m_fbo;
+    std::shared_ptr<luly::renderer::perspective_camera> m_camera;
 };
