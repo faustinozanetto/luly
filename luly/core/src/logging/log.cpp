@@ -16,12 +16,14 @@ namespace luly::core
             spdlog::sinks::rotating_file_sink_mt>("logs/luly.log", 1048576 * 5, 3);
 
         console_sink->set_pattern("[%H:%M:%S %z] [%n] [thread %t] %v");
+        /*
         console_sink->set_color(spdlog::level::trace, 37); // White
         console_sink->set_color(spdlog::level::debug, 36); // Cyan
         console_sink->set_color(spdlog::level::info, 32); // Green
         console_sink->set_color(spdlog::level::warn, 33); // Yellow
         console_sink->set_color(spdlog::level::err, 31); // Red
         console_sink->set_color(spdlog::level::critical, 1); // Bold Red
+        */
 
         file_sink->set_pattern("[%H:%M:%S %z] [%n] [thread %t] %v");
 
@@ -32,7 +34,6 @@ namespace luly::core
         spdlog::register_logger(s_logger_instance);
         spdlog::set_pattern("%^[%T] %n: %v%$");
         s_logger_instance->set_level(spdlog::level::trace);
-        s_logger_instance->flush_on(spdlog::level::trace);
     }
 
     void log::add_sink(spdlog::sink_ptr& sink)

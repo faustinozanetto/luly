@@ -13,6 +13,8 @@ namespace luly::renderer
         LY_TRACE("Started initializing renderer...");
         initialize_data();
         initialize_glad();
+        initialize_debug();
+        set_clear_color(s_data.clear_color);
 
         glEnable(GL_DEPTH_TEST);
         glFrontFace(GL_CW);
@@ -107,10 +109,16 @@ namespace luly::renderer
         }
     }
 
+    void renderer::bind_texture(int slot, uint32_t handle)
+    {
+        glBindTextureUnit(slot, handle);
+    }
+
     void renderer::initialize_data()
     {
         core::application& application = core::application::get();
         s_data.window = application.get_window();
+        s_data.clear_color = glm::vec4(0.85f);
     }
 
     void renderer::initialize_glad()
@@ -118,6 +126,24 @@ namespace luly::renderer
         const int glad_initialize_status = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
         LY_ASSERT_MSG(glad_initialize_status, "Failed to initialize glad!")
         LY_TRACE("Glad initialized successfully!");
+
+        auto renderer = (const char*)glGetString(GL_RENDERER);
+        auto version = (const char*)glGetString(GL_VERSION);
+        auto vendor = (const char*)glGetString(GL_VENDOR);
+        auto glsl_version = (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
+
+        LY_TRACE("OpenGL information:");
+        LY_TRACE(" - Renderer: {0}", renderer);
+        LY_TRACE(" - OpenGL version supported: {0}", version);
+        LY_TRACE(" - Vendor: {0}", vendor);
+        LY_TRACE(" - GLSL Version: {0}", glsl_version);
+    }
+
+    void renderer::initialize_debug()
+    {
+        glEnable(GL_DEBUG_OUTPUT);
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+        glDebugMessageCallback(renderer::open_gl_message_callback, nullptr);
     }
 
     uint32_t renderer::get_renderer_draw_mode_to_opengl(renderer_draw_mode draw_mode)
@@ -141,5 +167,39 @@ namespace luly::renderer
         }
         LY_ASSERT_MSG(false, "Unknown renderer draw mode!");
         return -1;
+    }
+
+    void renderer::open_gl_message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
+    {
+        switch (severity)
+        {
+        case GL_DEBUG_SEVERITY_HIGH: {
+            LY_CRITICAL("OpenGL Debug Message (High Severity)");
+            break;
+        }
+        case GL_DEBUG_SEVERITY_MEDIUM: {
+            LY_WARN("OpenGL Debug Message (Medium Severity)");
+            break;
+        }
+        case GL_DEBUG_SEVERITY_LOW: {
+            LY_INFO("OpenGL Debug Message (Low Severity)");
+            break;
+        }
+        case GL_DEBUG_SEVERITY_NOTIFICATION: {
+            LY_TRACE("OpenGL Debug Message (Notification)");
+            break;
+        }
+        default: {
+            LY_ERROR("Unknown OpenGL Debug Message Severity");
+            break;
+        }
+        }
+
+        LY_INFO("   - Source: 0x{:X}", source);
+        LY_INFO("   - Type: 0x{:X}", type);
+        LY_INFO("   - ID: {}", id);
+        LY_INFO("   - Severity: 0x{:X}", severity);
+        LY_INFO("   - Message Length: {}", length);
+        LY_INFO("   - Message: {}", message);
     }
 }

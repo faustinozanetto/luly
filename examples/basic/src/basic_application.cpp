@@ -29,7 +29,7 @@ basic_application::~basic_application()
 void basic_application::on_update()
 {
     m_shader->bind();
-    glBindTextureUnit(0, m_texture->get_handle_id());
+    luly::renderer::renderer::bind_texture(0, m_texture->get_handle_id());
     m_shader->set_mat4("u_view_matrix", m_camera->get_view_matrix());
     m_shader->set_mat4("u_projection_matrix", m_camera->get_projection_matrix());
     luly::renderer::renderer::submit_model(m_model);
