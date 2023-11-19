@@ -14,6 +14,7 @@
 
 #include "log/engine_ui_sink.h"
 #include "panels/console/console_panel.h"
+#include "panels/menubar/menubar_panel.h"
 #include "panels/profiling/profiling_panel.h"
 #include "panels/viewport/viewport_panel.h"
 
@@ -139,6 +140,9 @@ namespace luly::ui
 
     void engine_ui::initialize_panels()
     {
+        const auto& ui_menubar_panel = std::make_shared<menubar_panel>();
+        s_engine_ui_data.panels.push_back(ui_menubar_panel);
+        
         const auto& ui_console_panel = std::make_shared<console_panel>();
         s_engine_ui_data.panels.push_back(ui_console_panel);
 

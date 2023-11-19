@@ -11,10 +11,11 @@ layout (location = 0) out vec2 o_tex_coord;
 layout (location = 1) out vec3 o_normals;
 
 layout (location = 0) uniform mat4 u_view_matrix;    
-layout (location = 1) uniform mat4 u_projection_matrix;    
+layout (location = 1) uniform mat4 u_projection_matrix;
+layout (location = 3) uniform mat4 u_model_matrix;
 
 void main() {
-    vec4 view_pos = u_projection_matrix * u_view_matrix * vec4(a_pos, 1.0);
+    vec4 view_pos = u_projection_matrix * u_view_matrix * u_model_matrix * vec4(a_pos, 1.0);
     o_tex_coord = a_tex_coord;
     o_normals = a_normals;
     gl_Position = view_pos;
