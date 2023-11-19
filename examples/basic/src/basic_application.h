@@ -22,6 +22,7 @@ public:
 private:
     void setup_fbo();
     void setup_camera();
+    void setup_scene();
 
     std::shared_ptr<luly::renderer::shader> m_shader;
     std::shared_ptr<luly::renderer::model> m_model;

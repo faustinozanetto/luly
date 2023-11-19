@@ -16,6 +16,7 @@
 #include "panels/console/console_panel.h"
 #include "panels/menubar/menubar_panel.h"
 #include "panels/profiling/profiling_panel.h"
+#include "panels/scene/scene_hierarchy_panel.h"
 #include "panels/viewport/viewport_panel.h"
 
 namespace luly::ui
@@ -142,7 +143,7 @@ namespace luly::ui
     {
         const auto& ui_menubar_panel = std::make_shared<menubar_panel>();
         s_engine_ui_data.panels.push_back(ui_menubar_panel);
-        
+
         const auto& ui_console_panel = std::make_shared<console_panel>();
         s_engine_ui_data.panels.push_back(ui_console_panel);
 
@@ -151,6 +152,9 @@ namespace luly::ui
 
         const auto& ui_profiling_panel = std::make_shared<profiling_panel>();
         s_engine_ui_data.panels.push_back(ui_profiling_panel);
+
+        const auto& ui_scene_hierarchy_panel = std::make_shared<scene_hierarchy_panel>();
+        s_engine_ui_data.panels.push_back(ui_scene_hierarchy_panel);
     }
 
     void engine_ui::initialize_log_sink()

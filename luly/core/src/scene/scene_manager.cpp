@@ -16,4 +16,9 @@ namespace luly::scene
     {
         m_scenes_pool.insert(scene);
     }
+
+    void scene_manager::switch_scene(const std::shared_ptr<scene>& scene)
+    {
+        m_current_scene = scene;
+    }
 }

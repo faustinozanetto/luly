@@ -9,6 +9,7 @@
 #include "shaders/shader.h"
 #include "shaders/shader_factory.h"
 #include "textures/texture_factory.h"
+#include "scene/scene.h"
 #include "time/engine_time.h"
 
 basic_application::basic_application(const luly::renderer::window_specification& window_specification) : application(
@@ -22,6 +23,7 @@ basic_application::basic_application(const luly::renderer::window_specification&
     m_texture = luly::renderer::texture_factory::create_texture_from_file("assets/textures/gameboy.png");
     setup_fbo();
     setup_camera();
+    setup_scene();
     luly::ui::engine_ui::set_render_target(m_fbo->get_attachment_id(0));
 }
 
@@ -36,7 +38,7 @@ void basic_application::on_update()
     m_shader->bind();
     luly::renderer::renderer::bind_texture(0, m_texture->get_handle_id());
     glm::mat4 model = glm::mat4(1.0f);
-    model = glm::rotate(model, luly::time::get_time(), glm::vec3(0,1,0));
+    model = glm::rotate(model, luly::time::get_time(), glm::vec3(0, 1, 0));
     m_shader->set_mat4("u_model_matrix", model);
     m_shader->set_mat4("u_view_matrix", m_camera->get_view_matrix());
     m_shader->set_mat4("u_projection_matrix", m_camera->get_projection_matrix());
@@ -75,6 +77,16 @@ void basic_application::setup_camera()
 {
     m_camera = std::make_shared<luly::renderer::perspective_camera>(45.0f);
     m_camera->set_position({0, 0, 3.0f});
+}
+
+void basic_application::setup_scene()
+{
+    const auto& scene = std::make_shared<luly::scene::scene>("Test Scene");
+    get_scene_manager()->add_scene(scene);
+    get_scene_manager()->switch_scene(scene);
+
+    auto actor = scene->create_actor("Test Model");
+    
 }
 
 luly::core::application* luly::core::create_application()

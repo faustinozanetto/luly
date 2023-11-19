@@ -15,6 +15,7 @@ namespace luly::scene
 
         /* Methods*/
         void add_scene(const std::shared_ptr<scene>& scene);
+        void switch_scene(const std::shared_ptr<scene>& scene);
 
     private:
         std::set<std::shared_ptr<scene>> m_scenes_pool;
