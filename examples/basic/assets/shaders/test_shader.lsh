@@ -31,5 +31,6 @@ layout (location = 1) in vec3 o_normals;
 layout (location = 2) uniform sampler2D u_texture;
 
 void main() {
-    frag_color = vec4(o_normals,1.0);
+    vec4 color = texture(u_texture, o_tex_coord);
+    frag_color = color;
 }

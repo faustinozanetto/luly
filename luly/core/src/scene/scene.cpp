@@ -2,6 +2,7 @@
 #include "scene.h"
 
 #include "actor/components/name_component.h"
+#include "actor/components/transform_component.h"
 
 namespace luly::scene
 {
@@ -33,6 +34,7 @@ namespace luly::scene
         entt::entity actor_handle = m_actors_registry->create();
         const auto& actor = std::make_shared<scene_actor>(actor_handle, this);
         actor->add_component<name_component>(name);
+        actor->add_component<transform_component>();
         return actor;
     }
 }

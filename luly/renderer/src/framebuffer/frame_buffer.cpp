@@ -123,7 +123,7 @@ namespace luly::renderer
     }
 
     void frame_buffer::attach_color_texture(const frame_buffer_attachment& attachment, uint32_t handle_id,
-                                            int index) const
+                                            unsigned int index) const
     {
         glBindTexture(GL_TEXTURE_2D, handle_id);
         const texture_format format =

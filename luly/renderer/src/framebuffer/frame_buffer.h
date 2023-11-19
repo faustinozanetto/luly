@@ -39,7 +39,7 @@ namespace luly::renderer
         void initialize();
         void cleanup();
 
-        void attach_color_texture(const frame_buffer_attachment& attachment, uint32_t handle_id, int index) const;
+        void attach_color_texture(const frame_buffer_attachment& attachment, uint32_t handle_id, unsigned int index) const;
         void attach_depth_texture(const frame_buffer_attachment& attachment, uint32_t handle_id);
 
         uint32_t m_handle;

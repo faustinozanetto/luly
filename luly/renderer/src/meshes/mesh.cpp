@@ -11,12 +11,11 @@ namespace luly::renderer
 
     void mesh::initialize_buffers()
     {
-        const int vertex_buffer_size = m_vertices.size() * sizeof(mesh_vertex);
-        const int index_buffer_size = m_indices.size() * sizeof(mesh_index);
+        size_t vertex_buffer_size = m_vertices.size() * sizeof(mesh_vertex);
+        size_t index_buffer_size = m_indices.size() * sizeof(mesh_index);
 
         // Create VAO
         m_vao = std::make_shared<vertex_array_object>();
-        m_vao->bind();
 
         // Create VBO
         const std::shared_ptr<vertex_buffer_object>& vertices_vbo = std::make_shared<
@@ -27,6 +26,7 @@ namespace luly::renderer
             element_buffer_object>(m_indices.size());
 
         // Set buffers data
+        m_vao->bind();
         vertices_vbo->bind();
         vertices_vbo->set_data(vertex_buffer_object_usage::static_draw, vertex_buffer_size, m_vertices.data());
 

@@ -26,6 +26,6 @@ namespace luly::renderer
     void element_buffer_object::set_data(int size, const void* data)
     {
         bind();
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
     }
 }

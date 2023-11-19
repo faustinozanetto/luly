@@ -4,6 +4,7 @@
 #include "renderer/renderer.h"
 
 #include <imgui.h>
+#include <imgui_internal.h>
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD
 #include <backends/imgui_impl_opengl3.cpp>
 #include <backends/imgui_impl_glfw.cpp>
@@ -11,13 +12,26 @@
 #include <logging/log.h>
 #include <utils/assert.h>
 
+#include "log/engine_ui_sink.h"
+#include "panels/console/console_panel.h"
+#include "panels/viewport/viewport_panel.h"
+
 namespace luly::ui
 {
+    static engine_ui_data s_engine_ui_data;
+
     void engine_ui::initialize()
     {
         LY_TRACE("Engine UI initialization started...");
         initialize_imgui();
+        initialize_panels();
+        initialize_log_sink();
         LY_TRACE("Engine UI initialized successfully.");
+    }
+
+    engine_ui_data& engine_ui::get_ui_data()
+    {
+        return s_engine_ui_data;
     }
 
     void engine_ui::set_color_scheme()
@@ -122,16 +136,69 @@ namespace luly::ui
         ImGui_ImplOpenGL3_Init("#version 450");
     }
 
+    void engine_ui::initialize_panels()
+    {
+        const auto& ui_console_panel = std::make_shared<console_panel>();
+        s_engine_ui_data.panels.push_back(ui_console_panel);
+
+        const auto& ui_viewport_panel = std::make_shared<viewport_panel>();
+        s_engine_ui_data.panels.push_back(ui_viewport_panel);
+    }
+
+    void engine_ui::initialize_log_sink()
+    {
+        spdlog::sink_ptr imgui_sink = std::make_shared<engine_ui_sink<std::mutex>>();
+        core::log::add_sink(imgui_sink);
+    }
+
+    void engine_ui::begin_dockspace()
+    {
+        static bool open = true;
+        static ImGuiDockNodeFlags opt_flags = ImGuiDockNodeFlags_NoWindowMenuButton | ImGuiDockNodeFlags_NoCloseButton;
+        ImGuiViewport* viewport = ImGui::GetMainViewport();
+        const float toolbar_height = ImGui::GetFrameHeight();
+        ImGui::SetNextWindowPos({viewport->Pos.x, viewport->Pos.y + toolbar_height});
+        ImGui::SetNextWindowSize({viewport->Size.x, viewport->Size.y - toolbar_height});
+        ImGui::SetNextWindowViewport(viewport->ID);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+
+        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDocking;
+        window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize |
+            ImGuiWindowFlags_NoMove;
+        window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+        ImGui::Begin("DockSpace", &open, window_flags);
+        ImGui::PopStyleVar(3);
+
+        const ImGuiID dockspace_id = ImGui::GetID("Dockspace");
+        const ImGuiIO& io = ImGui::GetIO();
+        if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
+        {
+            ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), opt_flags);
+        }
+    }
+
+    void engine_ui::end_dockspace()
+    {
+        ImGui::End();
+    }
+
     void engine_ui::begin_frame()
     {
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+
+        begin_dockspace();
     }
 
     void engine_ui::end_frame()
     {
+        end_dockspace();
+
         // Rendering
         ImGuiIO& io = ImGui::GetIO();
         io.DisplaySize = ImVec2(static_cast<float>(renderer::renderer::get_viewport_size().x),
@@ -147,6 +214,19 @@ namespace luly::ui
             ImGui::UpdatePlatformWindows();
             ImGui::RenderPlatformWindowsDefault();
             glfwMakeContextCurrent(backup_current_context);
+        }
+    }
+
+    void engine_ui::set_render_target(uint32_t render_target)
+    {
+        s_engine_ui_data.render_target = render_target;
+    }
+
+    void engine_ui::on_update()
+    {
+        for (const auto& ui_panel : s_engine_ui_data.panels)
+        {
+            ui_panel->on_render_panel();
         }
     }
 }

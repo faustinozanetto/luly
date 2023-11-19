@@ -15,12 +15,14 @@ project "basic"
         "src",
         "%{_WORKING_DIR}/luly/core/src",
         "%{_WORKING_DIR}/luly/renderer/src",
+        "%{_WORKING_DIR}/luly/ui/src",
         "%{include_dirs.glfw}",
         "%{include_dirs.glad}",
         "%{include_dirs.glm}",
         "%{include_dirs.spdlog}",
         "%{include_dirs.assimp}",
         "%{include_dirs.entt}",
+        "%{include_dirs.imgui}",
     }
     
     links {
