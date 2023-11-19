@@ -1,6 +1,8 @@
 ﻿#pragma once
 
 #include "scene/scene.h"
+#include "utils/assert.h"
+#include "logging/log.h"
 
 #include <entt/entt.hpp>
 

@@ -17,6 +17,7 @@
 #include "panels/menubar/menubar_panel.h"
 #include "panels/profiling/profiling_panel.h"
 #include "panels/scene/scene_hierarchy_panel.h"
+#include "panels/scene/actor/actor_details_panel.h"
 #include "panels/viewport/viewport_panel.h"
 
 namespace luly::ui
@@ -155,6 +156,9 @@ namespace luly::ui
 
         const auto& ui_scene_hierarchy_panel = std::make_shared<scene_hierarchy_panel>();
         s_engine_ui_data.panels.push_back(ui_scene_hierarchy_panel);
+
+        const auto& ui_actor_details_panel = std::make_shared<actor_details_panel>();
+        s_engine_ui_data.panels.push_back(ui_actor_details_panel);
     }
 
     void engine_ui::initialize_log_sink()
@@ -232,6 +236,11 @@ namespace luly::ui
     void engine_ui::set_render_target(uint32_t render_target)
     {
         s_engine_ui_data.render_target = render_target;
+    }
+
+    void engine_ui::set_selected_actor(const std::shared_ptr<scene::scene_actor>& selected_actor)
+    {
+        s_engine_ui_data.selected_actor = selected_actor;
     }
 
     void engine_ui::on_update()

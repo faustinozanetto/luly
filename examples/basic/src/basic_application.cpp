@@ -18,9 +18,9 @@ basic_application::basic_application(const luly::renderer::window_specification&
     m_shader = luly::renderer::shader_factory::create_shader_from_file(
         "assets/shaders/test_shader.lsh");
 
-    m_model = luly::renderer::model_factory::create_model_from_file("assets/models/gameboy.obj");
+    m_model = luly::renderer::model_factory::create_model_from_file("assets/models/shaylushai.obj");
 
-    m_texture = luly::renderer::texture_factory::create_texture_from_file("assets/textures/gameboy.png");
+    m_texture = luly::renderer::texture_factory::create_texture_from_file("assets/textures/shaylushai.jpg");
     setup_fbo();
     setup_camera();
     setup_scene();
@@ -76,7 +76,7 @@ void basic_application::setup_fbo()
 void basic_application::setup_camera()
 {
     m_camera = std::make_shared<luly::renderer::perspective_camera>(45.0f);
-    m_camera->set_position({0, 0, 3.0f});
+    m_camera->set_position({0, 1, 3.0f});
 }
 
 void basic_application::setup_scene()

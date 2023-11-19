@@ -1,5 +1,6 @@
 ﻿#include "scene_hierarchy_panel.h"
 
+#include "engine_ui.h"
 #include "application/application.h"
 #include "scene/scene_manager.h"
 #include "scene/actor/components/name_component.h"
@@ -50,7 +51,7 @@ namespace luly::ui
                 // Selection of actor
                 if (ImGui::IsItemClicked())
                 {
-                    const scene::scene_actor selected_actor = {actor_handle, current_scene.get()};
+                    engine_ui::set_selected_actor(current_scene->get_actor(actor_handle));
                 }
 
                 if (open)

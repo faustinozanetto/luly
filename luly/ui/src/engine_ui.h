@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "panels/ui_panel.h"
+#include "scene/actor/scene_actor.h"
 
 #include <memory>
 #include <vector>
@@ -11,6 +12,7 @@ namespace luly::ui
     {
         uint32_t render_target;
         std::vector<std::shared_ptr<ui_panel>> panels;
+        std::shared_ptr<scene::scene_actor> selected_actor;
     };
 
     class engine_ui
@@ -26,6 +28,7 @@ namespace luly::ui
         static void end_frame();
 
         static void set_render_target(uint32_t render_target);
+        static void set_selected_actor(const std::shared_ptr<scene::scene_actor>& selected_actor);
 
         static void on_update();
 
