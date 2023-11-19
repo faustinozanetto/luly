@@ -31,6 +31,7 @@ namespace luly::core
 
         std::shared_ptr<renderer::window> m_window;
         std::shared_ptr<scene::scene_manager> m_scene_manager;
+        float m_frame_delay;
 
         friend int ::main(int argc, char** argv);
         static application* s_instance;
