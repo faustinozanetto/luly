@@ -14,6 +14,7 @@
 
 #include "log/engine_ui_sink.h"
 #include "panels/console/console_panel.h"
+#include "panels/profiling/profiling_panel.h"
 #include "panels/viewport/viewport_panel.h"
 
 namespace luly::ui
@@ -143,6 +144,9 @@ namespace luly::ui
 
         const auto& ui_viewport_panel = std::make_shared<viewport_panel>();
         s_engine_ui_data.panels.push_back(ui_viewport_panel);
+
+        const auto& ui_profiling_panel = std::make_shared<profiling_panel>();
+        s_engine_ui_data.panels.push_back(ui_profiling_panel);
     }
 
     void engine_ui::initialize_log_sink()

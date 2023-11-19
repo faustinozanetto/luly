@@ -56,13 +56,13 @@ void basic_application::setup_fbo()
             luly::renderer::texture_wrapping::clamp_to_edge, viewport_size
         },
     };
-    
+
     luly::renderer::frame_buffer_attachment depth_attachment = {
         luly::renderer::texture_internal_format::depth_component32f,
         luly::renderer::texture_filtering::linear,
         luly::renderer::texture_wrapping::clamp_to_edge, viewport_size
     };
-    
+
     m_fbo = std::make_shared<luly::renderer::frame_buffer>(
         viewport_size.x, viewport_size.y, attachments, depth_attachment);
 }

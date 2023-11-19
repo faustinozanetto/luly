@@ -49,6 +49,11 @@ namespace luly::renderer
         return glm::ivec2(s_data.window->get_data().width, s_data.window->get_data().height);
     }
 
+    void renderer::set_vsync_enabled(bool vsync_enabled)
+    {
+        glfwSwapInterval(vsync_enabled ? 1 : 0);
+    }
+
     void renderer::submit_arrays(int count, renderer_draw_mode draw_mode)
     {
         glDrawArrays(get_renderer_draw_mode_to_opengl(draw_mode), 0, count);
