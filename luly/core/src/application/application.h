@@ -9,6 +9,8 @@
 // Entry point used in applications.
 int main(int argc, char** argv);
 
+#define BIND_EVENT_FN(fn) [this](auto &&...args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
+
 namespace luly::core
 {
     class application
@@ -28,6 +30,7 @@ namespace luly::core
 
     private:
         void run();
+        void on_event(events::base_event& event);
 
         std::shared_ptr<renderer::window> m_window;
         std::shared_ptr<scene::scene_manager> m_scene_manager;

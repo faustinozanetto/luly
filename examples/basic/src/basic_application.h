@@ -6,7 +6,9 @@
 #include <shaders/shader.h>
 #include <models/model.h>
 
-#include "camera/perspective_camera.h"
+#include "camera/perspective/perspective_camera.h"
+#include "camera/perspective/perspective_camera_controller.h"
+#include "events/key/key_pressed_event.h"
 #include "framebuffer/frame_buffer.h"
 #include "textures/texture.h"
 
@@ -18,6 +20,7 @@ public:
 
     void on_update() override;
     void on_handle_event(luly::events::base_event& event) override;
+    bool on_key_pressed_event(const luly::events::key_pressed_event &key_pressed_event) const;
 
 private:
     void setup_fbo();
@@ -30,4 +33,5 @@ private:
     std::shared_ptr<luly::renderer::frame_buffer> m_fbo;
     std::shared_ptr<luly::scene::scene_actor> m_actor;
     std::shared_ptr<luly::renderer::perspective_camera> m_camera;
+    std::shared_ptr<luly::renderer::perspective_camera_controller> m_camera_controller;
 };

@@ -31,7 +31,7 @@ namespace luly::ui
         }
 
         auto rotation = glm::vec3(glm::eulerAngles(transform->get_rotation()));
-        if (ui_utils::draw_property("Rotation", rotation, -2 * glm::pi<float>(), 2 * glm::pi<float>(), 0.05f))
+        if (ui_utils::draw_property("Rotation", rotation, -4 * glm::pi<float>(), 4 * glm::pi<float>(), 0.01f))
         {
             const glm::quat pitch = glm::angleAxis(rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
             const glm::quat yaw = glm::angleAxis(rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));

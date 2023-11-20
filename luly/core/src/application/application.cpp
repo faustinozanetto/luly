@@ -17,6 +17,7 @@ namespace luly::core
 
         LY_TRACE("Started creating application...");
         m_window = std::make_shared<renderer::window>(window_specification);
+        m_window->set_event_function(BIND_EVENT_FN(application::on_event));
         renderer::renderer::initialize();
         ui::engine_ui::initialize();
 
@@ -59,5 +60,10 @@ namespace luly::core
             renderer::renderer::poll_input();
             renderer::renderer::swap_buffers();
         }
+    }
+
+    void application::on_event(events::base_event& event)
+    {
+        on_handle_event(event);
     }
 }

@@ -1,5 +1,6 @@
 ﻿#pragma once
-#include "camera.h"
+
+#include "camera/camera.h"
 
 namespace luly::renderer
 {

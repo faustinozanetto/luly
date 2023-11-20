@@ -79,9 +79,6 @@ namespace luly::renderer
             data.width = width;
             data.height = height;
 
-            // Dispatch event.
-            if (!data.event_func) return;
-
             events::window_resize_event event({width, height});
             data.event_func(event);
         });
@@ -90,7 +87,6 @@ namespace luly::renderer
         glfwSetKeyCallback(m_handle, [](GLFWwindow* window, int key, int scancode, int action, int mods)
         {
             const window_data& data = *static_cast<window_data*>(glfwGetWindowUserPointer(window));
-            if (!data.event_func) return;
 
             switch (action)
             {
@@ -119,7 +115,6 @@ namespace luly::renderer
         glfwSetMouseButtonCallback(m_handle, [](GLFWwindow* window, int button, int action, int mods)
         {
             const window_data& data = *static_cast<window_data*>(glfwGetWindowUserPointer(window));
-            if (!data.event_func) return;
 
             switch (action)
             {
@@ -142,7 +137,6 @@ namespace luly::renderer
         glfwSetScrollCallback(m_handle, [](GLFWwindow* window, double x_offset, double y_offset)
         {
             const window_data& data = *static_cast<window_data*>(glfwGetWindowUserPointer(window));
-            if (!data.event_func) return;
 
             events::mouse_scrolled_event event(static_cast<float>(x_offset), static_cast<float>(y_offset));
             data.event_func(event);
@@ -152,7 +146,6 @@ namespace luly::renderer
         glfwSetCursorPosCallback(m_handle, [](GLFWwindow* window, double x_pos, double y_pos)
         {
             const window_data& data = *static_cast<window_data*>(glfwGetWindowUserPointer(window));
-            if (!data.event_func) return;
 
             events::mouse_moved_event event(static_cast<float>(x_pos), static_cast<float>(y_pos));
             data.event_func(event);
