@@ -10,6 +10,7 @@
 #include "shaders/shader_factory.h"
 #include "textures/texture_factory.h"
 #include "scene/scene.h"
+#include "scene/actor/components/model_renderer_component.h"
 #include "time/engine_time.h"
 
 basic_application::basic_application(const luly::renderer::window_specification& window_specification) : application(
@@ -41,7 +42,7 @@ void basic_application::on_update()
                        m_actor->get_component<luly::scene::transform_component>().get_transform()->get_transform());
     m_shader->set_mat4("u_view_matrix", m_camera->get_view_matrix());
     m_shader->set_mat4("u_projection_matrix", m_camera->get_projection_matrix());
-    luly::renderer::renderer::submit_model(m_model);
+    luly::renderer::renderer::submit_model(m_actor->get_component<luly::scene::model_renderer_component>().get_model());
     m_shader->un_bind();
     m_fbo->un_bind();
 }
@@ -131,6 +132,7 @@ void basic_application::setup_scene()
     get_scene_manager()->switch_scene(scene);
 
     m_actor = scene->create_actor("Test Model");
+    m_actor->add_component<luly::scene::model_renderer_component>(m_model);
 }
 
 luly::core::application* luly::core::create_application()

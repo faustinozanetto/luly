@@ -1,6 +1,5 @@
 ﻿#include "actor_component_panel.h"
 
-#include <scene/scene_manager.h>
 #include <imgui_internal.h>
 
 #include "application/application.h"
@@ -34,12 +33,24 @@ namespace luly::ui
         ImGui::Separator();
         bool open = ImGui::TreeNodeEx(reinterpret_cast<void*>(component_hash), component_flags,
                                       m_component_name.c_str());
-        //  ImGui::PopStyleVar();
+        ImGui::PopStyleVar();
         ImGui::SameLine(available_region.x - line_height * 0.5f);
-        // Settings
+
+        // Settings Popup Open
         if (ImGui::Button("+", ImVec2{line_height, line_height}))
         {
             ImGui::OpenPopup("Settings");
+        }
+
+        // Render settings popup
+        bool should_remove_component = false;
+        if (ImGui::BeginPopup("Settings"))
+        {
+            if (ImGui::MenuItem("Remove Component"))
+            {
+                should_remove_component = true;
+            }
+            ImGui::EndPopup();
         }
 
         // Render actual component details
@@ -48,6 +59,5 @@ namespace luly::ui
             on_render_component_details();
             ImGui::TreePop();
         }
-        ImGui::PopStyleVar();
     }
 }

@@ -6,6 +6,24 @@
 
 namespace luly::ui
 {
+    void ui_utils::draw_property(const std::string& name, const std::string& content)
+    {
+        ImGui::PushID(name.c_str());
+        // Name
+        ImGui::AlignTextToFramePadding();
+        ImGui::Columns(2);
+        ImGui::PushItemWidth(-1);
+        ImGui::TextUnformatted(name.c_str());
+        ImGui::NextColumn();
+
+        // Content
+        ImGui::Text(content.c_str());
+
+        // Reset
+        ImGui::Columns(1);
+        ImGui::PopID();
+    }
+
     bool ui_utils::draw_property(const std::string& name, glm::vec2& value, float min, float max,
                                  float step, float reset_value)
     {

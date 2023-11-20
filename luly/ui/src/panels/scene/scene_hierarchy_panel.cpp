@@ -18,6 +18,7 @@ namespace luly::ui
     void scene_hierarchy_panel::on_render_panel()
     {
         const auto& current_scene = core::application::get().get_scene_manager()->get_current_scene();
+        const auto& current_actor = engine_ui::get_ui_data().selected_actor;
 
         ImGui::Begin("Hierarchy", &m_show);
         if (current_scene)
@@ -43,10 +44,15 @@ namespace luly::ui
                 const auto& name_component = current_scene->get_registry()->get<scene::name_component>(
                     actor_handle);
 
-                ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
+                const bool is_current_actor_selected = current_actor != nullptr && current_actor->get_handle() ==
+                    actor_handle;
+                ImGuiTreeNodeFlags flags = (is_current_actor_selected
+                                                ? ImGuiTreeNodeFlags_Selected
+                                                : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_FramePadding;
                 flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
-                bool open = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)actor_handle, flags,
-                                              name_component.get_name().c_str());
+                const bool open = ImGui::TreeNodeEx(
+                    reinterpret_cast<void*>(static_cast<uint64_t>(static_cast<uint32_t>(actor_handle))), flags,
+                    name_component.get_name().c_str());
 
                 // Selection of actor
                 if (ImGui::IsItemClicked())
