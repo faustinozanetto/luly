@@ -37,9 +37,8 @@ void basic_application::on_update()
     luly::renderer::renderer::clear_screen();
     m_shader->bind();
     luly::renderer::renderer::bind_texture(0, m_texture->get_handle_id());
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::rotate(model, luly::time::get_time(), glm::vec3(0, 1, 0));
-    m_shader->set_mat4("u_model_matrix", model);
+    m_shader->set_mat4("u_model_matrix",
+                       m_actor->get_component<luly::scene::transform_component>().get_transform()->get_transform());
     m_shader->set_mat4("u_view_matrix", m_camera->get_view_matrix());
     m_shader->set_mat4("u_projection_matrix", m_camera->get_projection_matrix());
     luly::renderer::renderer::submit_model(m_model);
@@ -85,8 +84,7 @@ void basic_application::setup_scene()
     get_scene_manager()->add_scene(scene);
     get_scene_manager()->switch_scene(scene);
 
-    auto actor = scene->create_actor("Test Model");
-    
+    m_actor = scene->create_actor("Test Model");
 }
 
 luly::core::application* luly::core::create_application()

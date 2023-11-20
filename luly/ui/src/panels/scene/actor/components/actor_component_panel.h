@@ -12,6 +12,7 @@ namespace luly::ui
         actor_component_panel(const std::string& component_name);
         ~actor_component_panel() override;
 
+        /* Overrides */
         void on_render_panel() override;
 
         virtual void on_render_component_details() = 0;

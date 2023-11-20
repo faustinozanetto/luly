@@ -28,5 +28,6 @@ private:
     std::shared_ptr<luly::renderer::model> m_model;
     std::shared_ptr<luly::renderer::texture> m_texture;
     std::shared_ptr<luly::renderer::frame_buffer> m_fbo;
+    std::shared_ptr<luly::scene::scene_actor> m_actor;
     std::shared_ptr<luly::renderer::perspective_camera> m_camera;
 };

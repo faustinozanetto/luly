@@ -2,6 +2,7 @@
 
 #include "engine_ui.h"
 #include "components/common/actor_name_component_panel.h"
+#include "components/common/actor_transform_component_panel.h"
 
 namespace luly::ui
 {
@@ -35,5 +36,6 @@ namespace luly::ui
     {
         /* Common Components*/
         m_component_panels.push_back(std::make_shared<actor_name_component_panel>());
+        m_component_panels.push_back(std::make_shared<actor_transform_component_panel>());
     }
 }
