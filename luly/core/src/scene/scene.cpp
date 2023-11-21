@@ -14,6 +14,7 @@ namespace luly::scene
         LY_TRACE("  - Name: '{}'", m_name);
 
         m_actors_registry = std::make_unique<entt::registry>();
+        m_camera_manager = std::make_shared<renderer::camera_manager>();
 
         LY_TRACE("Scene created successfully!");
     }

@@ -117,6 +117,6 @@ namespace luly::renderer
             }
         }
 
-        return std::make_shared<mesh>(vertices, indices);
+        return std::make_shared<mesh>(assimp_mesh->mName.C_Str(), vertices, indices);
     }
 }

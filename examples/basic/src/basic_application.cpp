@@ -23,7 +23,6 @@ basic_application::basic_application(const luly::renderer::window_specification&
 
     m_texture = luly::renderer::texture_factory::create_texture_from_file("assets/textures/gameboy.png");
     setup_fbo();
-    setup_camera();
     setup_scene();
     luly::ui::engine_ui::set_render_target(m_fbo->get_attachment_id(0));
 }
@@ -34,14 +33,18 @@ basic_application::~basic_application()
 
 void basic_application::on_update()
 {
+    if (!get_scene_manager()->get_current_scene()) return;
+
+    auto& camera = get_scene_manager()->get_current_scene()->get_camera_manager()->get_perspective_camera();
+
     m_fbo->bind();
     luly::renderer::renderer::clear_screen();
     m_shader->bind();
     luly::renderer::renderer::bind_texture(0, m_texture->get_handle_id());
     m_shader->set_mat4("u_model_matrix",
                        m_actor->get_component<luly::scene::transform_component>().get_transform()->get_transform());
-    m_shader->set_mat4("u_view_matrix", m_camera->get_view_matrix());
-    m_shader->set_mat4("u_projection_matrix", m_camera->get_projection_matrix());
+    m_shader->set_mat4("u_view_matrix", camera->get_view_matrix());
+    m_shader->set_mat4("u_projection_matrix", camera->get_projection_matrix());
     luly::renderer::renderer::submit_model(m_actor->get_component<luly::scene::model_renderer_component>().get_model());
     m_shader->un_bind();
     m_fbo->un_bind();
@@ -53,41 +56,46 @@ void basic_application::on_handle_event(luly::events::base_event& event)
     dispatcher.dispatch<luly::events::key_pressed_event>(BIND_EVENT_FN(basic_application::on_key_pressed_event));
 }
 
-bool basic_application::on_key_pressed_event(const luly::events::key_pressed_event& key_pressed_event) const
+bool basic_application::on_key_pressed_event(const luly::events::key_pressed_event& key_pressed_event)
 {
+    if (!get_scene_manager()->get_current_scene()) return false;
+
+    auto& camera_controller = get_scene_manager()->get_current_scene()->get_camera_manager()->
+                                                   get_perspective_camera_controller();
+
     if (key_pressed_event.get_key_code() == luly::input::key::w)
     {
-        m_camera_controller->process_keyboard_input(
+        camera_controller->process_keyboard_input(
             luly::renderer::camera_keyboard_direction::forward);
         return true;
     }
     if (key_pressed_event.get_key_code() == luly::input::key::s)
     {
-        m_camera_controller->process_keyboard_input(
+        camera_controller->process_keyboard_input(
             luly::renderer::camera_keyboard_direction::backward);
         return true;
     }
     if (key_pressed_event.get_key_code() == luly::input::key::a)
     {
-        m_camera_controller->process_keyboard_input(
+        camera_controller->process_keyboard_input(
             luly::renderer::camera_keyboard_direction::left);
         return true;
     }
     if (key_pressed_event.get_key_code() == luly::input::key::d)
     {
-        m_camera_controller->process_keyboard_input(
+        camera_controller->process_keyboard_input(
             luly::renderer::camera_keyboard_direction::right);
         return true;
     }
     if (key_pressed_event.get_key_code() == luly::input::key::e)
     {
-        m_camera_controller->process_keyboard_input(
+        camera_controller->process_keyboard_input(
             luly::renderer::camera_keyboard_direction::down);
         return true;
     }
     if (key_pressed_event.get_key_code() == luly::input::key::q)
     {
-        m_camera_controller->process_keyboard_input(
+        camera_controller->process_keyboard_input(
             luly::renderer::camera_keyboard_direction::up);
         return true;
     }
@@ -115,14 +123,6 @@ void basic_application::setup_fbo()
 
     m_fbo = std::make_shared<luly::renderer::frame_buffer>(
         viewport_size.x, viewport_size.y, attachments, depth_attachment);
-}
-
-void basic_application::setup_camera()
-{
-    m_camera = std::make_shared<luly::renderer::perspective_camera>(45.0f);
-    m_camera->set_position({0, 1, 3.0f});
-
-    m_camera_controller = std::make_shared<luly::renderer::perspective_camera_controller>(m_camera);
 }
 
 void basic_application::setup_scene()

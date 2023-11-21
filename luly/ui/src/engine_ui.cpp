@@ -13,6 +13,7 @@
 #include <utils/assert.h>
 
 #include "log/engine_ui_sink.h"
+#include "panels/camera/camera_panel.h"
 #include "panels/console/console_panel.h"
 #include "panels/menubar/menubar_panel.h"
 #include "panels/profiling/profiling_panel.h"
@@ -142,23 +143,13 @@ namespace luly::ui
 
     void engine_ui::initialize_panels()
     {
-        const auto& ui_menubar_panel = std::make_shared<menubar_panel>();
-        s_engine_ui_data.panels.push_back(ui_menubar_panel);
-
-        const auto& ui_console_panel = std::make_shared<console_panel>();
-        s_engine_ui_data.panels.push_back(ui_console_panel);
-
-        const auto& ui_viewport_panel = std::make_shared<viewport_panel>();
-        s_engine_ui_data.panels.push_back(ui_viewport_panel);
-
-        const auto& ui_profiling_panel = std::make_shared<profiling_panel>();
-        s_engine_ui_data.panels.push_back(ui_profiling_panel);
-
-        const auto& ui_scene_hierarchy_panel = std::make_shared<scene_hierarchy_panel>();
-        s_engine_ui_data.panels.push_back(ui_scene_hierarchy_panel);
-
-        const auto& ui_actor_details_panel = std::make_shared<actor_details_panel>();
-        s_engine_ui_data.panels.push_back(ui_actor_details_panel);
+        s_engine_ui_data.panels.push_back(std::make_shared<menubar_panel>());
+        s_engine_ui_data.panels.push_back(std::make_shared<console_panel>());
+        s_engine_ui_data.panels.push_back(std::make_shared<viewport_panel>());
+        s_engine_ui_data.panels.push_back(std::make_shared<profiling_panel>());
+        s_engine_ui_data.panels.push_back(std::make_shared<scene_hierarchy_panel>());
+        s_engine_ui_data.panels.push_back(std::make_shared<actor_details_panel>());
+        s_engine_ui_data.panels.push_back(std::make_shared<camera_panel>());
     }
 
     void engine_ui::initialize_log_sink()

@@ -22,16 +22,19 @@ namespace luly::renderer
     class mesh
     {
     public:
-        mesh(const std::vector<mesh_vertex>& vertices, const std::vector<mesh_index>& indices);
+        mesh(const std::string& name, const std::vector<mesh_vertex>& vertices, const std::vector<mesh_index>& indices);
 
         /* Getters */
         const std::shared_ptr<vertex_array_object>& get_vao() const { return m_vao; }
         const std::vector<mesh_vertex>& get_vertices() const { return m_vertices; }
         const std::vector<mesh_index>& get_indices() const { return m_indices; }
+        const std::string& get_name() const { return m_name; }
 
     private:
         void initialize_buffers();
-        
+
+        std::string m_name;
+
         std::shared_ptr<vertex_array_object> m_vao;
         std::vector<mesh_vertex> m_vertices;
         std::vector<mesh_index> m_indices;

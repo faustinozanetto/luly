@@ -2,8 +2,10 @@
 
 namespace luly::renderer
 {
-    mesh::mesh(const std::vector<mesh_vertex>& vertices, const std::vector<mesh_index>& indices)
+    mesh::mesh(const std::string& name, const std::vector<mesh_vertex>& vertices,
+               const std::vector<mesh_index>& indices)
     {
+        m_name = name;
         m_vertices = vertices;
         m_indices = indices;
         initialize_buffers();
@@ -11,8 +13,8 @@ namespace luly::renderer
 
     void mesh::initialize_buffers()
     {
-        size_t vertex_buffer_size = m_vertices.size() * sizeof(mesh_vertex);
-        size_t index_buffer_size = m_indices.size() * sizeof(mesh_index);
+        const size_t vertex_buffer_size = m_vertices.size() * sizeof(mesh_vertex);
+        const size_t index_buffer_size = m_indices.size() * sizeof(mesh_index);
 
         // Create VAO
         m_vao = std::make_shared<vertex_array_object>();

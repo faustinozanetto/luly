@@ -23,13 +23,15 @@ namespace luly::ui
         /* Getters */
         static engine_ui_data& get_ui_data();
 
-        /* Methods*/
+        /* Methods */
         static void begin_frame();
         static void end_frame();
 
+        /* Setters */
         static void set_render_target(uint32_t render_target);
         static void set_selected_actor(const std::shared_ptr<scene::scene_actor>& selected_actor);
 
+        /* Methods */
         static void on_update();
 
     private:
