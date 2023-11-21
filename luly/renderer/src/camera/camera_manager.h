@@ -1,12 +1,14 @@
 ﻿#pragma once
-#include <memory>
 
+#include "renderer_api.h"
 #include "perspective/perspective_camera.h"
 #include "perspective/perspective_camera_controller.h"
 
+#include <memory>
+
 namespace luly::renderer
 {
-    class camera_manager
+    class LULY_RENDERER_API camera_manager
     {
     public:
         camera_manager();

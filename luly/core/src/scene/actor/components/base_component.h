@@ -3,9 +3,11 @@
 #include "scene/actor/scene_actor.h"
 #include "utils/uuid.h"
 
+#include "core_api.h"
+
 namespace luly::scene
 {
-    class base_component
+    class LULY_CORE_API base_component
     {
     public:
         virtual ~base_component() = default;

@@ -1,6 +1,7 @@
 ﻿#include "actor_model_renderer_component_panel.h"
 
 #include "engine_ui.h"
+#include "core_api.h"
 #include "scene/actor/components/model_renderer_component.h"
 #include "utils/ui_utils.h"
 

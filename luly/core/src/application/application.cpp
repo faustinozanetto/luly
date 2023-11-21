@@ -1,10 +1,12 @@
 ﻿#include "lypch.h"
 #include "application.h"
 
-#include "engine_ui.h"
-#include "events/event_dispatcher.h"
-#include "renderer/renderer.h"
-#include "time/engine_time.h"
+#include <time/app_time.h>
+
+#include <renderer/renderer.h>
+#include <events/event_dispatcher.h>
+#include <utils/assert.h>
+#include <logging/log.h>
 
 namespace luly::core
 {
@@ -13,16 +15,16 @@ namespace luly::core
     application::application(const renderer::window_specification& window_specification)
     {
         s_instance = this;
-        time::update_time();
+        app_time::update_time();
 
         LY_TRACE("Started creating application...");
         m_window = std::make_shared<renderer::window>(window_specification);
         m_window->set_event_function(BIND_EVENT_FN(application::on_event));
-        renderer::renderer::initialize();
-        ui::engine_ui::initialize();
+        renderer::renderer::initialize(m_window);
+//        ui::engine_ui::initialize();
 
         m_scene_manager = std::make_shared<scene::scene_manager>();
-        time::update_time();
+        app_time::update_time();
     }
 
     application::~application()
@@ -36,15 +38,15 @@ namespace luly::core
         {
             renderer::renderer::clear_screen();
 
-            time::update_time();
+            app_time::update_time();
 
             if (m_frame_delay > 0.f)
             {
-                frame_time -= time::get_delta_time();
+                frame_time -= app_time::get_delta_time();
                 if (frame_time <= 0.f)
                 {
                     frame_time = m_frame_delay;
-                    time::set_delta_time(m_frame_delay);
+                    app_time::set_delta_time(m_frame_delay);
                 }
                 else
                 {
@@ -52,10 +54,10 @@ namespace luly::core
                 }
             }
 
-            ui::engine_ui::begin_frame();
+//            ui::engine_ui::begin_frame();
             on_update();
-            ui::engine_ui::on_update();
-            ui::engine_ui::end_frame();
+  //          ui::engine_ui::on_update();
+    //        ui::engine_ui::end_frame();
 
             renderer::renderer::poll_input();
             renderer::renderer::swap_buffers();

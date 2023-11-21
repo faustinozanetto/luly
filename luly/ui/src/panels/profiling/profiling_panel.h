@@ -1,9 +1,12 @@
 ﻿#pragma once
+
 #include "panels/ui_panel.h"
+
+#include <core_api.h>
 
 namespace luly::ui
 {
-    class profiling_panel : public ui_panel
+    class LULY_UI_API profiling_panel : public ui_panel
     {
     public:
         profiling_panel();

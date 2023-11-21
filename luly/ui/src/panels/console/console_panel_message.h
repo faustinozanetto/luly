@@ -1,10 +1,11 @@
 ﻿#pragma once
 
+#include "ui_api.h"
 #include <string>
 
 namespace luly::ui
 {
-    class console_panel_message
+    class LULY_UI_API console_panel_message
     {
     public:
         console_panel_message(std::string message, std::string source) : m_message(std::move(message)),

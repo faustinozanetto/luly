@@ -1,14 +1,16 @@
 ﻿#pragma once
 
 #include "scene/scene.h"
-#include "utils/assert.h"
-#include "logging/log.h"
 
+#include "core_api.h"
+
+#include <logging/log.h>
+#include <utils/assert.h>
 #include <entt/entt.hpp>
 
 namespace luly::scene
 {
-    class scene_actor
+    class LULY_CORE_API scene_actor
     {
     public:
         scene_actor(entt::entity handle, scene* scene);

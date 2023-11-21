@@ -1,6 +1,6 @@
 ﻿#include "profiling_panel.h"
 
-#include "time/engine_time.h"
+#include <time/app_time.h>
 
 namespace luly::ui
 {
@@ -20,7 +20,7 @@ namespace luly::ui
 
         if (ImGui::Begin("Profiler", &s_show))
         {
-            const auto frame_times = time::get_frame_times();
+            const auto frame_times = app_time::get_frame_times();
             // Calculate average frame time
             float average_frame_time = 0.0f;
             if (!frame_times.empty())
@@ -32,16 +32,16 @@ namespace luly::ui
                 average_frame_time /= frame_times.size();
             }
 
-            ImGui::Text("FPS %.6f", time::get_fps());
-            ImGui::Text("Raw Delta Time: %.6f ms", time::get_raw_delta_time());
-            ImGui::Text("Delta Time: %.6f ms", time::get_delta_time());
-            ImGui::Text("Frame Time: %.6f ms", time::get_frame_time());
-            ImGui::Text("Time: %.4f s", time::get_time());
-            ImGui::Text("Time Scale: %.2f ms", time::get_time_scale());
+            ImGui::Text("FPS %.6f", app_time::get_fps());
+            ImGui::Text("Raw Delta Time: %.6f ms", app_time::get_raw_delta_time());
+            ImGui::Text("Delta Time: %.6f ms", app_time::get_delta_time());
+            ImGui::Text("Frame Time: %.6f ms", app_time::get_frame_time());
+            ImGui::Text("Time: %.4f s", app_time::get_time());
+            ImGui::Text("Time Scale: %.2f ms", app_time::get_time_scale());
 
             char overlay[32];
             sprintf_s(overlay, "Avg %.6f ms", average_frame_time);
-            ImGui::PlotLines("Frame Times", frame_times.data(), static_cast<int>(time::get_frame_times().size()), 0,
+            ImGui::PlotLines("Frame Times", frame_times.data(), static_cast<int>(app_time::get_frame_times().size()), 0,
                              overlay, -1.0f, 1.0f, ImVec2(0, 80.0f));
             ImGui::End();
         }

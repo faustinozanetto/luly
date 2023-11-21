@@ -2,9 +2,11 @@
 
 #include "events/base_event.h"
 
+#include "shared_api.h"
+
 namespace luly::events
 {
-    class mouse_moved_event : public base_event
+    class LULY_SHARED_API mouse_moved_event : public base_event
     {
     public:
         mouse_moved_event(float x, float y) : m_pos_x(x), m_pos_y(y)

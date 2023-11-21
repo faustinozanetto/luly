@@ -3,13 +3,15 @@
 #include "common/bindable_object.h"
 #include "vertex_buffer_layout_descriptor.h"
 
+#include "renderer_api.h"
+
 #include <memory>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 namespace luly::renderer
 {
-    enum class vertex_buffer_object_usage
+    enum class LULY_RENDERER_API vertex_buffer_object_usage
     {
         static_draw,
         static_read,
@@ -19,7 +21,7 @@ namespace luly::renderer
         dynamic_copy
     };
 
-    class vertex_buffer_object : public bindable_object
+    class LULY_RENDERER_API vertex_buffer_object : public bindable_object
     {
     public:
         vertex_buffer_object();

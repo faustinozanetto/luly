@@ -1,12 +1,14 @@
 ﻿#pragma once
 
-#include <glm/glm.hpp>
-
 #include "events/base_event.h"
+
+#include "shared_api.h"
+
+#include <glm/glm.hpp>
 
 namespace luly::events
 {
-    class window_resize_event : public base_event
+    class LULY_SHARED_API window_resize_event : public base_event
     {
     public:
         window_resize_event(const glm::ivec2& window_size) : m_window_size(window_size)

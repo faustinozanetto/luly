@@ -11,11 +11,15 @@
 #include "textures/texture_factory.h"
 #include "scene/scene.h"
 #include "scene/actor/components/model_renderer_component.h"
-#include "time/engine_time.h"
+
+#include <events/event_dispatcher.h>
+#include <time/app_time.h>
 
 basic_application::basic_application(const luly::renderer::window_specification& window_specification) : application(
     window_specification)
 {
+    luly::ui::engine_ui::initialize();
+
     m_shader = luly::renderer::shader_factory::create_shader_from_file(
         "assets/shaders/test_shader.lsh");
 
@@ -33,6 +37,8 @@ basic_application::~basic_application()
 
 void basic_application::on_update()
 {
+  //  luly::ui::engine_ui::begin_frame();
+
     if (!get_scene_manager()->get_current_scene()) return;
 
     auto& camera = get_scene_manager()->get_current_scene()->get_camera_manager()->get_perspective_camera();
@@ -48,6 +54,9 @@ void basic_application::on_update()
     luly::renderer::renderer::submit_model(m_actor->get_component<luly::scene::model_renderer_component>().get_model());
     m_shader->un_bind();
     m_fbo->un_bind();
+
+    //luly::ui::engine_ui::on_update();
+    //luly::ui::engine_ui::end_frame();
 }
 
 void basic_application::on_handle_event(luly::events::base_event& event)
@@ -66,37 +75,37 @@ bool basic_application::on_key_pressed_event(const luly::events::key_pressed_eve
     if (key_pressed_event.get_key_code() == luly::input::key::w)
     {
         camera_controller->process_keyboard_input(
-            luly::renderer::camera_keyboard_direction::forward);
+            luly::renderer::camera_keyboard_direction::forward, luly::app_time::get_delta_time());
         return true;
     }
     if (key_pressed_event.get_key_code() == luly::input::key::s)
     {
         camera_controller->process_keyboard_input(
-            luly::renderer::camera_keyboard_direction::backward);
+            luly::renderer::camera_keyboard_direction::backward, luly::app_time::get_delta_time());
         return true;
     }
     if (key_pressed_event.get_key_code() == luly::input::key::a)
     {
         camera_controller->process_keyboard_input(
-            luly::renderer::camera_keyboard_direction::left);
+            luly::renderer::camera_keyboard_direction::left, luly::app_time::get_delta_time());
         return true;
     }
     if (key_pressed_event.get_key_code() == luly::input::key::d)
     {
         camera_controller->process_keyboard_input(
-            luly::renderer::camera_keyboard_direction::right);
+            luly::renderer::camera_keyboard_direction::right, luly::app_time::get_delta_time());
         return true;
     }
     if (key_pressed_event.get_key_code() == luly::input::key::e)
     {
         camera_controller->process_keyboard_input(
-            luly::renderer::camera_keyboard_direction::down);
+            luly::renderer::camera_keyboard_direction::down, luly::app_time::get_delta_time());
         return true;
     }
     if (key_pressed_event.get_key_code() == luly::input::key::q)
     {
         camera_controller->process_keyboard_input(
-            luly::renderer::camera_keyboard_direction::up);
+            luly::renderer::camera_keyboard_direction::up, luly::app_time::get_delta_time());
         return true;
     }
 

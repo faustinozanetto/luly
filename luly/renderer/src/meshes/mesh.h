@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "renderer_api.h"
 #include "arrays/vertex_array_object.h"
 
 #include <glm/glm.hpp>
@@ -10,7 +11,7 @@ namespace luly::renderer
 {
     typedef uint32_t mesh_index;
 
-    struct mesh_vertex
+    struct LULY_RENDERER_API mesh_vertex
     {
         glm::vec3 position;
         glm::vec2 tex_coords;
@@ -19,7 +20,7 @@ namespace luly::renderer
         glm::vec3 bi_tangent;
     };
 
-    class mesh
+    class LULY_RENDERER_API mesh
     {
     public:
         mesh(const std::string& name, const std::vector<mesh_vertex>& vertices, const std::vector<mesh_index>& indices);

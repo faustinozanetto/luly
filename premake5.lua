@@ -27,6 +27,7 @@ group "luly"
     include "luly/core"
     include "luly/renderer"
     include "luly/ui"
+    include "luly/shared"
 group ""
 
 group "examples"

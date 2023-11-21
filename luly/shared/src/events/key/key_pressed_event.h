@@ -2,9 +2,11 @@
 
 #include "key_event.h"
 
+#include "shared_api.h"
+
 namespace luly::events
 {
-    class key_pressed_event : public key_event
+    class LULY_SHARED_API key_pressed_event : public key_event
     {
     public:
         key_pressed_event(const input::key key_code, bool repeat = false)

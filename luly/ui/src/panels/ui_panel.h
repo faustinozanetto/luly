@@ -1,11 +1,13 @@
 ﻿#pragma once
 
+#include "ui_api.h"
+
 #include <imgui.h>
 #include <string>
 
 namespace luly::ui
 {
-    class ui_panel
+    class LULY_UI_API ui_panel
     {
     public:
         ui_panel(std::string name) : m_name(std::move(name))

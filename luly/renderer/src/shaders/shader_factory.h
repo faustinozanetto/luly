@@ -1,12 +1,13 @@
 ﻿#pragma once
 
 #include "shader.h"
+#include "renderer_api.h"
 
 #include <memory>
 
 namespace luly::renderer
 {
-    class shader_factory
+    class LULY_RENDERER_API shader_factory
     {
     public:
         static std::shared_ptr<shader> create_shader_from_file(const std::string& file_path);

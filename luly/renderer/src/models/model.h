@@ -1,13 +1,14 @@
 ﻿#pragma once
 
 #include "meshes/mesh.h"
+#include "renderer_api.h"
 
 #include <vector>
 #include <memory>
 
 namespace luly::renderer
 {
-    class model
+    class LULY_RENDERER_API model
     {
     public:
         model(const std::vector<std::shared_ptr<mesh>>& meshes);

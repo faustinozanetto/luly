@@ -1,8 +1,10 @@
 ﻿#pragma once
 
+#include "shared_api.h"
+
 namespace luly::events
 {
-    enum class event_type
+    enum class LULY_SHARED_API event_type
     {
         window_resize,
         key_pressed,
@@ -13,7 +15,7 @@ namespace luly::events
         mouse_button_released
     };
 
-    class base_event
+    class LULY_SHARED_API base_event
     {
     public:
         virtual ~base_event() = default;

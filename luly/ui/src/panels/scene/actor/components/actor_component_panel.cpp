@@ -2,6 +2,7 @@
 
 #include <imgui_internal.h>
 
+#include "core_api.h"
 #include "application/application.h"
 
 namespace luly::ui

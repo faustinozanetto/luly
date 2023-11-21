@@ -1,9 +1,11 @@
 ﻿#pragma once
 
-#include "window/window.h"
-#include "events/base_event.h"
 #include "scene/scene_manager.h"
 
+#include "core_api.h"
+
+#include <window/window.h>
+#include <events/base_event.h>
 #include <memory>
 
 // Entry point used in applications.
@@ -11,9 +13,10 @@ int main(int argc, char** argv);
 
 #define BIND_EVENT_FN(fn) [this](auto &&...args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
 
+
 namespace luly::core
 {
-    class application
+    class LULY_CORE_API application
     {
     public:
         application(const renderer::window_specification& window_specification);

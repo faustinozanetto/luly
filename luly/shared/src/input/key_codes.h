@@ -1,12 +1,14 @@
 ﻿#pragma once
 
+#include "shared_api.h"
+
 #include <cstdint>
 
 namespace luly::input
 {
     using key_code = uint16_t;
 
-    enum key : key_code
+    enum class LULY_SHARED_API key : key_code
     {
         space = 32,
         apostrophe = 39,

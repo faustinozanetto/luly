@@ -1,14 +1,15 @@
 ﻿#pragma once
 
-#include <entt/entt.hpp>
+#include "core_api.h"
 
-#include "camera/camera_manager.h"
+#include <camera/camera_manager.h>
+#include <entt/entt.hpp>
 
 namespace luly::scene
 {
     class scene_actor;
 
-    class scene
+    class LULY_CORE_API scene
     {
     public:
         scene(const std::string& name);

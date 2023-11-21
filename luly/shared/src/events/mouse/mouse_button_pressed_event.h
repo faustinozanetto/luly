@@ -2,9 +2,11 @@
 
 #include "mouse_button_event.h"
 
+#include "shared_api.h"
+
 namespace luly::events
 {
-    class mouse_button_pressed_event : public mouse_button_event
+    class LULY_SHARED_API mouse_button_pressed_event : public mouse_button_event
     {
     public:
         mouse_button_pressed_event(const input::mouse_button button_code) : mouse_button_event(button_code)

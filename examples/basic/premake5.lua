@@ -16,6 +16,7 @@ project "basic"
         "%{_WORKING_DIR}/luly/core/src",
         "%{_WORKING_DIR}/luly/renderer/src",
         "%{_WORKING_DIR}/luly/ui/src",
+        "%{_WORKING_DIR}/luly/shared/src",
         "%{include_dirs.glfw}",
         "%{include_dirs.glad}",
         "%{include_dirs.glm}",
@@ -28,8 +29,18 @@ project "basic"
     links {
         "luly-core",
         "luly-renderer",
-        "luly-ui"
+        "luly-ui",
+        "luly-shared"
     }
+
+    postbuildcommands {
+        '{COPY} "%{_WORKING_DIR}/binaries/%{output_dir}/luly-core/luly-core.dll" "$(OutDir)"',
+        '{COPY} "%{_WORKING_DIR}/binaries/%{output_dir}/luly-renderer/luly-renderer.dll" "$(OutDir)"',
+        '{COPY} "%{_WORKING_DIR}/binaries/%{output_dir}/luly-shared/luly-shared.dll" "$(OutDir)"',
+        '{COPY} "%{_WORKING_DIR}/binaries/%{output_dir}/luly-ui/luly-ui.dll" "$(OutDir)"',
+    }
+    
+    postbuildmessage "Copying DLLs to $(OutDir)"
     
     filter "configurations:debug"
         defines "LY_DEBUG"

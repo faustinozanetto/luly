@@ -1,7 +1,9 @@
 project "luly-ui"
-    kind "StaticLib"
+    kind "SharedLib"
     language "C++"
     cppdialect "C++20"
+    defines { "LULY_UI_EXPORTS" }
+    targetextension ".dll"
     
     targetdir("%{_WORKING_DIR}/binaries/" .. output_dir .. "/%{prj.name}")
     objdir("%{_WORKING_DIR}/intermediates/" .. output_dir .. "/%{prj.name}")
@@ -15,6 +17,7 @@ project "luly-ui"
         "src",
         "%{_WORKING_DIR}/luly/core/src",
         "%{_WORKING_DIR}/luly/renderer/src",
+        "%{_WORKING_DIR}/luly/shared/src",
         "%{include_dirs.glfw}",
         "%{include_dirs.glad}",
         "%{include_dirs.glm}",
@@ -26,12 +29,13 @@ project "luly-ui"
     }
     
     links {
+        "luly-core",
+        "luly-shared",
+        "luly-renderer",
         "glfw",
         "glad",
         "stb",
         "imgui",
-        "luly-core",
-        "luly-renderer"
     }
     
     filter "configurations:debug"

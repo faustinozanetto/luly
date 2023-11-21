@@ -1,9 +1,10 @@
 ﻿#pragma once
+
 #include "panels/ui_panel.h"
 
 namespace luly::ui
 {
-    class camera_panel : public ui_panel
+    class LULY_UI_API camera_panel : public ui_panel
     {
     public:
         camera_panel();

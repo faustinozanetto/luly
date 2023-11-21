@@ -1,9 +1,10 @@
 ﻿#pragma once
+
 #include "panels/ui_panel.h"
 
 namespace luly::ui
 {
-    class scene_hierarchy_panel : public ui_panel
+    class LULY_UI_API scene_hierarchy_panel : public ui_panel
     {
     public:
         scene_hierarchy_panel();

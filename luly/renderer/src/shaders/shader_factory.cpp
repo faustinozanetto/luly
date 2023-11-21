@@ -4,6 +4,7 @@
 
 #include <logging/log.h>
 #include <utils/assert.h>
+#include <fstream>
 
 namespace luly::renderer
 {

@@ -3,6 +3,7 @@
 #include "window/window.h"
 #include "arrays/vertex_array_object.h"
 #include "models/model.h"
+#include "renderer_api.h"
 
 #include <memory>
 #include <glm/glm.hpp>
@@ -11,13 +12,13 @@
 
 namespace luly::renderer
 {
-    struct renderer_data
+    struct LULY_RENDERER_API renderer_data
     {
         std::shared_ptr<window> window;
         glm::vec4 clear_color;
     };
 
-    enum class renderer_draw_mode
+    enum class LULY_RENDERER_API renderer_draw_mode
     {
         points,
         line_strip,
@@ -28,10 +29,10 @@ namespace luly::renderer
         triangles
     };
 
-    class renderer
+    class LULY_RENDERER_API renderer
     {
     public:
-        static void initialize();
+        static void initialize(const std::shared_ptr<window>& window);
 
         static void swap_buffers();
         static void poll_input();
@@ -79,6 +80,8 @@ namespace luly::renderer
 
         static void initialize_debug();
 
-        static void open_gl_message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam);
+        static void open_gl_message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
+                                             const GLchar* message, const void* userParam);
+        static renderer_data s_data;
     };
 }

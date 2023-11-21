@@ -4,6 +4,8 @@
 #include "actor/components/name_component.h"
 #include "actor/components/transform_component.h"
 
+#include <logging/log.h>
+
 namespace luly::scene
 {
     scene::scene(const std::string& name)

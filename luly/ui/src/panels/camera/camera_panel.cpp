@@ -1,7 +1,9 @@
 ﻿#include "camera_panel.h"
 
-#include "application/application.h"
+#include "core_api.h"
 #include "utils/ui_utils.h"
+
+#include <application/application.h>
 
 namespace luly::ui
 {

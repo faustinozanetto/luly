@@ -1,13 +1,14 @@
 ﻿#pragma once
 
 #include "common/bindable_object.h"
+#include "renderer_api.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 namespace luly::renderer
 {
-    enum class texture_format
+    enum class LULY_RENDERER_API texture_format
     {
         rg = 0,
         rgb,
@@ -20,7 +21,7 @@ namespace luly::renderer
         alpha,
     };
 
-    enum class texture_internal_format
+    enum class LULY_RENDERER_API texture_internal_format
     {
         r8 = 0,
         r16,
@@ -46,13 +47,13 @@ namespace luly::renderer
         stencil_index8
     };
 
-    struct texture_formats
+    struct LULY_RENDERER_API texture_formats
     {
         texture_format format;
         texture_internal_format internal_format;
     };
 
-    enum class texture_filtering
+    enum class LULY_RENDERER_API texture_filtering
     {
         none = 0,
         nearest,
@@ -63,13 +64,13 @@ namespace luly::renderer
         linear_mipmap_linear,
     };
 
-    enum class texture_filtering_type
+    enum class LULY_RENDERER_API texture_filtering_type
     {
         filter_min = 0,
         filter_mag,
     };
 
-    enum class texture_wrapping
+    enum class LULY_RENDERER_API texture_wrapping
     {
         none = 0,
         repeat,
@@ -78,14 +79,14 @@ namespace luly::renderer
         clamp_to_border,
     };
 
-    enum class texture_wrapping_type
+    enum class LULY_RENDERER_API texture_wrapping_type
     {
         wrap_s = 0,
         wrap_t,
         wrap_r,
     };
 
-    struct texture_specification
+    struct LULY_RENDERER_API texture_specification
     {
         int width;
         int height;
@@ -98,7 +99,7 @@ namespace luly::renderer
         texture_specification(int width, int height, int channels, void* data);
     };
 
-    class texture : public bindable_object
+    class LULY_RENDERER_API texture : public bindable_object
     {
     public:
         texture(const texture_specification& texture_specification);

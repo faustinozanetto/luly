@@ -1,12 +1,13 @@
 ﻿#pragma once
 
+#include "shared_api.h"
 #include <cstdint>
 
 namespace luly::input
 {
     using mouse_code = uint16_t;
 
-    enum mouse_button : mouse_code
+    enum class LULY_SHARED_API mouse_button : mouse_code
     {
         button0 = 0,
         button1 = 1,

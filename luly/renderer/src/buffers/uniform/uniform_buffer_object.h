@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "renderer_api.h"
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -7,7 +9,7 @@
 
 namespace luly::renderer
 {
-    class uniform_buffer_object : public bindable_object
+    class LULY_RENDERER_API uniform_buffer_object : public bindable_object
     {
     public:
         uniform_buffer_object();

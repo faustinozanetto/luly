@@ -2,11 +2,13 @@
 
 #include "math/transform/transform.h"
 
+#include "core_api.h"
+
 #include <glm/glm.hpp>
 
 namespace luly::math
 {
-    class bounding_box
+    class LULY_CORE_API bounding_box
     {
     public:
         bounding_box();

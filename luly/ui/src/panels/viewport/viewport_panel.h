@@ -4,7 +4,7 @@
 
 namespace luly::ui
 {
-    class viewport_panel : public ui_panel
+    class LULY_UI_API viewport_panel : public ui_panel
     {
     public:
         viewport_panel();

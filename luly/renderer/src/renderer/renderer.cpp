@@ -1,17 +1,18 @@
 ﻿#include "renderer.h"
 
-#include <application/application.h>
 #include <utils/assert.h>
 #include <logging/log.h>
 
 namespace luly::renderer
 {
-    static renderer_data s_data;
+    renderer_data renderer::s_data = {};
 
-    void renderer::initialize()
+    void renderer::initialize(const std::shared_ptr<window>& window)
     {
         LY_TRACE("Started initializing renderer...");
-        initialize_data();
+        s_data.window = window;
+        s_data.clear_color = glm::vec4(0.85f);
+
         initialize_glad();
         initialize_debug();
         set_clear_color(s_data.clear_color);
@@ -112,13 +113,6 @@ namespace luly::renderer
     void renderer::bind_texture(int slot, uint32_t handle)
     {
         glBindTextureUnit(slot, handle);
-    }
-
-    void renderer::initialize_data()
-    {
-        core::application& application = core::application::get();
-        s_data.window = application.get_window();
-        s_data.clear_color = glm::vec4(0.85f);
     }
 
     void renderer::initialize_glad()

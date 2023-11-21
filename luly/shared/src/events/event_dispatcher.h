@@ -1,17 +1,16 @@
 ﻿#pragma once
 
 #include "base_event.h"
+#include "shared_api.h"
 
 #include <functional>
 
 namespace luly::events
 {
-    class event_dispatcher
+    class LULY_SHARED_API event_dispatcher
     {
     public:
-        event_dispatcher(base_event& event) : m_event(event)
-        {
-        }
+        event_dispatcher(base_event& event);
 
         template <typename T>
         bool dispatch(std::function<bool(T&)> func)

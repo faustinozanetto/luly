@@ -1,11 +1,13 @@
 #pragma once
 
+#include "core_api.h"
+
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>
 
 namespace luly::math
 {
-    class transform
+    class LULY_CORE_API transform
     {
     public:
         transform(const glm::vec3& location = glm::vec3(0.0f),

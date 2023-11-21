@@ -1,7 +1,5 @@
 ﻿#include "perspective_camera_controller.h"
 
-#include "time/engine_time.h"
-
 namespace luly::renderer
 {
     perspective_camera_controller::perspective_camera_controller(
@@ -11,9 +9,10 @@ namespace luly::renderer
         m_movement_speed = 15.0f;
     }
 
-    void perspective_camera_controller::process_keyboard_input(camera_keyboard_direction direction) const
+    void perspective_camera_controller::process_keyboard_input(camera_keyboard_direction direction,
+                                                               float delta_time) const
     {
-        const float speed = m_movement_speed * time::get_delta_time();
+        const float speed = m_movement_speed * delta_time;
         glm::vec3 updated_position = m_perspective_camera->get_position();
 
         if (direction == camera_keyboard_direction::forward)
@@ -40,7 +39,7 @@ namespace luly::renderer
         {
             updated_position -= m_perspective_camera->get_up() * speed;
         }
-        
+
         m_perspective_camera->set_position(updated_position);
         m_perspective_camera->update_view_matrix();
     }

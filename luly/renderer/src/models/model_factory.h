@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "models/model.h"
+#include "renderer_api.h"
 
 #include <memory>
 #include <vector>
@@ -8,7 +9,7 @@
 
 namespace luly::renderer
 {
-    class model_factory
+    class LULY_RENDERER_API model_factory
     {
     public:
         static std::shared_ptr<model> create_model_from_file(const std::string& file_path);

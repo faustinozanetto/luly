@@ -1,7 +1,7 @@
 ﻿#include "engine_ui.h"
 
-#include "application/application.h"
-#include "renderer/renderer.h"
+#include <application/application.h>
+#include <renderer/renderer.h>
 
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -155,7 +155,7 @@ namespace luly::ui
     void engine_ui::initialize_log_sink()
     {
         spdlog::sink_ptr imgui_sink = std::make_shared<engine_ui_sink<std::mutex>>();
-        core::log::add_sink(imgui_sink);
+        shared::log::add_sink(imgui_sink);
     }
 
     void engine_ui::begin_dockspace()

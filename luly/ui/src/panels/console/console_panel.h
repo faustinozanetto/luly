@@ -8,7 +8,7 @@
 
 namespace luly::ui
 {
-    class console_panel : public ui_panel
+    class LULY_UI_API console_panel : public ui_panel
     {
     public:
         console_panel();

@@ -3,9 +3,11 @@
 #include "events/base_event.h"
 #include "input/key_codes.h"
 
+#include "shared_api.h"
+
 namespace luly::events
 {
-    class key_event : public base_event
+    class LULY_SHARED_API key_event : public base_event
     {
     public:
         key_event(const input::key key_code) : m_key_code(key_code)

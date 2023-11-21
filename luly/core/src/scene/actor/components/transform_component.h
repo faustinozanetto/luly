@@ -3,9 +3,11 @@
 #include "base_component.h"
 #include "math/transform/transform.h"
 
+#include "core_api.h"
+
 namespace luly::scene
 {
-    class transform_component : public base_component
+    class LULY_CORE_API transform_component : public base_component
     {
     public:
         transform_component(const glm::vec3& location = glm::vec3(0.0f),

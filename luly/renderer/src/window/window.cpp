@@ -1,17 +1,17 @@
 ﻿#include "window.h"
 
-#include "events/window/window_resize_event.h"
+#include <shared_api.h>
+
+#include <events/window/window_resize_event.h>
+#include <events/key/key_pressed_event.h>
+#include <events/key/key_released_event.h>
+#include <events/mouse/mouse_button_pressed_event.h>
+#include <events/mouse/mouse_button_released_event.h>
+#include <events/mouse/mouse_moved_event.h>
+#include <events/mouse/mouse_scrolled_event.h>
 
 #include <logging/log.h>
 #include <utils/assert.h>
-
-#include "events/key/key_pressed_event.h"
-#include "events/key/key_released_event.h"
-#include "events/mouse/mouse_button_pressed_event.h"
-#include "events/mouse/mouse_button_released_event.h"
-#include "events/mouse/mouse_moved_event.h"
-#include "events/mouse/mouse_scrolled_event.h"
-#include "input/mouse_codes.h"
 
 namespace luly::renderer
 {

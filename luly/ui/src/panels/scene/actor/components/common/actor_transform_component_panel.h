@@ -4,7 +4,7 @@
 
 namespace luly::ui
 {
-    class actor_transform_component_panel : public actor_component_panel
+    class LULY_UI_API actor_transform_component_panel : public actor_component_panel
     {
     public:
         actor_transform_component_panel();

@@ -16,8 +16,6 @@
 #include <unordered_set>
 #include <vector>
 
-#include "logging/log.h"
 #include "utils/memory.h"
-#include "utils/assert.h"
 
 #include <Windows.h>

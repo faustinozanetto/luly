@@ -5,10 +5,9 @@
 #include <arrays/vertex_array_object.h>
 #include <shaders/shader.h>
 #include <models/model.h>
-
-#include "events/key/key_pressed_event.h"
-#include "framebuffer/frame_buffer.h"
-#include "textures/texture.h"
+#include <events/key/key_pressed_event.h>
+#include <framebuffer/frame_buffer.h>
+#include <textures/texture.h>
 
 class basic_application : public luly::core::application
 {
