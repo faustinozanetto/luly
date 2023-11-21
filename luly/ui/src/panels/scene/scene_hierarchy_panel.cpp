@@ -7,6 +7,8 @@
 
 namespace luly::ui
 {
+    bool scene_hierarchy_panel::s_show = true;
+
     scene_hierarchy_panel::scene_hierarchy_panel() : ui_panel("scene_hierarchy_panel")
     {
     }
@@ -17,59 +19,73 @@ namespace luly::ui
 
     void scene_hierarchy_panel::on_render_panel()
     {
-        const auto& current_scene = core::application::get().get_scene_manager()->get_current_scene();
-        const auto& current_actor = engine_ui::get_ui_data().selected_actor;
+        if (!s_show) return;
 
-        ImGui::Begin("Hierarchy", &m_show);
-        if (current_scene)
+        if (ImGui::Begin("Scene Hierarchy", &s_show))
         {
-            if (ImGui::BeginPopupContextWindow("create_actor", ImGuiPopupFlags_MouseButtonRight))
+            const auto& current_scene = core::application::get().get_scene_manager()->get_current_scene();
+            const auto& current_actor = engine_ui::get_ui_data().selected_actor;
+            if (current_scene)
             {
-                if (ImGui::MenuItem("Create Actor"))
+                if (ImGui::BeginPopupContextWindow("create_actor", ImGuiPopupFlags_MouseButtonRight))
                 {
-                    current_scene->create_actor("Empty Actor");
+                    if (ImGui::MenuItem("Create Actor"))
+                    {
+                        current_scene->create_actor("Empty Actor");
+                    }
+                    ImGui::EndPopup();
                 }
-                ImGui::EndPopup();
+
+                // No actors message.
+                if (!current_scene->get_registry()->storage<entt::entity>().in_use())
+                {
+                    ImGui::Text("There are no actors in the current scene!");
+                }
+
+                // Actor hierarchy render
+                current_scene->get_registry()->each([&](entt::entity actor_handle)
+                {
+                    const auto& name_component = current_scene->get_registry()->get<scene::name_component>(
+                        actor_handle);
+
+                    const bool is_current_actor_selected = current_actor != nullptr && current_actor->get_handle() ==
+                        actor_handle;
+                    ImGuiTreeNodeFlags flags = (is_current_actor_selected
+                                                    ? ImGuiTreeNodeFlags_Selected
+                                                    : 0) | ImGuiTreeNodeFlags_OpenOnArrow |
+                        ImGuiTreeNodeFlags_FramePadding;
+                    flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
+                    const bool open = ImGui::TreeNodeEx(
+                        reinterpret_cast<void*>(static_cast<uint64_t>(static_cast<uint32_t>(actor_handle))), flags,
+                        name_component.get_name().c_str());
+
+                    // Selection of actor
+                    if (ImGui::IsItemClicked())
+                    {
+                        engine_ui::set_selected_actor(current_scene->get_actor(actor_handle));
+                    }
+
+                    if (open)
+                    {
+                        ImGui::TreePop();
+                    }
+                });
             }
-
-            // No actors message.
-            if (!current_scene->get_registry()->storage<entt::entity>().in_use())
+            else
             {
-                ImGui::Text("There are no actors in the current scene!");
+                ImGui::Text("No active scene!");
             }
-
-            // Actor hierarchy render
-            current_scene->get_registry()->each([&](entt::entity actor_handle)
-            {
-                const auto& name_component = current_scene->get_registry()->get<scene::name_component>(
-                    actor_handle);
-
-                const bool is_current_actor_selected = current_actor != nullptr && current_actor->get_handle() ==
-                    actor_handle;
-                ImGuiTreeNodeFlags flags = (is_current_actor_selected
-                                                ? ImGuiTreeNodeFlags_Selected
-                                                : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_FramePadding;
-                flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
-                const bool open = ImGui::TreeNodeEx(
-                    reinterpret_cast<void*>(static_cast<uint64_t>(static_cast<uint32_t>(actor_handle))), flags,
-                    name_component.get_name().c_str());
-
-                // Selection of actor
-                if (ImGui::IsItemClicked())
-                {
-                    engine_ui::set_selected_actor(current_scene->get_actor(actor_handle));
-                }
-
-                if (open)
-                {
-                    ImGui::TreePop();
-                }
-            });
+            ImGui::End();
         }
-        else
-        {
-            ImGui::Text("No active scene!");
-        }
-        ImGui::End();
+    }
+
+    bool scene_hierarchy_panel::get_show_panel()
+    {
+        return s_show;
+    }
+
+    void scene_hierarchy_panel::set_show_panel(bool show_panel)
+    {
+        s_show = show_panel;
     }
 }

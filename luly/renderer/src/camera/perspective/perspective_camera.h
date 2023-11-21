@@ -17,6 +17,9 @@ namespace luly::renderer
         /* Getters*/
         float get_fov() const { return m_fov; }
 
+        /* Setters */
+        void set_fov(float fov);
+
     private:
         float m_fov;
     };

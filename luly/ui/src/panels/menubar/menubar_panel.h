@@ -12,6 +12,8 @@ namespace luly::ui
 
         /* Overrides*/
         void on_render_panel() override;
+        bool get_show_panel() override { return true; }
+        void set_show_panel(bool show_panel) override {}
 
     private:
         bool m_show_styles_editor;

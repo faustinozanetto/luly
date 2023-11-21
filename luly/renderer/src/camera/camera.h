@@ -27,9 +27,13 @@ namespace luly::renderer
         float get_pitch() const { return m_pitch; }
         float get_yaw() const { return m_yaw; }
 
+        /* Setters */
+        void set_position(const glm::vec3& position);
+        void set_near_clip(float near_clip);
+        void set_far_clip(float far_clip);
+
         /* Methods */
         void update_vectors();
-        void set_position(const glm::vec3& position);
 
     protected:
         glm::mat4 m_view_matrix;

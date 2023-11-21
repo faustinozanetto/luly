@@ -16,6 +16,8 @@ namespace luly::ui
 
         /* Overrides */
         void on_render_panel() override;
+        bool get_show_panel() override;
+        void set_show_panel(bool show_panel) override;
 
         /* Getters*/
         static console_panel* get_instance() { return s_instance; }
@@ -26,5 +28,6 @@ namespace luly::ui
     private:
         std::vector<std::shared_ptr<console_panel_message>> m_messages;
         static console_panel* s_instance;
+        static bool s_show;
     };
 }

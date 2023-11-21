@@ -25,7 +25,7 @@ namespace luly::ui
 
         if (model_renderer_component.get_model())
         {
-            ui_utils::draw_property("Mesh Count",
+            ui_utils::draw_property("Mesh Count: ",
                                     std::format("{}", model_renderer_component.get_model()->get_meshes().size()));
             if (ImGui::TreeNode("Meshes"))
             {
@@ -33,8 +33,8 @@ namespace luly::ui
                 {
                     if (ImGui::TreeNode(std::format("Mesh '{}'", mesh->get_name()).c_str()))
                     {
-                        ImGui::Text("Vertices %llu", mesh->get_vertices().size());
-                        ImGui::Text("Indices %llu", mesh->get_indices().size());
+                        ui_utils::draw_property("Vertices: ", std::format("{}", mesh->get_vertices().size()));
+                        ui_utils::draw_property("Indices: ", std::format("{}", mesh->get_indices().size()));
 
                         ImGui::TreePop();
                     }

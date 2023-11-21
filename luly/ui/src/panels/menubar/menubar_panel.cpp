@@ -1,5 +1,7 @@
 ﻿#include "menubar_panel.h"
 
+#include "engine_ui.h"
+
 namespace luly::ui
 {
     menubar_panel::menubar_panel() : ui_panel("menubar_panel")
@@ -25,6 +27,21 @@ namespace luly::ui
                 m_show_styles_editor = ImGui::MenuItem("Styles Editor");
                 ImGui::EndMenu();
             }
+            if (ImGui::BeginMenu("Panels"))
+            {
+                for (const auto& ui_panel : engine_ui::get_ui_data().panels)
+                {
+                    // Skip this panel.
+                    if (ui_panel->get_name() == "menubar_panel") continue;
+
+                    if (ImGui::MenuItem(ui_panel->get_name().c_str(), "", ui_panel->get_show_panel(), true))
+                    {
+                        ui_panel->set_show_panel(!ui_panel->get_show_panel());
+                    }
+                }
+                ImGui::EndMenu();
+            }
+
             ImGui::EndMainMenuBar();
         }
 

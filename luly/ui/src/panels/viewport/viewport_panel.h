@@ -12,5 +12,10 @@ namespace luly::ui
 
         /* Overrides */
         void on_render_panel() override;
+        bool get_show_panel() override;
+        void set_show_panel(bool show_panel) override;
+
+    private:
+        static bool s_show;
     };
 }

@@ -1,5 +1,10 @@
 ﻿#include "camera.h"
 
+#include "renderer/renderer.h"
+
+#include <logging/log.h>
+#include <utils/assert.h>
+
 namespace luly::renderer
 {
     camera::camera()
@@ -35,5 +40,19 @@ namespace luly::renderer
     {
         m_position = position;
         update_view_matrix();
+    }
+
+    void camera::set_near_clip(float near_clip)
+    {
+        LY_ASSERT_MSG(near_clip > 0, "Near clip must be > 0!");
+        m_near_clip = near_clip;
+        update_projection_matrix(renderer::get_viewport_size());
+    }
+
+    void camera::set_far_clip(float far_clip)
+    {
+        LY_ASSERT_MSG(far_clip > 0, "Far clip must be > 0!");
+        m_far_clip = far_clip;
+        update_projection_matrix(renderer::get_viewport_size());
     }
 }

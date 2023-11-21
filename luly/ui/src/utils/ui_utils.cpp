@@ -24,6 +24,82 @@ namespace luly::ui
         ImGui::PopID();
     }
 
+    bool ui_utils::draw_property(const std::string& name, bool& value)
+    {
+        bool modified = false;
+        ImGui::PushID(name.c_str());
+        // Name
+        ImGui::AlignTextToFramePadding();
+        ImGui::Columns(2);
+        ImGui::PushItemWidth(-1);
+        ImGui::TextUnformatted(name.c_str());
+        ImGui::NextColumn();
+
+        // Content
+        const std::string id = "##" + name;
+        if (ImGui::Checkbox(id.c_str(), &value))
+        {
+            modified = true;
+        }
+
+        // Reset
+        ImGui::Columns(1);
+        ImGui::PopID();
+
+        return modified;
+    }
+
+    bool ui_utils::draw_property(const std::string& name, int& value, int min, int max, int reset_value)
+    {
+        bool modified = false;
+        ImGui::PushID(name.c_str());
+        // Name
+        ImGui::AlignTextToFramePadding();
+        ImGui::Columns(2);
+        ImGui::PushItemWidth(-1);
+        ImGui::TextUnformatted(name.c_str());
+        ImGui::NextColumn();
+
+        // Content
+        const std::string id = "##" + name;
+        if (ImGui::SliderInt(id.c_str(), &value, min, max))
+        {
+            modified = true;
+        }
+
+        // Reset
+        ImGui::Columns(1);
+        ImGui::PopID();
+
+        return modified;
+    }
+
+    bool ui_utils::draw_property(const std::string& name, float& value, float min, float max, float step,
+                                 float reset_value)
+    {
+        bool modified = false;
+        ImGui::PushID(name.c_str());
+        // Name
+        ImGui::AlignTextToFramePadding();
+        ImGui::Columns(2);
+        ImGui::PushItemWidth(-1);
+        ImGui::TextUnformatted(name.c_str());
+        ImGui::NextColumn();
+
+        // Content
+        const std::string id = "##" + name;
+        if (ImGui::DragFloat(id.c_str(), &value, step, min, max))
+        {
+            modified = true;
+        }
+
+        // Reset
+        ImGui::Columns(1);
+        ImGui::PopID();
+
+        return modified;
+    }
+
     bool ui_utils::draw_property(const std::string& name, glm::vec2& value, float min, float max,
                                  float step, float reset_value)
     {
