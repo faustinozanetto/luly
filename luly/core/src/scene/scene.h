@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <camera/camera_manager.h>
+#include "renderer/camera/camera_manager.h"
 #include <entt/entt.hpp>
 
 namespace luly::scene

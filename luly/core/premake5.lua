@@ -17,7 +17,6 @@ project "luly-core"
     
     includedirs {
         "src",
-        "%{_WORKING_DIR}/luly/renderer/src",
         "%{_WORKING_DIR}/luly/shared/src",
         "%{include_dirs.glfw}",
         "%{include_dirs.glad}",
@@ -25,13 +24,14 @@ project "luly-core"
         "%{include_dirs.spdlog}",
         "%{include_dirs.assimp}",
         "%{include_dirs.entt}",
+        "%{include_dirs.stb}",
     }
     
     links {
-        "luly-renderer",
         "luly-shared",
         "glfw",
         "glad",
+        "stb"
     }
     
     filter "configurations:debug"

@@ -14,7 +14,6 @@ project "luly-ui"
     includedirs {
         "src",
         "%{_WORKING_DIR}/luly/core/src",
-        "%{_WORKING_DIR}/luly/renderer/src",
         "%{_WORKING_DIR}/luly/shared/src",
         "%{include_dirs.glfw}",
         "%{include_dirs.glad}",
@@ -29,7 +28,6 @@ project "luly-ui"
     links {
         "luly-core",
         "luly-shared",
-        "luly-renderer",
         "glfw",
         "glad",
         "stb",

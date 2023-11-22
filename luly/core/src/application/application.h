@@ -2,7 +2,8 @@
 
 #include "scene/scene_manager.h"
 
-#include <window/window.h>
+#include "renderer/window/window.h"
+
 #include <events/base_event.h>
 #include <memory>
 

@@ -9,8 +9,8 @@
 #include "panels/scene/actor/actor_details_panel.h"
 #include "panels/viewport/viewport_panel.h"
 
-#include <renderer/renderer.h>
-#include <application/application.h>
+#include "renderer/renderer/renderer.h"
+#include "application/application.h"
 
 #include <imgui.h>
 #include <imgui_internal.h>

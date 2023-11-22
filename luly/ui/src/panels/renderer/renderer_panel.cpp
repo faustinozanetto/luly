@@ -1,6 +1,6 @@
 ﻿#include "renderer_panel.h"
 
-#include "renderer/renderer.h"
+#include "renderer/renderer/renderer.h"
 #include "utils/ui_utils.h"
 
 namespace luly::ui

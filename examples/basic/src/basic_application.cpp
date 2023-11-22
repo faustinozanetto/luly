@@ -4,18 +4,18 @@
 
 #include "engine_ui.h"
 #include "imgui.h"
-#include "models/model_factory.h"
-#include "renderer/renderer.h"
-#include "shaders/shader.h"
-#include "shaders/shader_factory.h"
-#include "textures/texture_factory.h"
+#include "renderer/models/model_factory.h"
+#include "renderer/renderer/renderer.h"
+#include "renderer/shaders/shader_factory.h"
+#include "renderer/textures/texture_factory.h"
 #include "scene/scene.h"
 #include "scene/actor/components/model_renderer_component.h"
 
 #include <events/event_dispatcher.h>
 #include <time/app_time.h>
 
-#include "renderer/pipeline/final_pass.h"
+#include "renderer/renderer/pipeline/final_pass.h"
+#include "renderer/scene/scene_renderer.h"
 #include "scene/actor/components/transform_component.h"
 
 basic_application::basic_application(const luly::renderer::window_specification& window_specification) : application(
@@ -31,7 +31,8 @@ basic_application::basic_application(const luly::renderer::window_specification&
     setup_fbo();
     setup_scene();
 
-    luly::ui::engine_ui::set_render_target(m_fbo->get_attachment_id(0));
+    luly::ui::engine_ui::set_render_target(
+        luly::renderer::scene_renderer::get_data().geometry_pass->get_frame_buffer()->get_attachment_id(0));
 }
 
 basic_application::~basic_application()
@@ -52,17 +53,8 @@ void basic_application::on_update()
 
     auto& camera = get_scene_manager()->get_current_scene()->get_camera_manager()->get_perspective_camera();
 
-    m_fbo->bind();
-    luly::renderer::renderer::clear_screen();
-    m_shader->bind();
-    luly::renderer::renderer::bind_texture(0, m_texture->get_handle_id());
-    m_shader->set_mat4("u_model_matrix",
-                       m_actor->get_component<luly::scene::transform_component>().get_transform()->get_transform());
-    m_shader->set_mat4("u_view_matrix", camera->get_view_matrix());
-    m_shader->set_mat4("u_projection_matrix", camera->get_projection_matrix());
-    luly::renderer::renderer::submit_model(m_actor->get_component<luly::scene::model_renderer_component>().get_model());
-    m_shader->un_bind();
-    m_fbo->un_bind();
+    luly::renderer::scene_renderer::begin_render(camera);
+    luly::renderer::scene_renderer::end_render();
 
     luly::ui::engine_ui::on_update();
     luly::ui::engine_ui::end_frame();

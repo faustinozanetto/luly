@@ -1,11 +1,11 @@
 ﻿#pragma once
 
-#include <arrays/vertex_array_object.h>
-#include <shaders/shader.h>
-#include <models/model.h>
+#include <renderer/arrays/vertex_array_object.h>
+#include <renderer/shaders/shader.h>
+#include <renderer/models/model.h>
 #include <events/key/key_pressed_event.h>
-#include <framebuffer/frame_buffer.h>
-#include <textures/texture.h>
+#include <renderer/framebuffer/frame_buffer.h>
+#include <renderer/textures/texture.h>
 
 #include <application/application.h>
 

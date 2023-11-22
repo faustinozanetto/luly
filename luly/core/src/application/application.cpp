@@ -3,12 +3,12 @@
 
 #include <time/app_time.h>
 
-#include <renderer/renderer.h>
+#include "renderer/renderer/renderer.h"
+#include "renderer/scene/scene_renderer.h"
+
 #include <events/event_dispatcher.h>
 #include <utils/assert.h>
 #include <logging/log.h>
-
-#include "scene/scene_renderer.h"
 
 namespace luly::core
 {
