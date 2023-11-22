@@ -16,6 +16,7 @@ namespace luly::renderer
     {
         std::shared_ptr<window> window;
         glm::vec4 clear_color;
+        bool vsync_enabled;
     };
 
     enum class renderer_draw_mode
@@ -42,6 +43,7 @@ namespace luly::renderer
 
         /* Getters */
         static glm::ivec2 get_viewport_size();
+        static bool get_is_vsync_enabled();
 
         /* Setters*/
         static void set_vsync_enabled(bool vsync_enabled);

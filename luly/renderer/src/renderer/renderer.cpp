@@ -50,8 +50,14 @@ namespace luly::renderer
         return glm::ivec2(s_data.window->get_data().width, s_data.window->get_data().height);
     }
 
+    bool renderer::get_is_vsync_enabled()
+    {
+        return s_data.vsync_enabled;
+    }
+
     void renderer::set_vsync_enabled(bool vsync_enabled)
     {
+        s_data.vsync_enabled = vsync_enabled;
         glfwSwapInterval(vsync_enabled ? 1 : 0);
     }
 
