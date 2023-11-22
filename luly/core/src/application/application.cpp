@@ -8,6 +8,8 @@
 #include <utils/assert.h>
 #include <logging/log.h>
 
+#include "scene/scene_renderer.h"
+
 namespace luly::core
 {
     application* application::s_instance = nullptr;
@@ -22,6 +24,7 @@ namespace luly::core
         m_window->set_event_function(BIND_EVENT_FN(application::on_event));
 
         renderer::renderer::initialize(m_window);
+        renderer::scene_renderer::initialize();
 
         m_scene_manager = std::make_shared<scene::scene_manager>();
         app_time::update_time();

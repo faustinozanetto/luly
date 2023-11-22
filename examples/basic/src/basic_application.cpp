@@ -15,6 +15,7 @@
 #include <events/event_dispatcher.h>
 #include <time/app_time.h>
 
+#include "renderer/pipeline/final_pass.h"
 #include "scene/actor/components/transform_component.h"
 
 basic_application::basic_application(const luly::renderer::window_specification& window_specification) : application(

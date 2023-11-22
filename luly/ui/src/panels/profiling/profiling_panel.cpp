@@ -37,7 +37,7 @@ namespace luly::ui
             ImGui::Text("Delta Time: %.6f ms", app_time::get_delta_time());
             ImGui::Text("Frame Time: %.6f ms", app_time::get_frame_time());
             ImGui::Text("Time: %.4f s", app_time::get_time());
-            ImGui::Text("Time Scale: %.2f ms", app_time::get_time_scale());
+            ImGui::Text("Time Scale: %.2f x", app_time::get_time_scale());
 
             char overlay[32];
             sprintf_s(overlay, "Avg %.6f ms", average_frame_time);
