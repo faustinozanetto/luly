@@ -5,6 +5,17 @@
 
 namespace luly::renderer
 {
+    material_specification::material_specification(const glm::vec3& albedo,
+                                                   float roughness,
+                                                   float metallic,
+                                                   float ambient_occlusion,
+                                                   float tilling,
+                                                   const std::map<material_texture_type, material_texture>& textures)
+        : albedo(albedo), roughness(roughness), metallic(metallic),
+          ambient_occlusion(ambient_occlusion), tilling(tilling), textures(textures)
+    {
+    }
+
     material::material(const material_specification& material_specification)
     {
         m_material_specification = material_specification;
@@ -24,11 +35,13 @@ namespace luly::renderer
 
         for (auto& [type, texture] : m_material_specification.textures)
         {
+/*
             shader->set_int(m_material_texture_enabled_locations[type], texture.is_enabled ? 1 : 0);
             if (!texture.is_enabled || !texture.texture)
                 continue;
             const int bind_slot = m_material_texture_bindings[type];
             renderer::bind_texture(bind_slot, texture.texture->get_handle_id());
+            */
         }
     }
 

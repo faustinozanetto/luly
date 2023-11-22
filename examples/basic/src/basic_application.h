@@ -1,11 +1,6 @@
 ﻿#pragma once
 
-#include <renderer/arrays/vertex_array_object.h>
-#include <renderer/shaders/shader.h>
-#include <renderer/models/model.h>
 #include <events/key/key_pressed_event.h>
-#include <renderer/framebuffer/frame_buffer.h>
-#include <renderer/textures/texture.h>
 
 #include <application/application.h>
 
@@ -24,12 +19,5 @@ public:
     bool on_key_pressed_event(const luly::events::key_pressed_event& key_pressed_event);
 
 private:
-    void setup_fbo();
     void setup_scene();
-
-    std::shared_ptr<luly::renderer::shader> m_shader;
-    std::shared_ptr<luly::renderer::model> m_model;
-    std::shared_ptr<luly::renderer::texture> m_texture;
-    std::shared_ptr<luly::renderer::frame_buffer> m_fbo;
-    std::shared_ptr<luly::scene::scene_actor> m_actor;
 };

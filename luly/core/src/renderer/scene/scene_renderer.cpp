@@ -5,8 +5,9 @@
 #include "renderer/renderer/pipeline/final_pass.h"
 #include "renderer/renderer/renderer.h"
 #include "renderer/shaders/shader_factory.h"
-#include "scene/actor/components/model_renderer_component.h"
+#include "scene/actor/components/rendering/model_renderer_component.h"
 #include "scene/actor/components/transform_component.h"
+#include "scene/actor/components/rendering/material_component.h"
 #include "application/application.h"
 
 #include <logging/log.h>
@@ -87,6 +88,15 @@ namespace luly::renderer
 
             // Check if has model_renderer_component
             if (!registry->any_of<scene::model_renderer_component>(actor)) continue;
+
+            // Check if has material_component
+            if (registry->any_of<scene::material_component>(actor))
+            {
+                auto& material_component = registry->get<scene::material_component>(actor);
+                auto& material = material_component.get_material();
+
+                material->bind(s_data.geometry_shader);
+            }
 
             auto& model_renderer_component = registry->get<scene::model_renderer_component>(actor);
             auto& model = model_renderer_component.get_model();

@@ -35,13 +35,12 @@ namespace luly::renderer
         float tilling;
         std::map<material_texture_type, material_texture> textures;
 
-        material_specification(const glm::vec3& albedo = glm::vec3(0.0f), float roughness = 1.0f, float metallic = 0.0f,
-                               float ambient_occlusion = 1.0f, float tilling = 1.0f,
-                               const std::map<material_texture_type, material_texture>& textures = {}) :
-            albedo(albedo), roughness(roughness), metallic(metallic),
-            ambient_occlusion(ambient_occlusion), tilling(tilling), textures(textures)
-        {
-        }
+        material_specification(const glm::vec3& albedo = glm::vec3(0.0f),
+                               float roughness = 1.0f,
+                               float metallic = 0.0f,
+                               float ambient_occlusion = 1.0f,
+                               float tilling = 1.0f,
+                               const std::map<material_texture_type, material_texture>& textures = {});
     };
 
     constexpr material_texture_type MATERIAL_TEXTURE_TYPES[] = {

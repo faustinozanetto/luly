@@ -9,25 +9,21 @@
 #include "renderer/shaders/shader_factory.h"
 #include "renderer/textures/texture_factory.h"
 #include "scene/scene.h"
-#include "scene/actor/components/model_renderer_component.h"
 
 #include <events/event_dispatcher.h>
 #include <time/app_time.h>
 
+#include "renderer/materials/material.h"
+#include "renderer/materials/material_specification_builder.h"
 #include "renderer/scene/scene_renderer.h"
 #include "scene/actor/components/transform_component.h"
+#include "scene/actor/components/rendering/model_renderer_component.h"
 
 basic_application::basic_application(const luly::renderer::window_specification& window_specification) : application(
     window_specification)
 {
     luly::ui::engine_ui::initialize();
 
-    m_shader = luly::renderer::shader_factory::create_shader_from_file(
-        "assets/shaders/test_shader.lsh");
-    m_model = luly::renderer::model_factory::create_model_from_file("assets/models/gameboy.obj");
-    m_texture = luly::renderer::texture_factory::create_texture_from_file("assets/textures/gameboy.png");
-
-    setup_fbo();
     setup_scene();
 
     luly::ui::engine_ui::set_render_target(
@@ -112,36 +108,54 @@ bool basic_application::on_key_pressed_event(const luly::events::key_pressed_eve
     return false;
 }
 
-void basic_application::setup_fbo()
-{
-    auto viewport_size = luly::renderer::renderer::get_viewport_size();
-
-    std::vector<luly::renderer::frame_buffer_attachment> attachments = {
-        {
-            luly::renderer::texture_internal_format::rgba8,
-            luly::renderer::texture_filtering::linear,
-            luly::renderer::texture_wrapping::clamp_to_edge, viewport_size
-        },
-    };
-
-    luly::renderer::frame_buffer_attachment depth_attachment = {
-        luly::renderer::texture_internal_format::depth_component32f,
-        luly::renderer::texture_filtering::linear,
-        luly::renderer::texture_wrapping::clamp_to_edge, viewport_size
-    };
-
-    m_fbo = std::make_shared<luly::renderer::frame_buffer>(
-        viewport_size.x, viewport_size.y, attachments, depth_attachment);
-}
-
 void basic_application::setup_scene()
 {
     const auto& scene = std::make_shared<luly::scene::scene>("Test Scene");
     get_scene_manager()->add_scene(scene);
     get_scene_manager()->switch_scene(scene);
 
-    m_actor = scene->create_actor("Test Model");
-    m_actor->add_component<luly::scene::model_renderer_component>(m_model);
+    const auto& actor = scene->create_actor("Test Model");
+    const auto& model = luly::renderer::model_factory::create_model_from_file("assets/models/gameboy.obj");
+    actor->add_component<luly::scene::model_renderer_component>(model);
+
+    const auto& albedo_texture = luly::renderer::texture_factory::create_texture_from_file(
+        "assets/textures/gameboy/DefaultMaterial_Albedo.png");
+    luly::renderer::material_texture albedo;
+    albedo.texture = albedo_texture;
+    albedo.is_enabled = true;
+    albedo.type = luly::renderer::material_texture_type::albedo;
+
+    const auto& normal_texture = luly::renderer::texture_factory::create_texture_from_file(
+        "assets/textures/gameboy/DefaultMaterial_Normal.png");
+    luly::renderer::material_texture normal;
+    normal.texture = normal_texture;
+    normal.is_enabled = true;
+    normal.type = luly::renderer::material_texture_type::normal;
+
+    const auto& metallic_texture = luly::renderer::texture_factory::create_texture_from_file(
+        "assets/textures/gameboy/DefaultMaterial_Metallic.png");
+    luly::renderer::material_texture metallic;
+    metallic.texture = metallic_texture;
+    metallic.is_enabled = true;
+    metallic.type = luly::renderer::material_texture_type::metallic;
+
+    const auto& roughness_texture = luly::renderer::texture_factory::create_texture_from_file(
+        "assets/textures/gameboy/DefaultMaterial_Rouhgness.png");
+    luly::renderer::material_texture roughness;
+    roughness.texture = roughness_texture;
+    roughness.is_enabled = true;
+    roughness.type = luly::renderer::material_texture_type::roughness;
+
+    std::map<luly::renderer::material_texture_type, luly::renderer::material_texture> textures;
+    textures.insert({luly::renderer::material_texture_type::albedo, albedo});
+    textures.insert({luly::renderer::material_texture_type::normal, normal});
+    textures.insert({luly::renderer::material_texture_type::metallic, metallic});
+    textures.insert({luly::renderer::material_texture_type::roughness, roughness});
+
+    auto material_specification = std::make_shared<luly::renderer::material_specification_builder>()->
+                                  with_textures(textures).build();
+
+    auto material = std::make_shared<luly::renderer::material>(material_specification);
 }
 
 luly::core::application* luly::core::create_application()

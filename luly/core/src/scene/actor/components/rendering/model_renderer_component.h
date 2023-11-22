@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "base_component.h"
+#include "scene/actor/components/base_component.h"
 
 #include "renderer/models/model.h"
 
