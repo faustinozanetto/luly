@@ -14,7 +14,6 @@
 #include <events/event_dispatcher.h>
 #include <time/app_time.h>
 
-#include "renderer/renderer/pipeline/final_pass.h"
 #include "renderer/scene/scene_renderer.h"
 #include "scene/actor/components/transform_component.h"
 

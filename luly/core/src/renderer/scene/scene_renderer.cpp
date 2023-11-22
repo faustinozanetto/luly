@@ -77,29 +77,25 @@ namespace luly::renderer
 
         s_data.geometry_pass->get_frame_buffer()->bind();
         renderer::clear_screen();
+        s_data.geometry_shader->bind();
 
         const auto& registry = current_scene->get_registry();
         const auto& view = registry->view<scene::transform_component>();
-
-        s_data.geometry_shader->bind();
-
         for (auto [actor, transform_component] : view.each())
         {
             auto& transform = transform_component.get_transform();
 
             // Check if has model_renderer_component
-            if (registry->any_of<scene::model_renderer_component>(actor))
-            {
-                auto& model_renderer_component = registry->get<scene::model_renderer_component>(actor);
-                auto& model = model_renderer_component.get_model();
+            if (!registry->any_of<scene::model_renderer_component>(actor)) continue;
 
-                s_data.geometry_shader->set_mat4("u_transform", transform->get_transform());
-                renderer::submit_model(model);
-            }
+            auto& model_renderer_component = registry->get<scene::model_renderer_component>(actor);
+            auto& model = model_renderer_component.get_model();
+
+            s_data.geometry_shader->set_mat4("u_transform", transform->get_transform());
+            renderer::submit_model(model);
         }
 
         s_data.geometry_shader->un_bind();
-
         s_data.geometry_pass->get_frame_buffer()->un_bind();
     }
 }
