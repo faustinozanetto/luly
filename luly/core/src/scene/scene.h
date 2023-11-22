@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include "core_api.h"
 
 #include <camera/camera_manager.h>
 #include <entt/entt.hpp>
@@ -9,7 +8,7 @@ namespace luly::scene
 {
     class scene_actor;
 
-    class LULY_CORE_API scene
+    class scene
     {
     public:
         scene(const std::string& name);

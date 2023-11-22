@@ -1,12 +1,15 @@
 ﻿#pragma once
 
-#include "events/base_event.h"
 #include "renderer_api.h"
 
 #include <functional>
 #include <string>
+
+#include <shared_api.h>
+#include <events/base_event.h>
+
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include <glfw/glfw3.h>
 
 namespace luly::renderer
 {
@@ -32,7 +35,7 @@ namespace luly::renderer
         ~window();
 
         /* Getters */
-        GLFWwindow* get_native_handle() const { return m_handle; }
+        __forceinline GLFWwindow* get_native_handle() const { return m_handle; }
         const window_data& get_data() const { return m_data; }
 
         /* Setters */
@@ -45,6 +48,8 @@ namespace luly::renderer
         void create_glfw_handle();
         void setup_glfw_callbacks() const;
         void make_current() const;
+
+        static void glfw_error_callback(int error, const char* description);
 
         GLFWwindow* m_handle;
         window_data m_data;

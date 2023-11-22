@@ -2,13 +2,12 @@
 
 #include "base_component.h"
 
-#include "core_api.h"
 
 #include <models/model.h>
 
 namespace luly::scene
 {
-    class LULY_CORE_API model_renderer_component : public base_component
+    class model_renderer_component : public base_component
     {
     public:
         model_renderer_component();

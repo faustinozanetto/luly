@@ -20,14 +20,25 @@ namespace luly::core
         LY_TRACE("Started creating application...");
         m_window = std::make_shared<renderer::window>(window_specification);
         m_window->set_event_function(BIND_EVENT_FN(application::on_event));
-        renderer::renderer::initialize(m_window);
-//        ui::engine_ui::initialize();
 
+        renderer::renderer::initialize(m_window);
+
+        m_imgui_manager = std::make_shared<renderer::imgui_manager>(m_window->get_native_handle());
         m_scene_manager = std::make_shared<scene::scene_manager>();
         app_time::update_time();
+
+        application::on_create();
     }
 
     application::~application()
+    {
+    }
+
+    void application::on_create()
+    {
+    }
+
+    void application::on_update()
     {
     }
 
@@ -54,10 +65,9 @@ namespace luly::core
                 }
             }
 
-//            ui::engine_ui::begin_frame();
+            m_imgui_manager->begin_frame();
             on_update();
-  //          ui::engine_ui::on_update();
-    //        ui::engine_ui::end_frame();
+            m_imgui_manager->end_frame();
 
             renderer::renderer::poll_input();
             renderer::renderer::swap_buffers();

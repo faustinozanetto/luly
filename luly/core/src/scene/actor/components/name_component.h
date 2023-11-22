@@ -2,11 +2,10 @@
 
 #include "scene/actor/components/base_component.h"
 
-#include "core_api.h"
 
 namespace luly::scene
 {
-    class LULY_CORE_API name_component : public base_component
+    class name_component : public base_component
     {
     public:
         name_component(const std::string& name);

@@ -29,7 +29,7 @@ namespace luly::scene
     {
         const auto iterator = m_actors_map.find(entity);
         if (iterator == m_actors_map.end())
-            LY_ASSERT_MSG(m_actors_map.contains(entity), "Actor does not belong to the registry!")
+            LY_ASSERT_MSG(m_actors_map.find(entity) != m_actors_map.end(), "Actor does not belong to the registry!")
 
         return iterator->second;
     }

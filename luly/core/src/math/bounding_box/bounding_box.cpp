@@ -46,7 +46,7 @@ namespace luly::math
         const glm::mat4& transform_matrix = transform.get_transform();
         const glm::vec3 updated_center = transform_matrix * glm::vec4(get_center(), 1.0f);
         const glm::vec3 edge = get_size() * 0.5f;
-        const glm::vec3 updated_edge = glm::vec3(
+        const auto updated_edge = glm::vec3(
             glm::abs(transform_matrix[0][0]) * edge.x + glm::abs(transform_matrix[1][0]) * edge.y + glm::abs(
                 transform_matrix[2][0]) * edge.z,
             glm::abs(transform_matrix[0][1]) * edge.x + glm::abs(transform_matrix[1][1]) * edge.y + glm::abs(

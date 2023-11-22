@@ -9,7 +9,7 @@ namespace luly::core
     using ref = std::shared_ptr<T>;
 
     template <typename T, typename... Args>
-    inline ref<T> make_ref(Args&&... args)
+    ref<T> make_ref(Args&&... args)
     {
         return std::make_shared<T>(std::forward<Args>(args)...);
     }

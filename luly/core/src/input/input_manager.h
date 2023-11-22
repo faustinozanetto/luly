@@ -3,13 +3,12 @@
 #include <input/key_codes.h>
 #include <input/mouse_codes.h>
 
-#include "core_api.h"
 
 #include <glm/glm.hpp>
 
 namespace luly::input
 {
-    class LULY_CORE_API input_manager
+    class input_manager
     {
     public:
         static bool is_key_pressed(key key_code);

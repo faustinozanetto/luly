@@ -1,11 +1,11 @@
 ﻿#pragma once
 
 #include "scene/scene.h"
-#include "core_api.h"
+
 
 namespace luly::scene
 {
-    class LULY_CORE_API scene_manager
+    class scene_manager
     {
     public:
         scene_manager();

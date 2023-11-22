@@ -1,9 +1,8 @@
 project "luly-renderer"
-    kind "SharedLib"
+    kind "StaticLib"
     language "C++"
     cppdialect "C++20"
     defines { "LULY_RENDERER_EXPORTS" }
-    targetextension ".dll"
     
     targetdir("%{_WORKING_DIR}/binaries/" .. output_dir .. "/%{prj.name}")
     objdir("%{_WORKING_DIR}/intermediates/" .. output_dir .. "/%{prj.name}")
@@ -19,6 +18,7 @@ project "luly-renderer"
         "%{include_dirs.glfw}",
         "%{include_dirs.glad}",
         "%{include_dirs.glm}",
+        "%{include_dirs.imgui}",
         "%{include_dirs.spdlog}",
         "%{include_dirs.assimp}",
         "%{include_dirs.stb}",
@@ -29,6 +29,7 @@ project "luly-renderer"
         "glfw",
         "glad",
         "stb",
+        "imgui"
     }
     
     filter "configurations:debug"

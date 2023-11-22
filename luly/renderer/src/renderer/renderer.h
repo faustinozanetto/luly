@@ -7,8 +7,9 @@
 
 #include <memory>
 #include <glm/glm.hpp>
+
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include <glfw/glfw3.h>
 
 namespace luly::renderer
 {

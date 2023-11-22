@@ -2,7 +2,6 @@
 
 #include "scene/scene.h"
 
-#include "core_api.h"
 
 #include <logging/log.h>
 #include <utils/assert.h>
@@ -10,7 +9,7 @@
 
 namespace luly::scene
 {
-    class LULY_CORE_API scene_actor
+    class scene_actor
     {
     public:
         scene_actor(entt::entity handle, scene* scene);

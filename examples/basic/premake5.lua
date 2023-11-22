@@ -1,7 +1,7 @@
 project "basic"
     kind "ConsoleApp"
     language "C++"
-    cppdialect "C++20"
+    cppdialect "C++17"
     
     targetdir("%{_WORKING_DIR}/binaries/" .. output_dir .. "/%{prj.name}")
     objdir("%{_WORKING_DIR}/intermediates/" .. output_dir .. "/%{prj.name}")
@@ -30,17 +30,11 @@ project "basic"
         "luly-core",
         "luly-renderer",
         "luly-ui",
-        "luly-shared"
+        "luly-shared",
+        "glfw",
+        "glad",
+        "stb",
     }
-
-    postbuildcommands {
-        '{COPY} "%{_WORKING_DIR}/binaries/%{output_dir}/luly-core/luly-core.dll" "$(OutDir)"',
-        '{COPY} "%{_WORKING_DIR}/binaries/%{output_dir}/luly-renderer/luly-renderer.dll" "$(OutDir)"',
-        '{COPY} "%{_WORKING_DIR}/binaries/%{output_dir}/luly-shared/luly-shared.dll" "$(OutDir)"',
-        '{COPY} "%{_WORKING_DIR}/binaries/%{output_dir}/luly-ui/luly-ui.dll" "$(OutDir)"',
-    }
-    
-    postbuildmessage "Copying DLLs to $(OutDir)"
     
     filter "configurations:debug"
         defines "LY_DEBUG"

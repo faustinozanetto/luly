@@ -2,6 +2,7 @@
 
 #include <application/entry_point.h>
 
+#include <ui_api.h>
 #include "engine_ui.h"
 #include "imgui.h"
 #include "models/model_factory.h"
@@ -15,6 +16,8 @@
 #include <events/event_dispatcher.h>
 #include <time/app_time.h>
 
+#include "scene/actor/components/transform_component.h"
+
 basic_application::basic_application(const luly::renderer::window_specification& window_specification) : application(
     window_specification)
 {
@@ -22,24 +25,28 @@ basic_application::basic_application(const luly::renderer::window_specification&
 
     m_shader = luly::renderer::shader_factory::create_shader_from_file(
         "assets/shaders/test_shader.lsh");
-
     m_model = luly::renderer::model_factory::create_model_from_file("assets/models/gameboy.obj");
-
     m_texture = luly::renderer::texture_factory::create_texture_from_file("assets/textures/gameboy.png");
+
     setup_fbo();
     setup_scene();
+
     luly::ui::engine_ui::set_render_target(m_fbo->get_attachment_id(0));
+
 }
 
 basic_application::~basic_application()
 {
 }
 
+void basic_application::on_create()
+{
+}
+
 void basic_application::on_update()
 {
-  //  luly::ui::engine_ui::begin_frame();
-
-    if (!get_scene_manager()->get_current_scene()) return;
+    if (!get_scene_manager()->get_current_scene())
+        return;
 
     auto& camera = get_scene_manager()->get_current_scene()->get_camera_manager()->get_perspective_camera();
 
@@ -55,8 +62,7 @@ void basic_application::on_update()
     m_shader->un_bind();
     m_fbo->un_bind();
 
-    //luly::ui::engine_ui::on_update();
-    //luly::ui::engine_ui::end_frame();
+    luly::ui::engine_ui::on_update();
 }
 
 void basic_application::on_handle_event(luly::events::base_event& event)

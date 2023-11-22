@@ -1,7 +1,5 @@
 ﻿#include "window.h"
 
-#include <shared_api.h>
-
 #include <events/window/window_resize_event.h>
 #include <events/key/key_pressed_event.h>
 #include <events/key/key_released_event.h>
@@ -26,6 +24,13 @@ namespace luly::renderer
 
     window::~window()
     {
+        glfwDestroyWindow(m_handle);
+        glfwTerminate();
+    }
+
+    void window::set_event_function(const std::function<void(events::base_event&)>& func)
+    {
+        m_data.event_func = func;
     }
 
     void window::initialize()
@@ -36,6 +41,7 @@ namespace luly::renderer
         setup_glfw_hints();
         create_glfw_handle();
 
+        glfwSetErrorCallback(glfw_error_callback);
         glfwSetWindowUserPointer(m_handle, &m_data);
 
         setup_glfw_callbacks();
@@ -45,8 +51,11 @@ namespace luly::renderer
 
     void window::initialize_glfw()
     {
-        const int glfw_initialize_status = glfwInit();
-        LY_ASSERT_MSG(glfw_initialize_status != GLFW_FALSE, "Failed to initialize GFLW!")
+        if (!glfwInit())
+        {
+            LY_CRITICAL("Failed to initialize glfw!");
+            exit(EXIT_FAILURE);
+        }
     }
 
     void window::setup_glfw_hints()
@@ -61,8 +70,8 @@ namespace luly::renderer
     {
         LY_TRACE("Creating GLFW window: ");
         LY_TRACE("   - Title: " + m_data.title);
-        LY_TRACE(std::format("   - Width: {} px", m_data.width));
-        LY_TRACE(std::format("   - Height: {} px", m_data.height));
+        LY_TRACE("   - Width: {0} px", m_data.width);
+        LY_TRACE("   - Height: {0} px", m_data.height);
 
         m_handle = glfwCreateWindow(m_data.width, m_data.height, m_data.title.c_str(), nullptr, nullptr);
         LY_ASSERT_MSG(m_handle != nullptr, "Failed to create GLFW window!");
@@ -157,8 +166,8 @@ namespace luly::renderer
         glfwMakeContextCurrent(m_handle);
     }
 
-    void window::set_event_function(const std::function<void(events::base_event&)>& func)
+    void window::glfw_error_callback(int error, const char* description)
     {
-        m_data.event_func = func;
+        LY_ERROR("GLFW Error ({0}): {1}", error, description);
     }
 }

@@ -64,7 +64,7 @@ namespace luly::math
     void transform::recalculate_transform()
     {
         m_transform = glm::translate(glm::mat4(1.0f), m_location) *
-            glm::toMat4(m_rotation) *
+            toMat4(m_rotation) *
             glm::scale(glm::mat4(1.0f), m_scale);
         m_transform_dirty = false;
     }

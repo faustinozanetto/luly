@@ -3,6 +3,7 @@
 #include "shared_api.h"
 
 #include <chrono>
+#include <vector>
 
 namespace luly
 {

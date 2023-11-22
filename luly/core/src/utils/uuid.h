@@ -1,10 +1,8 @@
 ﻿#pragma once
 
-#include "core_api.h"
-
 namespace luly::utils
 {
-    class LULY_CORE_API uuid
+    class uuid
     {
     public:
         uuid();

@@ -1,7 +1,7 @@
 ﻿#include "actor_details_panel.h"
 
 #include "engine_ui.h"
-#include "core_api.h"
+
 #include "components/common/actor_name_component_panel.h"
 #include "components/common/actor_transform_component_panel.h"
 #include "components/common/rendering/actor_model_renderer_component_panel.h"

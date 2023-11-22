@@ -24,10 +24,10 @@ namespace luly
     void app_time::update_time()
     {
         // Calculate the frame time
-        time_point current_time = std::chrono::high_resolution_clock::now();
-        duration delta = current_time - s_previous_time;
+        const time_point current_time = std::chrono::high_resolution_clock::now();
+        const duration delta = current_time - s_previous_time;
         s_previous_time = current_time;
-        float frame_time = std::chrono::duration_cast<std::chrono::duration<float>>(delta).count();
+        const float frame_time = std::chrono::duration_cast<std::chrono::duration<float>>(delta).count();
 
         // Store frame time for FPS calculation
         s_frame_times.push_back(frame_time);

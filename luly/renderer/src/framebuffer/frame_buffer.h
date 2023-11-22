@@ -6,6 +6,9 @@
 #include <glm/glm.hpp>
 #include <vector>
 
+#include <glad/glad.h>
+#include "glfw/glfw3.h"
+
 namespace luly::renderer
 {
     struct LULY_RENDERER_API frame_buffer_attachment

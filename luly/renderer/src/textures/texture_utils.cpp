@@ -1,7 +1,7 @@
 ﻿#include "texture_utils.h"
 
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include <glfw/glfw3.h>
 
 #include <logging/log.h>
 #include <utils/assert.h>

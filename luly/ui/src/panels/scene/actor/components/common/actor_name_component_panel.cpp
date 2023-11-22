@@ -1,7 +1,7 @@
 ﻿#include "actor_name_component_panel.h"
 
 #include "engine_ui.h"
-#include "core_api.h"
+
 #include "scene/actor/components/name_component.h"
 
 namespace luly::ui

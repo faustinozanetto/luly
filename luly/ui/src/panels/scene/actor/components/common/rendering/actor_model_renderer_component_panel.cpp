@@ -1,7 +1,7 @@
 ﻿#include "actor_model_renderer_component_panel.h"
 
 #include "engine_ui.h"
-#include "core_api.h"
+
 #include "scene/actor/components/model_renderer_component.h"
 #include "utils/ui_utils.h"
 
@@ -27,15 +27,16 @@ namespace luly::ui
         if (model_renderer_component.get_model())
         {
             ui_utils::draw_property("Mesh Count: ",
-                                    std::format("{}", model_renderer_component.get_model()->get_meshes().size()));
+                                    std::to_string(model_renderer_component.get_model()->get_meshes().size()));
             if (ImGui::TreeNode("Meshes"))
             {
                 for (const auto& mesh : model_renderer_component.get_model()->get_meshes())
                 {
-                    if (ImGui::TreeNode(std::format("Mesh '{}'", mesh->get_name()).c_str()))
+                    std::string node_title = "Mesh " + mesh->get_name();
+                    if (ImGui::TreeNode(node_title.c_str()))
                     {
-                        ui_utils::draw_property("Vertices: ", std::format("{}", mesh->get_vertices().size()));
-                        ui_utils::draw_property("Indices: ", std::format("{}", mesh->get_indices().size()));
+                        ui_utils::draw_property("Vertices: ", std::to_string(mesh->get_vertices().size()));
+                        ui_utils::draw_property("Indices: ", std::to_string(mesh->get_indices().size()));
 
                         ImGui::TreePop();
                     }
