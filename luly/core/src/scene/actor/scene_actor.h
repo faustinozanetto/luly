@@ -2,7 +2,6 @@
 
 #include "scene/scene.h"
 
-
 #include <logging/log.h>
 #include <utils/assert.h>
 #include <entt/entt.hpp>

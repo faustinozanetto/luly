@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-
 #include <camera/camera_manager.h>
 #include <entt/entt.hpp>
 

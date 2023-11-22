@@ -2,7 +2,6 @@
 
 #include "math/transform/transform.h"
 
-
 #include <glm/glm.hpp>
 
 namespace luly::math

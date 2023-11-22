@@ -4,7 +4,7 @@
 
 namespace luly::ui
 {
-    class LULY_UI_API scene_hierarchy_panel : public ui_panel
+    class scene_hierarchy_panel : public ui_panel
     {
     public:
         scene_hierarchy_panel();

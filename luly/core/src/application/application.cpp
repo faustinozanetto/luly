@@ -23,7 +23,6 @@ namespace luly::core
 
         renderer::renderer::initialize(m_window);
 
-        m_imgui_manager = std::make_shared<renderer::imgui_manager>(m_window->get_native_handle());
         m_scene_manager = std::make_shared<scene::scene_manager>();
         app_time::update_time();
 
@@ -65,9 +64,7 @@ namespace luly::core
                 }
             }
 
-            m_imgui_manager->begin_frame();
             on_update();
-            m_imgui_manager->end_frame();
 
             renderer::renderer::poll_input();
             renderer::renderer::swap_buffers();

@@ -2,7 +2,6 @@
 
 #include "scene/scene.h"
 
-
 namespace luly::scene
 {
     class scene_manager

@@ -1,11 +1,10 @@
 ﻿#pragma once
 
 #include "texture.h"
-#include "renderer_api.h"
 
 namespace luly::renderer
 {
-    class LULY_RENDERER_API texture_utils
+    class texture_utils
     {
     public:
         static const char* get_texture_filtering_to_string(texture_filtering filtering);

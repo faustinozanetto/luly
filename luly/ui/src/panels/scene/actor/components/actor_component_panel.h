@@ -6,7 +6,7 @@
 
 namespace luly::ui
 {
-    class LULY_UI_API actor_component_panel : public ui_panel
+    class actor_component_panel : public ui_panel
     {
     public:
         actor_component_panel(const std::string& component_name);

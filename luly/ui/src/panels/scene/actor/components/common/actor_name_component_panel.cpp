@@ -2,7 +2,7 @@
 
 #include "engine_ui.h"
 
-#include "scene/actor/components/name_component.h"
+#include <scene/actor/components/name_component.h>
 
 namespace luly::ui
 {

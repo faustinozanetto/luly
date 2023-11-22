@@ -2,7 +2,6 @@
 
 #include "base_component.h"
 
-
 #include <models/model.h>
 
 namespace luly::scene

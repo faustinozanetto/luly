@@ -1,13 +1,12 @@
 ﻿#pragma once
 
 #include "shaders/shader.h"
-#include "renderer_api.h"
 
 namespace luly::renderer
 {
 #define SHADER_TYPE_TOKEN "#shader"
 
-    class LULY_RENDERER_API shader_utils
+    class shader_utils
     {
     public:
         static uint32_t get_shader_type_to_opengl(shader_type shader_type);

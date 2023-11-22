@@ -4,7 +4,7 @@
 
 namespace luly::ui
 {
-    class LULY_UI_API camera_panel : public ui_panel
+    class camera_panel : public ui_panel
     {
     public:
         camera_panel();

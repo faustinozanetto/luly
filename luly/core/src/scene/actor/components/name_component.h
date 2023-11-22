@@ -2,7 +2,6 @@
 
 #include "scene/actor/components/base_component.h"
 
-
 namespace luly::scene
 {
     class name_component : public base_component

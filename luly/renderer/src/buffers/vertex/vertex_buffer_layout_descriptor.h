@@ -1,7 +1,5 @@
 #pragma once
 
-#include "renderer_api.h"
-
 #include <string>
 #include <vector>
 
@@ -10,7 +8,7 @@
 
 namespace luly::renderer
 {
-    enum class LULY_RENDERER_API vertex_buffer_entry_type
+    enum class vertex_buffer_entry_type
     {
         FLOAT,
         FLOAT2,
@@ -25,7 +23,7 @@ namespace luly::renderer
         BOOL
     };
 
-    class LULY_RENDERER_API vertex_buffer_layout_entry
+    class vertex_buffer_layout_entry
     {
     public:
         vertex_buffer_layout_entry(const std::string& name, vertex_buffer_entry_type type, bool is_normalized);

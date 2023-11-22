@@ -3,7 +3,6 @@
 #include <input/key_codes.h>
 #include <input/mouse_codes.h>
 
-
 #include <glm/glm.hpp>
 
 namespace luly::input

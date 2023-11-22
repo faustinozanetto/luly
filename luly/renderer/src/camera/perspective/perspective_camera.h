@@ -1,11 +1,10 @@
 ﻿#pragma once
 
-#include "renderer_api.h"
 #include "camera/camera.h"
 
 namespace luly::renderer
 {
-    class LULY_RENDERER_API perspective_camera : public camera
+    class perspective_camera : public camera
     {
     public:
         perspective_camera(float fov = 45.0f);

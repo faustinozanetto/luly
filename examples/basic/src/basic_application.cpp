@@ -2,7 +2,6 @@
 
 #include <application/entry_point.h>
 
-#include <ui_api.h>
 #include "engine_ui.h"
 #include "imgui.h"
 #include "models/model_factory.h"
@@ -32,11 +31,11 @@ basic_application::basic_application(const luly::renderer::window_specification&
     setup_scene();
 
     luly::ui::engine_ui::set_render_target(m_fbo->get_attachment_id(0));
-
 }
 
 basic_application::~basic_application()
 {
+    luly::ui::engine_ui::shutdown();
 }
 
 void basic_application::on_create()
@@ -47,6 +46,8 @@ void basic_application::on_update()
 {
     if (!get_scene_manager()->get_current_scene())
         return;
+
+    luly::ui::engine_ui::begin_frame();
 
     auto& camera = get_scene_manager()->get_current_scene()->get_camera_manager()->get_perspective_camera();
 
@@ -63,6 +64,7 @@ void basic_application::on_update()
     m_fbo->un_bind();
 
     luly::ui::engine_ui::on_update();
+    luly::ui::engine_ui::end_frame();
 }
 
 void basic_application::on_handle_event(luly::events::base_event& event)

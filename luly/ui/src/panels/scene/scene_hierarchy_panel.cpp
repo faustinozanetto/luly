@@ -1,9 +1,9 @@
 ﻿#include "scene_hierarchy_panel.h"
 
 #include "engine_ui.h"
-#include "application/application.h"
-#include "scene/scene_manager.h"
-#include "scene/actor/components/name_component.h"
+#include <application/application.h>
+#include <scene/scene_manager.h>
+#include <scene/actor/components/name_component.h>
 
 namespace luly::ui
 {

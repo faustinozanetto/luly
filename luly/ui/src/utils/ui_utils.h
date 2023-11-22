@@ -1,13 +1,11 @@
 ﻿#pragma once
 
-#include "ui_api.h"
-
 #include <string>
 #include <glm/glm.hpp>
 
 namespace luly::ui
 {
-    class LULY_UI_API ui_utils
+    class ui_utils
     {
     public:
         static void draw_property(const std::string &name, const std::string &content);

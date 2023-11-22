@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include "renderer_api.h"
 #include "textures/texture.h"
 
 #include <glm/glm.hpp>
@@ -11,7 +10,7 @@
 
 namespace luly::renderer
 {
-    struct LULY_RENDERER_API frame_buffer_attachment
+    struct frame_buffer_attachment
     {
         texture_internal_format internal_format;
         texture_filtering filtering;
@@ -19,7 +18,7 @@ namespace luly::renderer
         glm::vec2 size;
     };
 
-    class LULY_RENDERER_API frame_buffer : public bindable_object
+    class frame_buffer : public bindable_object
     {
     public:
         frame_buffer(int width, int height);

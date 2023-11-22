@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "common/bindable_object.h"
-#include "renderer_api.h"
 
 #include <string>
 #include <unordered_map>
@@ -13,14 +12,14 @@
 
 namespace luly::renderer
 {
-    enum class LULY_RENDERER_API shader_type
+    enum class shader_type
     {
         fragment,
         vertex,
         geometry,
     };
 
-    class LULY_RENDERER_API shader : public bindable_object
+    class shader : public bindable_object
     {
     public:
         shader(const std::unordered_map<shader_type, std::string>& shader_contents);

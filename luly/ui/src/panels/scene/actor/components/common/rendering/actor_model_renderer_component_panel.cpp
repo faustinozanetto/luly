@@ -1,9 +1,9 @@
 ﻿#include "actor_model_renderer_component_panel.h"
 
 #include "engine_ui.h"
-
-#include "scene/actor/components/model_renderer_component.h"
 #include "utils/ui_utils.h"
+
+#include <scene/actor/components/model_renderer_component.h>
 
 namespace luly::ui
 {

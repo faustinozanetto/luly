@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include "renderer_api.h"
-
 #include <functional>
 #include <string>
 
@@ -13,14 +11,14 @@
 
 namespace luly::renderer
 {
-    struct LULY_RENDERER_API window_specification
+    struct window_specification
     {
         std::string title;
         int width;
         int height;
     };
 
-    struct LULY_RENDERER_API window_data
+    struct window_data
     {
         int width;
         int height;
@@ -28,7 +26,7 @@ namespace luly::renderer
         std::function<void(events::base_event&)> event_func;
     };
 
-    class LULY_RENDERER_API window
+    class window
     {
     public:
         window(const window_specification& window_specification);

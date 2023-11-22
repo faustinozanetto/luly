@@ -1,12 +1,10 @@
 ﻿#pragma once
 
-#include "renderer_api.h"
-
 #include <glm/glm.hpp>
 
 namespace luly::renderer
 {
-    class LULY_RENDERER_API camera
+    class camera
     {
     public:
         camera();

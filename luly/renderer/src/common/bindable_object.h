@@ -1,10 +1,8 @@
 ﻿#pragma once
 
-#include "renderer_api.h"
-
 namespace luly::renderer
 {
-    class LULY_RENDERER_API bindable_object
+    class bindable_object
     {
     public:
         virtual ~bindable_object() = default;

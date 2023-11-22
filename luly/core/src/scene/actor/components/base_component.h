@@ -3,7 +3,6 @@
 #include "scene/actor/scene_actor.h"
 #include "utils/uuid.h"
 
-
 namespace luly::scene
 {
     class base_component

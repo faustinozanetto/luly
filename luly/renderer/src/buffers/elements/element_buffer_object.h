@@ -1,14 +1,13 @@
 ﻿#pragma once
 
 #include "common/bindable_object.h"
-#include "renderer_api.h"
 
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
 
 namespace luly::renderer
 {
-    class LULY_RENDERER_API element_buffer_object : public bindable_object
+    class element_buffer_object : public bindable_object
     {
     public:
         element_buffer_object(int count = 0);

@@ -3,7 +3,6 @@
 #include "base_component.h"
 #include "math/transform/transform.h"
 
-
 namespace luly::scene
 {
     class transform_component : public base_component

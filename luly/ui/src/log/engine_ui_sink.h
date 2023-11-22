@@ -3,15 +3,13 @@
 #include "panels/console/console_panel.h"
 #include "panels/console/console_panel_message.h"
 
-#include "ui_api.h"
-
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/base_sink.h>
 
 namespace luly::ui
 {
     template <typename Mutex>
-    class LULY_UI_API engine_ui_sink : public spdlog::sinks::base_sink<Mutex>
+    class engine_ui_sink : public spdlog::sinks::base_sink<Mutex>
     {
     public:
         explicit engine_ui_sink()

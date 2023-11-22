@@ -9,7 +9,7 @@
 
 namespace luly::ui
 {
-    class LULY_UI_API actor_details_panel : public ui_panel
+    class actor_details_panel : public ui_panel
     {
     public:
         actor_details_panel();

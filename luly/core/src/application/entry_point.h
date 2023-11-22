@@ -10,7 +10,7 @@ int main(int argc, char** argv)
 {
     luly::shared::log::initialize();
 
-    auto application = luly::core::create_application();
+    const auto application = luly::core::create_application();
     application->run();
 
     delete application;

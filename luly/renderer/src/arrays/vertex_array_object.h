@@ -3,8 +3,6 @@
 #include "buffers/vertex/vertex_buffer_object.h"
 #include "buffers/elements/element_buffer_object.h"
 
-#include "renderer_api.h"
-
 #include <vector>
 #include <memory>
 
@@ -13,7 +11,7 @@
 
 namespace luly::renderer
 {
-    class LULY_RENDERER_API vertex_array_object : public bindable_object
+    class vertex_array_object : public bindable_object
     {
     public:
         vertex_array_object();

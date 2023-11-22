@@ -4,7 +4,7 @@
 
 namespace luly::ui
 {
-    class LULY_UI_API menubar_panel : public ui_panel
+    class menubar_panel : public ui_panel
     {
     public:
         menubar_panel();

@@ -1,37 +1,25 @@
-project "luly-core"
-    kind "StaticLib"
+project "luly-shared"
+    kind "SharedLib"
     language "C++"
     cppdialect "C++20"
-    defines { "LULY_CORE_EXPORTS" }
+    defines { "LULY_SHARED_EXPORTS" }
+    targetextension ".dll"
     
     targetdir("%{_WORKING_DIR}/binaries/" .. output_dir .. "/%{prj.name}")
     objdir("%{_WORKING_DIR}/intermediates/" .. output_dir .. "/%{prj.name}")
     
-    pchheader "lypch.h"
-    pchsource "src/lypch.cpp"
-    
     files {
         "src/**.h",
-        "src/**.cpp"
+        "src/**.cpp",
+        "src/utils/assert.h",
+        "src/input/key_codes.h",
+        "src/input/mouse_codes.h",
     }
     
     includedirs {
         "src",
-        "%{_WORKING_DIR}/luly/renderer/src",
-        "%{_WORKING_DIR}/luly/shared/src",
-        "%{include_dirs.glfw}",
-        "%{include_dirs.glad}",
-        "%{include_dirs.glm}",
         "%{include_dirs.spdlog}",
-        "%{include_dirs.assimp}",
-        "%{include_dirs.entt}",
-    }
-    
-    links {
-        "luly-renderer",
-        "luly-shared",
-        "glfw",
-        "glad",
+        "%{include_dirs.glm}",
     }
     
     filter "configurations:debug"
