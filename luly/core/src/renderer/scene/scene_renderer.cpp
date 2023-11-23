@@ -5,6 +5,7 @@
 #include "renderer/renderer/pipeline/final_pass.h"
 #include "renderer/renderer/renderer.h"
 #include "renderer/shaders/shader_factory.h"
+#include "renderer/meshes/mesh_factory.h"
 #include "scene/actor/components/rendering/model_renderer_component.h"
 #include "scene/actor/components/transform_component.h"
 #include "scene/actor/components/rendering/material_component.h"
@@ -21,6 +22,7 @@ namespace luly::renderer
         LY_TRACE("Scene renderer initialization started...");
         create_pipeline_passes();
         create_camera_data();
+        create_common_data();
         LY_TRACE("Scene renderer initialized successfully!");
     }
 
@@ -33,6 +35,7 @@ namespace luly::renderer
         s_data.camera_ubo->bind(0);
 
         perform_geometry_pass();
+        perform_final_pass();
     }
 
     void scene_renderer::end_render()
@@ -48,6 +51,8 @@ namespace luly::renderer
     {
         LY_TRACE("Started creating pipeling passes...");
         s_data.final_pass = std::make_shared<final_pass>();
+        s_data.final_shader = shader_factory::create_shader_from_file("assets/shaders/final_pass_shader.lsh");
+
         s_data.geometry_pass = std::make_shared<geometry_pass>();
         s_data.geometry_shader = shader_factory::create_shader_from_file("assets/shaders/geometry_pass_shader.lsh");
         LY_TRACE("Pipeline passes created successfully!");
@@ -57,6 +62,11 @@ namespace luly::renderer
     {
         s_data.camera_ubo = std::make_shared<uniform_buffer_object>();
         s_data.camera_ubo->initialize(sizeof(camera_data), nullptr);
+    }
+
+    void scene_renderer::create_common_data()
+    {
+        s_data.screen_mesh = mesh_factory::create_screen_quad_mesh();
     }
 
     void scene_renderer::update_camera_data()
@@ -107,5 +117,18 @@ namespace luly::renderer
 
         s_data.geometry_shader->un_bind();
         s_data.geometry_pass->get_frame_buffer()->un_bind();
+    }
+
+    void scene_renderer::perform_final_pass()
+    {
+        s_data.final_pass->get_frame_buffer()->bind();
+        renderer::clear_screen();
+        s_data.final_shader->bind();
+
+        renderer::bind_texture(0, s_data.geometry_pass->get_frame_buffer()->get_attachment_id(2));
+        renderer::submit_mesh(s_data.screen_mesh);
+
+        s_data.final_shader->un_bind();
+        s_data.final_pass->get_frame_buffer()->un_bind();
     }
 }

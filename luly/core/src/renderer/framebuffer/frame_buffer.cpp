@@ -12,10 +12,26 @@ namespace luly::renderer
     {
     }
 
-    frame_buffer::frame_buffer(int width, int height,
-                               const std::vector<frame_buffer_attachment>& attachments) : frame_buffer(
-        width, height, attachments, {})
+    frame_buffer::frame_buffer(int width, int height, const std::vector<frame_buffer_attachment>& attachments)
     {
+        LY_TRACE("Started creating frame buffer...");
+        m_width = width;
+        m_height = height;
+        m_has_depth_attachment = false;
+        m_handle = 0;
+
+        m_attachments = {};
+        m_attachments_data = attachments;
+        m_depth_attachment = {};
+
+        LY_TRACE("  - Width: {0} px", m_width);
+        LY_TRACE("  - Height: {0} px", m_height);
+        LY_TRACE("  - Attachments Count: {0}", m_attachments_data.size());
+        LY_TRACE("  - Has Depth Attachment: '{0}'", m_has_depth_attachment ? "true" : "false");
+
+        initialize();
+
+        LY_TRACE("Frame buffer created successfully.");
     }
 
     frame_buffer::frame_buffer(int width, int height, const std::vector<frame_buffer_attachment>& attachments,

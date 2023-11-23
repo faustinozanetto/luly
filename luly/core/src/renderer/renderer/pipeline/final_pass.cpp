@@ -20,19 +20,13 @@ namespace luly::renderer
 
         std::vector<frame_buffer_attachment> attachments = {
             {
-                texture_internal_format::rgba8,
+                texture_internal_format::rgba16f,
                 texture_filtering::linear,
                 texture_wrapping::clamp_to_edge, viewport_size
             },
         };
-
-        frame_buffer_attachment depth_attachment = {
-            texture_internal_format::depth_component32f,
-            texture_filtering::linear,
-            texture_wrapping::clamp_to_edge, viewport_size
-        };
-
+        
         m_fbo = std::make_shared<frame_buffer>(
-            viewport_size.x, viewport_size.y, attachments, depth_attachment);
+            viewport_size.x, viewport_size.y, attachments);
     }
 }

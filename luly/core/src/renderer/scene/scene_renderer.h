@@ -8,6 +8,8 @@
 
 #include <memory>
 
+#include "renderer/meshes/mesh.h"
+
 namespace luly::renderer
 {
     struct camera_data
@@ -19,12 +21,16 @@ namespace luly::renderer
 
     struct scene_renderer_data
     {
+        /* Common*/
+        std::shared_ptr<mesh> screen_mesh;
+
         /* Geometry Pass */
         std::shared_ptr<geometry_pass> geometry_pass;
         std::shared_ptr<shader> geometry_shader;
 
         /* Final Pass */
         std::shared_ptr<final_pass> final_pass;
+        std::shared_ptr<shader> final_shader;
 
         /* Camera */
         camera_data camera_data;
@@ -46,11 +52,13 @@ namespace luly::renderer
     private:
         static void create_pipeline_passes();
         static void create_camera_data();
+        static void create_common_data();
 
         static void update_camera_data();
         static void update_camera_buffer();
 
         static void perform_geometry_pass();
+        static void perform_final_pass();
 
         static scene_renderer_data s_data;
     };
