@@ -6,7 +6,6 @@
 #include "imgui.h"
 #include "renderer/models/model_factory.h"
 #include "renderer/renderer/renderer.h"
-#include "renderer/shaders/shader_factory.h"
 #include "renderer/textures/texture_factory.h"
 #include "scene/scene.h"
 
@@ -146,11 +145,19 @@ void basic_application::setup_scene()
     roughness.is_enabled = true;
     roughness.type = luly::renderer::material_texture_type::roughness;
 
+    const auto& opacity_texture = luly::renderer::texture_factory::create_texture_from_file(
+        "assets/textures/gameboy/DefaultMaterial_Opacity.png");
+    luly::renderer::material_texture opacity;
+    opacity.texture = opacity_texture;
+    opacity.is_enabled = true;
+    opacity.type = luly::renderer::material_texture_type::opacity;
+
     std::map<luly::renderer::material_texture_type, luly::renderer::material_texture> textures;
     textures.insert({luly::renderer::material_texture_type::albedo, albedo});
     textures.insert({luly::renderer::material_texture_type::normal, normal});
     textures.insert({luly::renderer::material_texture_type::metallic, metallic});
     textures.insert({luly::renderer::material_texture_type::roughness, roughness});
+    textures.insert({luly::renderer::material_texture_type::opacity, opacity});
 
     auto material_specification = std::make_shared<luly::renderer::material_specification_builder>()->
                                   with_textures(textures).build();

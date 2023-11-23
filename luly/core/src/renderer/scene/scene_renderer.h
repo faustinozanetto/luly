@@ -9,6 +9,7 @@
 #include <memory>
 
 #include "renderer/meshes/mesh.h"
+#include "renderer/renderer/pipeline/lighting_pass.h"
 
 namespace luly::renderer
 {
@@ -27,6 +28,10 @@ namespace luly::renderer
         /* Geometry Pass */
         std::shared_ptr<geometry_pass> geometry_pass;
         std::shared_ptr<shader> geometry_shader;
+
+        /* Lighting Pass */
+        std::shared_ptr<lighting_pass> lighting_pass;
+        std::shared_ptr<shader> lighting_shader;
 
         /* Final Pass */
         std::shared_ptr<final_pass> final_pass;
@@ -58,6 +63,7 @@ namespace luly::renderer
         static void update_camera_buffer();
 
         static void perform_geometry_pass();
+        static void perform_lighting_pass();
         static void perform_final_pass();
 
         static scene_renderer_data s_data;

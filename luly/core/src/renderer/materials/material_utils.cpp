@@ -20,6 +20,8 @@ namespace luly::renderer
             return "metallic";
         case material_texture_type::ambient_occlusion:
             return "ambient_occlusion";
+        case material_texture_type::opacity:
+            return "opacity";
         }
         LY_ASSERT_MSG(false, "Invalid material texture type!");
         return nullptr;

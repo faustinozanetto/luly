@@ -35,6 +35,7 @@ namespace luly::renderer
         s_data.camera_ubo->bind(0);
 
         perform_geometry_pass();
+        perform_lighting_pass();
         perform_final_pass();
     }
 
@@ -55,6 +56,9 @@ namespace luly::renderer
 
         s_data.geometry_pass = std::make_shared<geometry_pass>();
         s_data.geometry_shader = shader_factory::create_shader_from_file("assets/shaders/geometry_pass_shader.lsh");
+
+        s_data.lighting_pass = std::make_shared<lighting_pass>();
+        s_data.lighting_shader = shader_factory::create_shader_from_file("assets/shaders/lighting_pass_shader.lsh");
         LY_TRACE("Pipeline passes created successfully!");
     }
 
@@ -119,13 +123,31 @@ namespace luly::renderer
         s_data.geometry_pass->get_frame_buffer()->un_bind();
     }
 
+    void scene_renderer::perform_lighting_pass()
+    {
+        s_data.lighting_pass->get_frame_buffer()->bind();
+        renderer::clear_screen();
+        s_data.lighting_shader->bind();
+
+        // Bind geometry pass outputs.
+        renderer::bind_texture(0, s_data.geometry_pass->get_frame_buffer()->get_attachment_id(0));
+        renderer::bind_texture(1, s_data.geometry_pass->get_frame_buffer()->get_attachment_id(1));
+        renderer::bind_texture(2, s_data.geometry_pass->get_frame_buffer()->get_attachment_id(2));
+        renderer::bind_texture(3, s_data.geometry_pass->get_frame_buffer()->get_attachment_id(3));
+
+        renderer::submit_mesh(s_data.screen_mesh);
+
+        s_data.lighting_shader->un_bind();
+        s_data.lighting_pass->get_frame_buffer()->un_bind();
+    }
+
     void scene_renderer::perform_final_pass()
     {
         s_data.final_pass->get_frame_buffer()->bind();
         renderer::clear_screen();
         s_data.final_shader->bind();
 
-        renderer::bind_texture(0, s_data.geometry_pass->get_frame_buffer()->get_attachment_id(2));
+        renderer::bind_texture(0, s_data.lighting_pass->get_frame_buffer()->get_attachment_id(0));
         renderer::submit_mesh(s_data.screen_mesh);
 
         s_data.final_shader->un_bind();
