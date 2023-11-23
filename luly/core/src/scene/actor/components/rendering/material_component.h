@@ -3,8 +3,6 @@
 #include "renderer/materials/material.h"
 #include "scene/actor/components/base_component.h"
 
-#include "renderer/models/model.h"
-
 namespace luly::scene
 {
     class material_component : public base_component

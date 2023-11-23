@@ -27,7 +27,7 @@ basic_application::basic_application(const luly::renderer::window_specification&
     setup_scene();
 
     luly::ui::engine_ui::set_render_target(
-        luly::renderer::scene_renderer::get_data().geometry_pass->get_frame_buffer()->get_attachment_id(1));
+        luly::renderer::scene_renderer::get_data().geometry_pass->get_frame_buffer()->get_attachment_id(2));
 }
 
 basic_application::~basic_application()

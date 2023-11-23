@@ -31,6 +31,11 @@ namespace luly::renderer
     {
     }
 
+    void material::set_texture_enabled(material_texture_type texture_type, bool is_enabled)
+    {
+        m_material_specification.textures.at(texture_type).is_enabled = is_enabled;
+    }
+
     void material::bind(const std::shared_ptr<shader>& shader)
     {
         shader->set_vec_float3("u_material.albedo", m_material_specification.albedo);

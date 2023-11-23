@@ -106,6 +106,10 @@ namespace luly::renderer
 
         /* Getters */
         uint32_t get_handle_id() const { return m_handle; }
+        int get_width() const { return m_texture_specification.width; }
+        int get_height() const { return m_texture_specification.height; }
+        int get_channels() const { return m_texture_specification.channels; }
+        int get_mip_maps_levels() const { return m_texture_specification.mip_map_levels; }
 
         /* Overrides */
         void bind() override;

@@ -1,11 +1,31 @@
 ﻿#include "ui_utils.h"
 
-#include <imgui.h>
 #include <imgui_internal.h>
 #include <glm/gtc/type_ptr.hpp>
 
 namespace luly::ui
 {
+    void ui_utils::draw_tooltip(const char* text)
+    {
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(4, 4));
+        if (ImGui::IsItemHovered())
+        {
+            ImGui::BeginTooltip();
+            ImGui::TextUnformatted(text);
+            ImGui::EndTooltip();
+        }
+        ImGui::PopStyleVar();
+    }
+
+    void ui_utils::draw_property(const std::string& name)
+    {
+        ImGui::TextUnformatted(name.c_str());
+        ImGui::NextColumn();
+        ImGui::PushItemWidth(-1);
+        ImGui::PopItemWidth();
+        ImGui::NextColumn();
+    }
+
     void ui_utils::draw_property(const std::string& name, const std::string& content)
     {
         ImGui::PushID(name.c_str());
@@ -283,6 +303,67 @@ namespace luly::ui
         // Reset
         ImGui::Columns(1);
         ImGui::PopID();
+        return modified;
+    }
+
+    bool ui_utils::draw_property(const std::string& name, const std::shared_ptr<renderer::texture>& texture,
+                                 const ImVec2& image_size, bool flip_image)
+    {
+        bool modified = false;
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2, 2));
+        ImGui::Columns(2);
+        ImGui::Separator();
+
+        ImGui::AlignTextToFramePadding();
+        // Texture widget
+        if (texture)
+        {
+            // Main image widget
+            if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(texture->get_handle_id()), image_size,
+                                   ImVec2(0.0f, flip_image ? 1.0f : 0.0f), ImVec2(1.0f, flip_image ? 0.0f : 1.0f)))
+            {
+                modified = true;
+            }
+            // Hover image widget
+            if (ImGui::IsItemHovered())
+            {
+                ImGui::BeginTooltip();
+                ImGui::Image(
+                    reinterpret_cast<ImTextureID>(texture->get_handle_id()),
+                    {256.0f, 256.0f},
+                    ImVec2(0.0f, flip_image ? 1.0f : 0.0f), ImVec2(1.0f, flip_image ? 0.0f : 1.0f));
+                ImGui::EndTooltip();
+            }
+        }
+        else
+        {
+            // No Image
+            if (ImGui::Button("Empty", image_size))
+            {
+                modified = true;
+            }
+        }
+
+        ImGui::NextColumn();
+        ImGui::PushItemWidth(-1);
+        ImGui::TextUnformatted("Texture");
+        // Texture details
+        if (texture)
+        {
+            ImGui::Text("Size %dx%d", texture->get_width(), texture->get_height());
+            ImGui::Text("Mip Maps: %d", texture->get_mip_maps_levels());
+            ImGui::Text("Channels: %d", texture->get_channels());
+        }
+        ImGui::PopItemWidth();
+        ImGui::NextColumn();
+
+
+        ImGui::Columns(1);
+
+        ImGui::Separator();
+        ImGui::PopStyleVar();
+
+
         return modified;
     }
 }

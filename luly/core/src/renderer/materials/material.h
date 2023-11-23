@@ -63,6 +63,22 @@ namespace luly::renderer
         material(const material_specification& material_specification);
         ~material();
 
+        /* Getters */
+        const glm::vec3& get_albedo() const { return m_material_specification.albedo; }
+        float get_ambient_occlusion() const { return m_material_specification.ambient_occlusion; }
+        float get_tilling() const { return m_material_specification.tilling; }
+        float get_roughness() const { return m_material_specification.roughness; }
+        float get_metallic() const { return m_material_specification.metallic; }
+        const std::map<material_texture_type, material_texture>& get_textures() const { return m_material_specification.textures; }
+
+        /* Setters */
+        void set_texture_enabled(material_texture_type texture_type, bool is_enabled);
+        void set_albedo(const glm::vec3 &albedo) { m_material_specification.albedo = albedo; }
+        void set_ambient_occlusion(float ambient_occlusion) { m_material_specification.ambient_occlusion = ambient_occlusion; }
+        void set_tilling(float tilling) { m_material_specification.tilling = tilling; }
+        void set_roughness(float roughness) { m_material_specification.roughness = roughness; }
+        void set_metallic(float metallic) { m_material_specification.metallic = metallic; }
+
         /* Methods */
         void bind(const std::shared_ptr<shader>& shader);
 
