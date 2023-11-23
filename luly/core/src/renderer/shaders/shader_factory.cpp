@@ -7,6 +7,9 @@
 #include <utils/assert.h>
 #include <fstream>
 
+#define SHADER_TYPE_TOKEN "#shader"
+#define SHADER_INCLUDE_TOKEN "#include"
+
 namespace luly::renderer
 {
     std::shared_ptr<shader> shader_factory::create_shader_from_file(const std::string& file_path)
@@ -51,9 +54,7 @@ namespace luly::renderer
 
         const size_t shader_type_token_len = strlen(SHADER_TYPE_TOKEN);
         size_t pos = shader_source.find(SHADER_TYPE_TOKEN, 0);
-
-        auto current_type = shader_type::fragment;
-
+        
         while (pos != std::string::npos)
         {
             const size_t eol = shader_source.find_first_of("\r\n", pos);
@@ -63,6 +64,8 @@ namespace luly::renderer
             const size_t next_line_pos = shader_source.find_first_not_of("\r\n", eol);
             pos = shader_source.find(SHADER_TYPE_TOKEN, next_line_pos);
 
+            auto current_type = shader_type::fragment;
+
             if (type == shader_utils::get_shader_type_to_string(shader_type::vertex))
                 current_type = shader_type::vertex;
             else if (type == shader_utils::get_shader_type_to_string(shader_type::fragment))
@@ -70,12 +73,99 @@ namespace luly::renderer
             else if (type == shader_utils::get_shader_type_to_string(shader_type::geometry))
                 current_type = shader_type::geometry;
 
-            shader_contents[current_type] = pos == std::string::npos
-                                                ? shader_source.substr(next_line_pos)
-                                                : shader_source.substr(next_line_pos, pos - next_line_pos);
+            std::unordered_set<std::string> included_files;
+            std::stringstream updated_source;
+            std::istringstream source_stream(pos == std::string::npos
+                                                 ? shader_source.substr(next_line_pos)
+                                                 : shader_source.substr(next_line_pos, pos - next_line_pos));
+            std::string line;
+
+            while (std::getline(source_stream, line))
+            {
+                if (line.find(SHADER_INCLUDE_TOKEN) != std::string::npos)
+                {
+                    std::istringstream include_stream(line);
+                    std::string directive, include_path;
+                    include_stream >> directive >> include_path;
+
+                    // Remove quotation marks from the include path
+                    std::erase(include_path, '\"');
+
+                    // Check if the file is not already included to avoid infinite recursion
+                    if (!included_files.contains(include_path))
+                    {
+                        included_files.insert(include_path);
+                        // Recursively parse the included file
+                        std::string include_code = parse_shader_includes(include_path, included_files);
+                        updated_source << include_code << std::endl;
+                    }
+                    else
+                    {
+                        std::cerr << "Warning: Circular include detected in file " << include_path << std::endl;
+                    }
+                }
+                else
+                {
+                    updated_source << line << std::endl;
+                }
+            }
+            // Store the parsed source.
+            shader_contents[current_type] = updated_source.str();
         }
 
         LY_TRACE("Shader sources parsed successfully!");
         return shader_contents;
+    }
+
+    std::string shader_factory::parse_shader_includes(const std::string& file_path,
+                                                      std::unordered_set<std::string>& included_files)
+    {
+        LY_TRACE("Parsing shader include file: {}", file_path);
+
+        std::string full_path = "assets/shaders/" + file_path;
+        std::ifstream file_stream(full_path);
+        if (!file_stream.is_open())
+        {
+            std::cerr << "Error: Could not open shader file " << file_path << std::endl;
+            return "";
+        }
+
+        std::stringstream include_code;
+        std::string line;
+
+        while (std::getline(file_stream, line))
+        {
+            if (line.find("#include") != std::string::npos)
+            {
+                std::istringstream include_stream(line);
+                std::string directive, include_path;
+                include_stream >> directive >> include_path;
+
+                // Remove quotation marks from the include path
+                std::erase(include_path, '\"');
+
+                // Check if the file is not already included to avoid infinite recursion
+                if (!included_files.contains(include_path))
+                {
+                    included_files.insert(include_path);
+                    // Recursively parse the included file
+                    std::string includedCode = parse_shader_includes(include_path, included_files);
+                    include_code << includedCode << std::endl;
+                }
+                else
+                {
+                    std::cerr << "Warning: Circular include detected in file " << file_path << " for " << include_path
+                        <<
+                        std::endl;
+                }
+            }
+            else
+            {
+                include_code << line << std::endl;
+            }
+        }
+
+        LY_TRACE("Shader file parsed successfully: {}", file_path);
+        return include_code.str();
     }
 }

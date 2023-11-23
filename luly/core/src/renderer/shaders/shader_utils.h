@@ -4,8 +4,6 @@
 
 namespace luly::renderer
 {
-#define SHADER_TYPE_TOKEN "#shader"
-
     class shader_utils
     {
     public:

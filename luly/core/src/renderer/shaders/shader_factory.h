@@ -14,5 +14,7 @@ namespace luly::renderer
     private:
         static std::string read_shader_from_file(const std::string& file_path);
         static std::unordered_map<shader_type, std::string> parse_shader_source(const std::string& shader_source);
+        static std::string parse_shader_includes(const std::string& file_path,
+                                                  std::unordered_set<std::string>& included_files);
     };
 }
