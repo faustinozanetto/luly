@@ -15,6 +15,7 @@
 #include "renderer/materials/material.h"
 #include "renderer/materials/material_specification_builder.h"
 #include "renderer/scene/scene_renderer.h"
+#include "scene/actor/components/lights/directional_light_component.h"
 #include "scene/actor/components/rendering/material_component.h"
 #include "scene/actor/components/rendering/model_renderer_component.h"
 
@@ -113,6 +114,9 @@ void basic_application::setup_scene()
     get_scene_manager()->add_scene(scene);
     get_scene_manager()->switch_scene(scene);
 
+    const auto& light_actor = scene->create_actor("Light Emitter");
+    light_actor->add_component<luly::scene::directional_light_component>(std::make_shared<luly::renderer::directional_light>());
+
     const auto& actor = scene->create_actor("Test Model");
     const auto& model = luly::renderer::model_factory::create_model_from_file("assets/models/gameboy.obj");
     actor->add_component<luly::scene::model_renderer_component>(model);
@@ -158,7 +162,7 @@ void basic_application::setup_scene()
     ambient_occlusion.texture = ao_texture;
     ambient_occlusion.is_enabled = true;
     ambient_occlusion.type = luly::renderer::material_texture_type::ambient_occlusion;
-    
+
     std::map<luly::renderer::material_texture_type, luly::renderer::material_texture> textures;
     textures.insert({luly::renderer::material_texture_type::albedo, albedo});
     textures.insert({luly::renderer::material_texture_type::normal, normal});
