@@ -19,27 +19,27 @@ namespace luly::renderer
         auto viewport_size = renderer::get_viewport_size();
 
         std::vector<frame_buffer_attachment> attachments = {
+            // Position
+            {
+                texture_internal_format::rgba16f,
+                texture_filtering::linear,
+                texture_wrapping::clamp_to_edge, viewport_size
+            },
             // Albedo
             {
-                texture_internal_format::rgba8,
+                texture_internal_format::rgba16f,
                 texture_filtering::linear,
                 texture_wrapping::clamp_to_edge, viewport_size
             },
             // Normal
             {
-                texture_internal_format::rgba8,
+                texture_internal_format::rgba16f,
                 texture_filtering::linear,
                 texture_wrapping::clamp_to_edge, viewport_size
             },
-            // Roughness
+            // Roughness-Metallic-AO
             {
-                texture_internal_format::rgba8,
-                texture_filtering::linear,
-                texture_wrapping::clamp_to_edge, viewport_size
-            },
-            // Metallic
-            {
-                texture_internal_format::rgba8,
+                texture_internal_format::rgba16f,
                 texture_filtering::linear,
                 texture_wrapping::clamp_to_edge, viewport_size
             },

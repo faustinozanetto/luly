@@ -1,6 +1,9 @@
 ﻿#include "lypch.h"
 #include "material.h"
 
+#include <format>
+
+#include "material_utils.h"
 #include "renderer/renderer/renderer.h"
 
 namespace luly::renderer
@@ -19,6 +22,9 @@ namespace luly::renderer
     material::material(const material_specification& material_specification)
     {
         m_material_specification = material_specification;
+
+        initialize_textures_map();
+        initialize_texture_locations();
     }
 
     material::~material()
@@ -27,7 +33,7 @@ namespace luly::renderer
 
     void material::bind(const std::shared_ptr<shader>& shader)
     {
-        shader->set_vec_float3("m_material_specification.albedo", m_material_specification.albedo);
+        shader->set_vec_float3("u_material.albedo", m_material_specification.albedo);
         shader->set_float("u_material.roughness", m_material_specification.roughness);
         shader->set_float("u_material.metallic", m_material_specification.metallic);
         shader->set_float("u_material.ambient_occlusion", m_material_specification.ambient_occlusion);
@@ -35,13 +41,12 @@ namespace luly::renderer
 
         for (auto& [type, texture] : m_material_specification.textures)
         {
-/*
             shader->set_int(m_material_texture_enabled_locations[type], texture.is_enabled ? 1 : 0);
+
             if (!texture.is_enabled || !texture.texture)
                 continue;
-            const int bind_slot = m_material_texture_bindings[type];
-            renderer::bind_texture(bind_slot, texture.texture->get_handle_id());
-            */
+
+            renderer::bind_texture(MATERIAL_TEXTURE_BIND_SLOTS.at(type), texture.texture->get_handle_id());
         }
     }
 
@@ -58,6 +63,16 @@ namespace luly::renderer
             texture.type = type;
             texture.texture = nullptr;
             m_material_specification.textures[type] = texture;
+        }
+    }
+
+    void material::initialize_texture_locations()
+    {
+        for (material_texture_type type : MATERIAL_TEXTURE_TYPES)
+        {
+            std::string location = std::format("u_material.{}_map_enabled",
+                                               material_utils::get_material_texture_type_to_string(type));
+            m_material_texture_enabled_locations.insert(std::make_pair(type, location));
         }
     }
 }

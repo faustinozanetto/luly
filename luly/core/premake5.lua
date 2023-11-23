@@ -2,7 +2,6 @@ project "luly-core"
     kind "StaticLib"
     language "C++"
     cppdialect "C++20"
-    defines { "LULY_CORE_EXPORTS" }
     
     targetdir("%{_WORKING_DIR}/binaries/" .. output_dir .. "/%{prj.name}")
     objdir("%{_WORKING_DIR}/intermediates/" .. output_dir .. "/%{prj.name}")

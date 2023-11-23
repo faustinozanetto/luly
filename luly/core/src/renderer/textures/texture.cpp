@@ -82,7 +82,7 @@ namespace luly::renderer
         set_wrapping(texture_wrapping_type::wrap_t, texture_wrapping::clamp_to_edge);
 
         // Allocating Memory.
-        texture_format format = texture_utils::get_texture_format_from_internal_format(
+        const texture_format format = texture_utils::get_texture_format_from_internal_format(
             m_texture_specification.internal_format);
         glTextureSubImage2D(m_handle, 0, 0, 0, m_texture_specification.width, m_texture_specification.height,
                             texture_utils::get_texture_format_to_opengl(format),

@@ -366,7 +366,7 @@ namespace luly::renderer
     texture_formats texture_utils::get_texture_formats_from_channel_count(int channel_count)
     {
         LY_ASSERT_MSG(channel_count > 0 && channel_count < 5, "Invalid texture channels count!");
-        texture_formats formats;
+        texture_formats formats = {};
         if (channel_count == 4)
         {
             formats.internal_format = texture_internal_format::rgba16f;

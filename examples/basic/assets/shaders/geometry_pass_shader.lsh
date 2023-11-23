@@ -53,6 +53,30 @@ struct geometry_out {
 
 layout(location = 0) in geometry_out o_geometry;
 
+struct material {
+    vec3 albedo;
+    float roughness;
+    float metallic;
+    float ambient_occlusion;
+    float tilling;
+    
+    int albedo_map_enabled;
+    int normal_map_enabled;
+    int roughness_map_enabled;
+    int metallic_map_enabled;
+    int ambient_occlusion_map_enabled;
+};
+
+// Uniforms
+layout (location = 1) uniform material u_material;
+        
+// Samplers
+layout (binding = 0) uniform sampler2D u_albedo_map;
+layout (binding = 1) uniform sampler2D u_normal_map;
+layout (binding = 2) uniform sampler2D u_roughness_map;
+layout (binding = 3) uniform sampler2D u_metallic_map;
+layout (binding = 4) uniform sampler2D u_ambient_occlusion_map;
+
 // G-Buffer outputs
 layout(location = 0) out vec4 g_position;
 layout(location = 1) out vec4 g_albedo_opacity;
@@ -62,9 +86,30 @@ layout(location = 3) out vec4 g_roughmetalao;
 void main() {
     g_position = vec4(o_geometry.frag_pos, 1.0);
 
-    vec3 albedo = vec3(0.25, 0.65, 0.35);
+    vec3 albedo = u_material.albedo;
+    if (u_material.albedo_map_enabled == 1)
+        albedo *= texture(u_albedo_map, o_geometry.tex_coords * u_material.tilling).rgb;
 
-    float opacity = 1.0;
+    g_albedo_opacity = vec4(albedo, 1.0);
 
-    g_albedo_opacity = vec4(albedo, opacity);
+    vec3 normal = o_geometry.normal;
+    if (u_material.normal_map_enabled == 1) {
+        normal = texture(u_normal_map, o_geometry.tex_coords * u_material.tilling).rgb;
+        normal = normalize(normal * 2.0 - 1.0);
+    }
+    g_normal = vec4(normalize(o_geometry.tbn * normal), 1.0);
+    
+    float roughness = u_material.roughness;
+    if (u_material.roughness_map_enabled == 1)
+        roughness *= texture(u_roughness_map, o_geometry.tex_coords * u_material.tilling).r;
+    
+    float metallic = u_material.metallic;
+    if (u_material.metallic_map_enabled == 1)
+        metallic *= texture(u_metallic_map, o_geometry.tex_coords * u_material.tilling).r;
+    
+    float ambient_occlusion = u_material.ambient_occlusion;
+    if (u_material.ambient_occlusion_map_enabled == 1)
+        ambient_occlusion *= texture(u_ambient_occlusion_map, o_geometry.tex_coords * u_material.tilling).r;
+    
+    g_roughmetalao = vec4(roughness, metallic, ambient_occlusion, 1.0);
 }

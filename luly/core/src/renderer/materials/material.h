@@ -1,10 +1,10 @@
 ﻿#pragma once
 
 #include "renderer/textures/texture.h"
+#include "renderer/shaders/shader.h"
 
 #include <glm/glm.hpp>
-
-#include "renderer/shaders/shader.h"
+#include <map>
 
 namespace luly::renderer
 {
@@ -15,8 +15,6 @@ namespace luly::renderer
         roughness,
         metallic,
         ambient_occlusion,
-        emissive,
-        opacity
     };
 
     struct material_texture
@@ -35,7 +33,7 @@ namespace luly::renderer
         float tilling;
         std::map<material_texture_type, material_texture> textures;
 
-        material_specification(const glm::vec3& albedo = glm::vec3(0.0f),
+        material_specification(const glm::vec3& albedo = glm::vec3(1.0f),
                                float roughness = 1.0f,
                                float metallic = 0.0f,
                                float ambient_occlusion = 1.0f,
@@ -49,8 +47,14 @@ namespace luly::renderer
         material_texture_type::roughness,
         material_texture_type::metallic,
         material_texture_type::ambient_occlusion,
-        material_texture_type::emissive,
-        material_texture_type::opacity
+    };
+
+    const std::map<material_texture_type, int> MATERIAL_TEXTURE_BIND_SLOTS = {
+        {material_texture_type::albedo, 0},
+        {material_texture_type::normal, 1},
+        {material_texture_type::roughness, 2},
+        {material_texture_type::metallic, 3},
+        {material_texture_type::ambient_occlusion, 4},
     };
 
     class material
@@ -64,7 +68,9 @@ namespace luly::renderer
 
     private:
         void initialize_textures_map();
+        void initialize_texture_locations();
 
+        std::map<material_texture_type, std::string> m_material_texture_enabled_locations;
         material_specification m_material_specification;
     };
 }

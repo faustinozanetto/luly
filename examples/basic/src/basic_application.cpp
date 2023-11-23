@@ -16,7 +16,7 @@
 #include "renderer/materials/material.h"
 #include "renderer/materials/material_specification_builder.h"
 #include "renderer/scene/scene_renderer.h"
-#include "scene/actor/components/transform_component.h"
+#include "scene/actor/components/rendering/material_component.h"
 #include "scene/actor/components/rendering/model_renderer_component.h"
 
 basic_application::basic_application(const luly::renderer::window_specification& window_specification) : application(
@@ -27,7 +27,7 @@ basic_application::basic_application(const luly::renderer::window_specification&
     setup_scene();
 
     luly::ui::engine_ui::set_render_target(
-        luly::renderer::scene_renderer::get_data().geometry_pass->get_frame_buffer()->get_attachment_id(0));
+        luly::renderer::scene_renderer::get_data().geometry_pass->get_frame_buffer()->get_attachment_id(1));
 }
 
 basic_application::~basic_application()
@@ -156,6 +156,7 @@ void basic_application::setup_scene()
                                   with_textures(textures).build();
 
     auto material = std::make_shared<luly::renderer::material>(material_specification);
+    actor->add_component<luly::scene::material_component>(material);
 }
 
 luly::core::application* luly::core::create_application()
