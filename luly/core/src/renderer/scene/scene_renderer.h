@@ -20,6 +20,17 @@ namespace luly::renderer
         glm::vec3 position;
     };
 
+    struct directional_light_data
+    {
+        glm::vec4 color;
+        glm::vec4 direction;
+    };
+
+    struct lights_data
+    {
+        directional_light_data directional_light;
+    };
+
     struct scene_renderer_data
     {
         /* Common*/
@@ -41,6 +52,10 @@ namespace luly::renderer
         camera_data camera_data;
         std::shared_ptr<camera> camera;
         std::shared_ptr<uniform_buffer_object> camera_ubo;
+
+        /* Lights */
+        std::shared_ptr<uniform_buffer_object> lights_ubo;
+        lights_data lights_data;
     };
 
     class scene_renderer
@@ -58,6 +73,7 @@ namespace luly::renderer
         static void create_pipeline_passes();
         static void create_camera_data();
         static void create_common_data();
+        static void create_lights_data();
 
         static void update_camera_data();
         static void update_camera_buffer();
@@ -65,6 +81,9 @@ namespace luly::renderer
         static void perform_geometry_pass();
         static void perform_lighting_pass();
         static void perform_final_pass();
+
+        static void collect_lights();
+        static void update_lights_buffer();
 
         static scene_renderer_data s_data;
     };

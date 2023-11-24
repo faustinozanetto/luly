@@ -116,7 +116,7 @@ void basic_application::setup_scene()
 
     const auto& light_actor = scene->create_actor("Light Emitter");
     light_actor->add_component<luly::scene::directional_light_component>(
-        std::make_shared<luly::renderer::directional_light>());
+        std::make_shared<luly::renderer::directional_light>(glm::vec3(0.85f), glm::vec3(0.8f, 0.3f, -5.0f)));
 
     const auto& actor = scene->create_actor("Test Model");
     const auto& model = luly::renderer::model_factory::create_model_from_file("assets/models/gameboy.obj");
@@ -182,7 +182,7 @@ void basic_application::setup_scene()
 luly::core::application* luly::core::create_application()
 {
     const renderer::window_specification window_specification = {
-        "Basic Application", 2560, 1440
+        "Basic Application", 1920, 1080
     };
     return new basic_application(window_specification);
 }

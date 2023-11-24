@@ -1,4 +1,14 @@
 ﻿struct directional_light {
-    vec3 color;
-    vec3 direction;
+    vec4 color;
+    vec4 direction;
 };
+
+struct point_light {
+    vec4 position;
+    vec4 color;
+};
+
+layout(set = 0, binding = 1) uniform lights_ubo
+{
+    directional_light directional_light;
+} lights;

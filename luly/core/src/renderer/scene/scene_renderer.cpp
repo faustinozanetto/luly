@@ -25,6 +25,7 @@ namespace luly::renderer
         create_pipeline_passes();
         create_camera_data();
         create_common_data();
+        create_lights_data();
         LY_TRACE("Scene renderer initialized successfully!");
     }
 
@@ -35,6 +36,11 @@ namespace luly::renderer
         update_camera_data();
         update_camera_buffer();
         s_data.camera_ubo->bind(0);
+
+        /* Lights */
+        collect_lights();
+        update_lights_buffer();
+        s_data.lights_ubo->bind(1);
 
         perform_geometry_pass();
         perform_lighting_pass();
@@ -73,6 +79,12 @@ namespace luly::renderer
     void scene_renderer::create_common_data()
     {
         s_data.screen_mesh = mesh_factory::create_screen_quad_mesh();
+    }
+
+    void scene_renderer::create_lights_data()
+    {
+        s_data.lights_ubo = std::make_shared<uniform_buffer_object>();
+        s_data.lights_ubo->initialize(sizeof(lights_data), nullptr);
     }
 
     void scene_renderer::update_camera_data()
@@ -130,7 +142,7 @@ namespace luly::renderer
         s_data.lighting_pass->get_frame_buffer()->bind();
         renderer::clear_screen();
         s_data.lighting_shader->bind();
-        
+
         auto& current_scene = core::application::get().get_scene_manager()->get_current_scene();
         const auto& registry = current_scene->get_registry();
         const auto& view = registry->view<scene::directional_light_component>();
@@ -164,5 +176,28 @@ namespace luly::renderer
 
         s_data.final_shader->un_bind();
         s_data.final_pass->get_frame_buffer()->un_bind();
+    }
+
+    void scene_renderer::collect_lights()
+    {
+        auto& current_scene = core::application::get().get_scene_manager()->get_current_scene();
+        const auto& registry = current_scene->get_registry();
+
+        const auto& view = registry->view<scene::directional_light_component>();
+        for (auto [actor, directional_light_component] : view.each())
+        {
+            auto& directional_light = directional_light_component.get_directional_light();
+
+            directional_light_data directional_light_data;
+            directional_light_data.direction = glm::vec4(directional_light->get_direction(), 1.0);
+            directional_light_data.color = glm::vec4(directional_light->get_color(), 1.0);
+
+            s_data.lights_data.directional_light = directional_light_data;
+        }
+    }
+
+    void scene_renderer::update_lights_buffer()
+    {
+        s_data.lights_ubo->set_data(sizeof(lights_data), &s_data.lights_data);
     }
 }
