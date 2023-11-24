@@ -2,3 +2,6 @@
 const float point_light_constant = 1.0;
 const float point_light_linear = 0.09;
 const float point_light_quadratic = 0.032;
+const float spot_light_constant = 1.0;
+const float spot_light_linear = 0.09;
+const float spot_light_quadratic = 0.032;

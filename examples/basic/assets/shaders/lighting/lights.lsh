@@ -8,8 +8,17 @@ struct point_light {
     vec4 position;
 };
 
+struct spot_light {
+    vec4 color;
+    vec4 position;
+    vec4 direction;
+    float inner_cone_angle;
+    float outer_cone_angle;
+};
+
 layout(binding = 1) uniform lights_ubo
 {
     point_light point_lights[10];
+    spot_light spot_lights[10];
     directional_light directional_light;
 } lights;

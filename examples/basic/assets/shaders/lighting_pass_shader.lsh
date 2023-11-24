@@ -30,10 +30,12 @@ layout (binding = 3) uniform sampler2D u_rough_metal_ao_map;
 void main()
 {
     vec3 frag_pos = texture(u_position_map, o_tex_coord).rgb;
-    vec3 albedo = pow(texture(u_albedo_map, o_tex_coord).rgb, vec3(2.2));
+    vec4 full_albedo = texture(u_albedo_map, o_tex_coord);
+    vec3 albedo = pow(full_albedo.rgb, vec3(2.2));
     vec3 normal = texture(u_normal_map, o_tex_coord).rgb;
     vec3 rough_metal_ao = texture(u_rough_metal_ao_map, o_tex_coord).rgb;
         
+    float opacity = full_albedo.a;
     float roughness = rough_metal_ao.r;
     float metallic = rough_metal_ao.g;
     float ambient_occlusion = rough_metal_ao.b;
@@ -44,10 +46,17 @@ void main()
         
     for (int i = 0; i < 10; i++) {
         luminance += calculate_point_light_luminance(lights.point_lights[i], normal, view_dir, frag_pos, albedo, roughness, metallic);   
-    }   
+    }
 
-    vec3 ambient = vec3(0.1) * albedo;
-    vec3 color = ambient + luminance;
+    for (int i = 0; i < 10; i++) {
+        luminance += calculate_spot_light_luminance(lights.spot_lights[i], normal, view_dir, frag_pos, albedo, roughness, metallic);
+    }
+
+    vec3 ambient = vec3(0.03) * albedo * ambient_occlusion;
+    vec3 color   = ambient + luminance;
         
-    frag_color = vec4(color, 1.0);
+    color = color / (color + vec3(1.0));
+    color = pow(color, vec3(1.0/2.2));
+
+    frag_color = vec4(color, opacity);
 }

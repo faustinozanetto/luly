@@ -15,7 +15,6 @@ namespace luly::renderer
         glDeleteBuffers(1, &m_handle_id);
     }
 
-
     void uniform_buffer_object::bind(uint32_t slot) const
     {
         glBindBufferBase(GL_UNIFORM_BUFFER, slot, m_handle_id);

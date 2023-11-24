@@ -19,6 +19,7 @@
 #include "scene/actor/components/transform_component.h"
 #include "scene/actor/components/lights/directional_light_component.h"
 #include "scene/actor/components/lights/point_light_component.h"
+#include "scene/actor/components/lights/spot_light_component.h"
 #include "scene/actor/components/rendering/material_component.h"
 #include "scene/actor/components/rendering/model_renderer_component.h"
 
@@ -119,6 +120,7 @@ void basic_application::setup_scene()
     get_scene_manager()->add_scene(scene);
     get_scene_manager()->switch_scene(scene);
 
+    /*
     const auto& dir_light_actor = scene->create_actor("Light Emitter");
     dir_light_actor->add_component<luly::scene::directional_light_component>(
         std::make_shared<luly::renderer::directional_light>(glm::vec3(0.85f), glm::vec3(0.8f, 0.3f, -5.0f)));
@@ -137,6 +139,13 @@ void basic_application::setup_scene()
             -1 + i, 0, 1.5f
         });
     }
+    */
+
+    const auto& spot_light_actor = scene->create_actor("Spot Light Emitter");
+    spot_light_actor->add_component<luly::scene::spot_light_component>(
+        std::make_shared<luly::renderer::spot_light>(glm::vec3(0.85f), glm::vec3(0, 0, 3), glm::vec3(0, 0, -1), 12.5f,
+                                                     25.0f));
+    spot_light_actor->get_component<luly::scene::transform_component>().get_transform()->set_location({0, 0, 2});
 
     const auto& actor = scene->create_actor("Test Model");
     const auto& model = luly::renderer::model_factory::create_model_from_file("assets/models/gameboy.obj");

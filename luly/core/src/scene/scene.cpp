@@ -7,6 +7,7 @@
 #include <logging/log.h>
 
 #include "actor/components/lights/point_light_component.h"
+#include "actor/components/lights/spot_light_component.h"
 
 namespace luly::scene
 {
@@ -55,13 +56,24 @@ namespace luly::scene
 
     void scene::update_lights()
     {
-        const auto& view = m_actors_registry->view<transform_component, point_light_component>();
-        for (auto [actor, transform_component, point_light_component] : view.each())
+        // Update point lights
+        const auto& point_view = m_actors_registry->view<transform_component, point_light_component>();
+        for (auto [actor, transform_component, point_light_component] : point_view.each())
         {
             auto& transform = transform_component.get_transform();
             auto& point_light = point_light_component.get_point_light();
 
             point_light->set_position(transform->get_location());
+        }
+
+        // Update spot lights
+        const auto& spot_view = m_actors_registry->view<transform_component, spot_light_component>();
+        for (auto [actor, transform_component, spot_light_component] : spot_view.each())
+        {
+            auto& transform = transform_component.get_transform();
+            auto& spot_light = spot_light_component.get_spot_light();
+
+            spot_light->set_position(transform->get_location());
         }
     }
 }
