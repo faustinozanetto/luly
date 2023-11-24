@@ -4,16 +4,12 @@
 #include "renderer/renderer/pipeline/geometry_pass.h"
 #include "renderer/renderer/pipeline/final_pass.h"
 #include "renderer/renderer/renderer.h"
-#include "renderer/shaders/shader_factory.h"
-#include "renderer/meshes/mesh_factory.h"
 #include "scene/actor/components/rendering/model_renderer_component.h"
 #include "scene/actor/components/transform_component.h"
 #include "scene/actor/components/rendering/material_component.h"
 #include "application/application.h"
 
 #include <logging/log.h>
-
-#include "scene/actor/components/lights/directional_light_component.h"
 
 namespace luly::renderer
 {
@@ -25,12 +21,14 @@ namespace luly::renderer
         create_pipeline_passes();
         create_camera_data();
         create_common_data();
-        create_lights_data();
         LY_TRACE("Scene renderer initialized successfully!");
     }
 
     void scene_renderer::begin_render(const std::shared_ptr<camera>& camera)
     {
+        auto& current_scene = core::application::get().get_scene_manager()->get_current_scene();
+        if (!current_scene) return;
+
         /* Camera setup */
         s_data.camera = camera;
         update_camera_data();
@@ -38,9 +36,7 @@ namespace luly::renderer
         s_data.camera_ubo->bind(0);
 
         /* Lights */
-        collect_lights();
-        update_lights_buffer();
-        s_data.lights_ubo->bind(1);
+        s_data.lighting_pass->update_lights();
 
         perform_geometry_pass();
         perform_lighting_pass();
@@ -59,14 +55,13 @@ namespace luly::renderer
     void scene_renderer::create_pipeline_passes()
     {
         LY_TRACE("Started creating pipeling passes...");
-        s_data.final_pass = std::make_shared<final_pass>();
-        s_data.final_shader = shader_factory::create_shader_from_file("assets/shaders/final_pass_shader.lsh");
-
         s_data.geometry_pass = std::make_shared<geometry_pass>();
-        s_data.geometry_shader = shader_factory::create_shader_from_file("assets/shaders/geometry_pass_shader.lsh");
 
         s_data.lighting_pass = std::make_shared<lighting_pass>();
-        s_data.lighting_shader = shader_factory::create_shader_from_file("assets/shaders/lighting_pass_shader.lsh");
+        s_data.lighting_pass->add_input({s_data.geometry_pass, "geometry_pass_input"});
+
+        s_data.final_pass = std::make_shared<final_pass>();
+        s_data.final_pass->add_input({s_data.lighting_pass, "lighting_pass_input"});
         LY_TRACE("Pipeline passes created successfully!");
     }
 
@@ -78,13 +73,6 @@ namespace luly::renderer
 
     void scene_renderer::create_common_data()
     {
-        s_data.screen_mesh = mesh_factory::create_screen_quad_mesh();
-    }
-
-    void scene_renderer::create_lights_data()
-    {
-        s_data.lights_ubo = std::make_shared<uniform_buffer_object>();
-        s_data.lights_ubo->initialize(sizeof(lights_data), nullptr);
     }
 
     void scene_renderer::update_camera_data()
@@ -101,103 +89,16 @@ namespace luly::renderer
 
     void scene_renderer::perform_geometry_pass()
     {
-        auto& current_scene = core::application::get().get_scene_manager()->get_current_scene();
-        if (!current_scene) return;
-
-        s_data.geometry_pass->get_frame_buffer()->bind();
-        renderer::clear_screen();
-        s_data.geometry_shader->bind();
-
-        const auto& registry = current_scene->get_registry();
-        const auto& view = registry->view<scene::transform_component>();
-        for (auto [actor, transform_component] : view.each())
-        {
-            auto& transform = transform_component.get_transform();
-
-            // Check if has model_renderer_component
-            if (!registry->any_of<scene::model_renderer_component>(actor)) continue;
-
-            // Check if has material_component
-            if (registry->any_of<scene::material_component>(actor))
-            {
-                auto& material_component = registry->get<scene::material_component>(actor);
-                auto& material = material_component.get_material();
-
-                material->bind(s_data.geometry_shader);
-            }
-
-            auto& model_renderer_component = registry->get<scene::model_renderer_component>(actor);
-            auto& model = model_renderer_component.get_model();
-
-            s_data.geometry_shader->set_mat4("u_transform", transform->get_transform());
-            renderer::submit_model(model);
-        }
-
-        s_data.geometry_shader->un_bind();
-        s_data.geometry_pass->get_frame_buffer()->un_bind();
+        s_data.geometry_pass->execute();
     }
 
     void scene_renderer::perform_lighting_pass()
     {
-        s_data.lighting_pass->get_frame_buffer()->bind();
-        renderer::clear_screen();
-        s_data.lighting_shader->bind();
-
-        auto& current_scene = core::application::get().get_scene_manager()->get_current_scene();
-        const auto& registry = current_scene->get_registry();
-        const auto& view = registry->view<scene::directional_light_component>();
-        for (auto [actor, directional_light_component] : view.each())
-        {
-            auto& directional_light = directional_light_component.get_directional_light();
-            s_data.lighting_shader->set_vec_float3("u_dir_light.color", directional_light->get_color());
-            s_data.lighting_shader->set_vec_float3("u_dir_light.direction", directional_light->get_direction());
-        }
-
-        // Bind geometry pass outputs.
-        renderer::bind_texture(0, s_data.geometry_pass->get_frame_buffer()->get_attachment_id(0));
-        renderer::bind_texture(1, s_data.geometry_pass->get_frame_buffer()->get_attachment_id(1));
-        renderer::bind_texture(2, s_data.geometry_pass->get_frame_buffer()->get_attachment_id(2));
-        renderer::bind_texture(3, s_data.geometry_pass->get_frame_buffer()->get_attachment_id(3));
-
-        renderer::submit_mesh(s_data.screen_mesh);
-
-        s_data.lighting_shader->un_bind();
-        s_data.lighting_pass->get_frame_buffer()->un_bind();
+        s_data.lighting_pass->execute();
     }
 
     void scene_renderer::perform_final_pass()
     {
-        s_data.final_pass->get_frame_buffer()->bind();
-        renderer::clear_screen();
-        s_data.final_shader->bind();
-
-        renderer::bind_texture(0, s_data.lighting_pass->get_frame_buffer()->get_attachment_id(0));
-        renderer::submit_mesh(s_data.screen_mesh);
-
-        s_data.final_shader->un_bind();
-        s_data.final_pass->get_frame_buffer()->un_bind();
-    }
-
-    void scene_renderer::collect_lights()
-    {
-        auto& current_scene = core::application::get().get_scene_manager()->get_current_scene();
-        const auto& registry = current_scene->get_registry();
-
-        const auto& view = registry->view<scene::directional_light_component>();
-        for (auto [actor, directional_light_component] : view.each())
-        {
-            auto& directional_light = directional_light_component.get_directional_light();
-
-            directional_light_data directional_light_data;
-            directional_light_data.direction = glm::vec4(directional_light->get_direction(), 1.0);
-            directional_light_data.color = glm::vec4(directional_light->get_color(), 1.0);
-
-            s_data.lights_data.directional_light = directional_light_data;
-        }
-    }
-
-    void scene_renderer::update_lights_buffer()
-    {
-        s_data.lights_ubo->set_data(sizeof(lights_data), &s_data.lights_data);
+        s_data.final_pass->execute();
     }
 }

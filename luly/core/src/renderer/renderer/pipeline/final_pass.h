@@ -1,6 +1,8 @@
 ﻿#pragma once
 
+#include "renderer/meshes/mesh.h"
 #include "renderer/renderer/pass/render_pass.h"
+#include "renderer/shaders/shader.h"
 
 namespace luly::renderer
 {
@@ -12,5 +14,10 @@ namespace luly::renderer
 
         /* Overrides */
         void initialize() override;
+        void execute() override;
+
+    private:
+        std::shared_ptr<shader> m_final_shader;
+        std::shared_ptr<mesh> m_screen_mesh;
     };
 }

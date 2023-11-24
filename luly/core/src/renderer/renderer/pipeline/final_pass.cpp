@@ -1,7 +1,9 @@
 ﻿#include "lypch.h"
 #include "final_pass.h"
 
+#include "renderer/meshes/mesh_factory.h"
 #include "renderer/renderer/renderer.h"
+#include "renderer/shaders/shader_factory.h"
 
 namespace luly::renderer
 {
@@ -25,8 +27,29 @@ namespace luly::renderer
                 texture_wrapping::clamp_to_edge, viewport_size
             },
         };
-        
+
         m_fbo = std::make_shared<frame_buffer>(
             viewport_size.x, viewport_size.y, attachments);
+
+        // Create shader.
+        m_final_shader = shader_factory::create_shader_from_file("assets/shaders/final_pass_shader.lsh");
+
+        // Create screen quad
+        m_screen_mesh = mesh_factory::create_screen_quad_mesh();
+    }
+
+    void final_pass::execute()
+    {
+        m_fbo->bind();
+        renderer::clear_screen();
+        m_final_shader->bind();
+
+        render_pass_input lighting_pass_input = m_inputs.at("lighting_pass_input");
+
+        renderer::bind_texture(0, lighting_pass_input.render_pass->get_frame_buffer()->get_attachment_id(0));
+        renderer::submit_mesh(m_screen_mesh);
+
+        m_final_shader->un_bind();
+        m_fbo->un_bind();
     }
 }
