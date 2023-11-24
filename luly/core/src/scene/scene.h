@@ -21,8 +21,11 @@ namespace luly::scene
 
         /* Methods */
         std::shared_ptr<scene_actor> create_actor(const std::string& name);
+        void on_update(float delta_time);
 
     private:
+        void update_lights();
+        
         std::string m_name;
         std::unique_ptr<entt::registry> m_actors_registry;
         std::unordered_map<entt::entity, std::shared_ptr<scene_actor>> m_actors_map;

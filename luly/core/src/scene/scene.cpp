@@ -6,6 +6,8 @@
 
 #include <logging/log.h>
 
+#include "actor/components/lights/point_light_component.h"
+
 namespace luly::scene
 {
     scene::scene(const std::string& name)
@@ -44,5 +46,22 @@ namespace luly::scene
         m_actors_map.insert({actor_handle, actor});
 
         return actor;
+    }
+
+    void scene::on_update(float delta_time)
+    {
+        update_lights();
+    }
+
+    void scene::update_lights()
+    {
+        auto& view = m_actors_registry->view<transform_component, point_light_component>();
+        for (auto [actor, transform_component, point_light_component] : view.each())
+        {
+            auto& transform = transform_component.get_transform();
+            auto& point_light = point_light_component.get_point_light();
+
+            point_light->set_position(transform->get_location());
+        }
     }
 }

@@ -21,4 +21,12 @@ namespace luly::scene
     {
         m_current_scene = scene;
     }
+
+    void scene_manager::on_update(float delta_time)
+    {
+        if (m_current_scene)
+        {
+            m_current_scene->on_update(delta_time);
+        }
+    }
 }

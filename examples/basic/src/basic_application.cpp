@@ -16,6 +16,7 @@
 #include "renderer/materials/material_specification_builder.h"
 #include "renderer/scene/scene_renderer.h"
 #include "scene/actor/components/lights/directional_light_component.h"
+#include "scene/actor/components/lights/point_light_component.h"
 #include "scene/actor/components/rendering/material_component.h"
 #include "scene/actor/components/rendering/model_renderer_component.h"
 
@@ -114,9 +115,13 @@ void basic_application::setup_scene()
     get_scene_manager()->add_scene(scene);
     get_scene_manager()->switch_scene(scene);
 
-    const auto& light_actor = scene->create_actor("Light Emitter");
-    light_actor->add_component<luly::scene::directional_light_component>(
+    const auto& dir_light_actor = scene->create_actor("Light Emitter");
+    dir_light_actor->add_component<luly::scene::directional_light_component>(
         std::make_shared<luly::renderer::directional_light>(glm::vec3(0.85f), glm::vec3(0.8f, 0.3f, -5.0f)));
+
+    const auto& point_light_actor = scene->create_actor("Point Light Emitter");
+    point_light_actor->add_component<luly::scene::point_light_component>(
+        std::make_shared<luly::renderer::point_light>(glm::vec3(0.85f), glm::vec3(0.0f)));
 
     const auto& actor = scene->create_actor("Test Model");
     const auto& model = luly::renderer::model_factory::create_model_from_file("assets/models/gameboy.obj");

@@ -366,4 +366,32 @@ namespace luly::ui
 
         return modified;
     }
+
+    bool ui_utils::draw_property(uint32_t texture_handle, const ImVec2& image_size,
+                                 bool flip_image)
+    {
+        bool modified = false;
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2, 2));
+
+        // Main image widget
+        if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(texture_handle), image_size,
+                               ImVec2(0.0f, flip_image ? 1.0f : 0.0f), ImVec2(1.0f, flip_image ? 0.0f : 1.0f)))
+        {
+            modified = true;
+        }
+        // Hover image widget
+        if (ImGui::IsItemHovered())
+        {
+            ImGui::BeginTooltip();
+            ImGui::Image(
+                reinterpret_cast<ImTextureID>(texture_handle),
+                {256.0f, 256.0f},
+                ImVec2(0.0f, flip_image ? 1.0f : 0.0f), ImVec2(1.0f, flip_image ? 0.0f : 1.0f));
+            ImGui::EndTooltip();
+        }
+
+        ImGui::PopStyleVar();
+        
+        return modified;
+    }
 }

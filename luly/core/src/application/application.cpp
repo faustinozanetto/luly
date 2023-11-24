@@ -42,6 +42,7 @@ namespace luly::core
 
     void application::on_update()
     {
+        m_scene_manager->on_update(app_time::get_delta_time());
     }
 
     void application::run()

@@ -27,5 +27,7 @@ namespace luly::ui
         static bool draw_property(const std::string& name, glm::vec4& value, bool color = true);
         static bool draw_property(const std::string& name, const std::shared_ptr<renderer::texture>& texture,
                                   const ImVec2& image_size = ImVec2(64, 64), bool flip_image = true);
+        static bool draw_property(uint32_t texture_handle,
+                                  const ImVec2& image_size = ImVec2(64, 64), bool flip_image = true);
     };
 }
