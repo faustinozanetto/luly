@@ -42,6 +42,8 @@ void basic_application::on_create()
 
 void basic_application::on_update()
 {
+    application::on_update();
+    
     if (!get_scene_manager()->get_current_scene())
         return;
 

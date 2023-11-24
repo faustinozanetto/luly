@@ -55,7 +55,7 @@ namespace luly::scene
 
     void scene::update_lights()
     {
-        auto& view = m_actors_registry->view<transform_component, point_light_component>();
+        const auto& view = m_actors_registry->view<transform_component, point_light_component>();
         for (auto [actor, transform_component, point_light_component] : view.each())
         {
             auto& transform = transform_component.get_transform();

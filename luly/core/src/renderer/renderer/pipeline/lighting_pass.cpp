@@ -6,6 +6,7 @@
 #include "renderer/renderer/renderer.h"
 #include "renderer/shaders/shader_factory.h"
 #include "scene/actor/components/lights/directional_light_component.h"
+#include "scene/actor/components/lights/point_light_component.h"
 
 namespace luly::renderer
 {
@@ -76,8 +77,9 @@ namespace luly::renderer
         auto& current_scene = core::application::get().get_scene_manager()->get_current_scene();
         const auto& registry = current_scene->get_registry();
 
-        const auto& view = registry->view<scene::directional_light_component>();
-        for (auto [actor, directional_light_component] : view.each())
+        // Directional lights.
+        const auto& directional_view = registry->view<scene::directional_light_component>();
+        for (auto [actor, directional_light_component] : directional_view.each())
         {
             auto& directional_light = directional_light_component.get_directional_light();
 
@@ -86,6 +88,20 @@ namespace luly::renderer
             directional_light_data.color = glm::vec4(directional_light->get_color(), 1.0);
 
             m_lights_data.directional_light = directional_light_data;
+        }
+
+        // Point lights.
+        const auto& point_view = registry->view<scene::point_light_component>();
+        int point_light_index = 0;
+        for (auto [actor, point_light_component] : point_view.each())
+        {
+            auto& point_light = point_light_component.get_point_light();
+
+            point_light_data point_light_data;
+            point_light_data.position = glm::vec4(point_light->get_position(), 1.0);
+            point_light_data.color = glm::vec4(point_light->get_color(), 1.0);
+
+            m_lights_data.point_lights[point_light_index++] = point_light_data;
         }
     }
 

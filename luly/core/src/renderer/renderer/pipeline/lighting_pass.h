@@ -7,6 +7,12 @@
 
 namespace luly::renderer
 {
+    struct point_light_data
+    {
+        glm::vec4 color;
+        glm::vec4 position;
+    };
+    
     struct directional_light_data
     {
         glm::vec4 color;
@@ -16,6 +22,7 @@ namespace luly::renderer
     struct lights_data
     {
         directional_light_data directional_light;
+        point_light_data point_lights[10];
     };
     
     class lighting_pass : public render_pass

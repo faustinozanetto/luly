@@ -5,6 +5,7 @@
 #include "components/common/actor_name_component_panel.h"
 #include "components/common/actor_transform_component_panel.h"
 #include "components/lights/actor_directional_light_component_panel.h"
+#include "components/lights/actor_point_light_component_panel.h"
 #include "components/rendering/actor_material_component_panel.h"
 #include "components/rendering/actor_model_renderer_component_panel.h"
 
@@ -52,6 +53,7 @@ namespace luly::ui
         m_component_panels.push_back(std::make_shared<actor_material_component_panel>());
         /* Lights Components */
         m_component_panels.push_back(std::make_shared<actor_directional_light_component_panel>());
+        m_component_panels.push_back(std::make_shared<actor_point_light_component_panel>());
     }
 
     bool actor_details_panel::get_show_panel()
