@@ -1,0 +1,4 @@
+﻿struct directional_light {
+    vec3 color;
+    vec3 direction;
+};

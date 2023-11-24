@@ -13,6 +13,8 @@
 
 #include <logging/log.h>
 
+#include "scene/actor/components/lights/directional_light_component.h"
+
 namespace luly::renderer
 {
     scene_renderer_data scene_renderer::s_data = {};
@@ -128,6 +130,16 @@ namespace luly::renderer
         s_data.lighting_pass->get_frame_buffer()->bind();
         renderer::clear_screen();
         s_data.lighting_shader->bind();
+        
+        auto& current_scene = core::application::get().get_scene_manager()->get_current_scene();
+        const auto& registry = current_scene->get_registry();
+        const auto& view = registry->view<scene::directional_light_component>();
+        for (auto [actor, directional_light_component] : view.each())
+        {
+            auto& directional_light = directional_light_component.get_directional_light();
+            s_data.lighting_shader->set_vec_float3("u_dir_light.color", directional_light->get_color());
+            s_data.lighting_shader->set_vec_float3("u_dir_light.direction", directional_light->get_direction());
+        }
 
         // Bind geometry pass outputs.
         renderer::bind_texture(0, s_data.geometry_pass->get_frame_buffer()->get_attachment_id(0));
