@@ -67,8 +67,7 @@ namespace luly::renderer
 
     void scene_renderer::create_camera_data()
     {
-        s_data.camera_ubo = std::make_shared<uniform_buffer_object>();
-        s_data.camera_ubo->initialize(sizeof(camera_data), nullptr);
+        s_data.camera_ubo = std::make_shared<uniform_buffer_object>(sizeof(camera_data), 0);
     }
 
     void scene_renderer::create_common_data()
@@ -84,7 +83,7 @@ namespace luly::renderer
 
     void scene_renderer::update_camera_buffer()
     {
-        s_data.camera_ubo->set_data(sizeof(camera_data), &s_data.camera_data);
+        s_data.camera_ubo->set_data(&s_data.camera_data, sizeof(camera_data));
     }
 
     void scene_renderer::perform_geometry_pass()

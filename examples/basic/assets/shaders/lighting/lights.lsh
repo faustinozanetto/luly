@@ -8,8 +8,8 @@ struct point_light {
     vec4 position;
 };
 
-layout(set = 0, binding = 1) uniform lights_ubo
+layout(binding = 1) uniform lights_ubo
 {
-    directional_light directional_light;
     point_light point_lights[10];
+    directional_light directional_light;
 } lights;

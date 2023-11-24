@@ -61,7 +61,8 @@ vec3 calculate_directional_light_luminance(directional_light dir_light, vec3 nor
     vec3 specular = cook_torrance_brdf(normalize(normal), view_dir, normalize(-dir_light.direction.xyz), roughness, F0);
 
     // Final lighting equation
-    vec3 luminance = NdotL * max(diffuse + specular, vec3(0.0)) * dir_light.color.rgb;
+    float intensity = dir_light.color.a;
+    vec3 luminance = NdotL * max(diffuse + specular, vec3(0.0)) * dir_light.color.rgb * intensity;
 
     return luminance;
 }
@@ -80,7 +81,8 @@ vec3 calculate_point_light_luminance(point_light point_light, vec3 normal, vec3 
     vec3 specular = cook_torrance_brdf(normalize(normal), view_dir, light_dir, roughness, F0);
 
     // Final lighting equation with attenuation
-    vec3 luminance = attenuation * NdotL * max(diffuse + specular, vec3(0.0)) * point_light.color.rgb;
+    float intensity = point_light.color.a;
+    vec3 luminance = attenuation * NdotL * max(diffuse + specular, vec3(0.0)) * point_light.color.rgb * intensity;
 
     return luminance;
 }

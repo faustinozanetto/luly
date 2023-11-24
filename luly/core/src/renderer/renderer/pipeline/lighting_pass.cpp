@@ -35,14 +35,19 @@ namespace luly::renderer
             viewport_size.x, viewport_size.y, attachments);
 
         // Create lights ubo.
-        m_lights_ubo = std::make_shared<uniform_buffer_object>();
-        m_lights_ubo->initialize(sizeof(lights_data), nullptr);
+        m_lights_ubo = std::make_shared<uniform_buffer_object>(sizeof(m_directional_light) + sizeof(m_point_lights), 1);
 
         // Create lighting shader.
         m_lighting_shader = shader_factory::create_shader_from_file("assets/shaders/lighting_pass_shader.lsh");
 
         // Create screen quad
         m_screen_mesh = mesh_factory::create_screen_quad_mesh();
+
+        for (int i = 0; i < 10; i++)
+        {
+            m_point_lights[i].color = glm::vec4(0);
+            m_point_lights[i].position = glm::vec4(0);
+        }
     }
 
     void lighting_pass::execute()
@@ -77,19 +82,6 @@ namespace luly::renderer
         auto& current_scene = core::application::get().get_scene_manager()->get_current_scene();
         const auto& registry = current_scene->get_registry();
 
-        // Directional lights.
-        const auto& directional_view = registry->view<scene::directional_light_component>();
-        for (auto [actor, directional_light_component] : directional_view.each())
-        {
-            auto& directional_light = directional_light_component.get_directional_light();
-
-            directional_light_data directional_light_data;
-            directional_light_data.direction = glm::vec4(directional_light->get_direction(), 1.0);
-            directional_light_data.color = glm::vec4(directional_light->get_color(), 1.0);
-
-            m_lights_data.directional_light = directional_light_data;
-        }
-
         // Point lights.
         const auto& point_view = registry->view<scene::point_light_component>();
         int point_light_index = 0;
@@ -99,14 +91,29 @@ namespace luly::renderer
 
             point_light_data point_light_data;
             point_light_data.position = glm::vec4(point_light->get_position(), 1.0);
-            point_light_data.color = glm::vec4(point_light->get_color(), 1.0);
+            point_light_data.color = glm::vec4(point_light->get_color(), point_light->get_intensity());
 
-            m_lights_data.point_lights[point_light_index++] = point_light_data;
+            m_point_lights[point_light_index++] = point_light_data;
+        }
+
+        // Directional lights.
+        const auto& directional_view = registry->view<scene::directional_light_component>();
+        for (auto [actor, directional_light_component] : directional_view.each())
+        {
+            auto& directional_light = directional_light_component.get_directional_light();
+
+            directional_light_data directional_light_data;
+            directional_light_data.direction = glm::vec4(directional_light->get_direction(), 1.0);
+            directional_light_data.color =
+                glm::vec4(directional_light->get_color(), directional_light->get_intensity());
+
+            m_directional_light = directional_light_data;
         }
     }
 
     void lighting_pass::update_lights_buffer()
     {
-        m_lights_ubo->set_data(sizeof(lights_data), &m_lights_data);
+        m_lights_ubo->set_data(&m_point_lights, sizeof(m_point_lights));
+        m_lights_ubo->set_data(&m_directional_light, sizeof(m_directional_light), sizeof(m_point_lights));
     }
 }

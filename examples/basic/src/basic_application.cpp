@@ -16,6 +16,7 @@
 #include "renderer/materials/material_specification_builder.h"
 #include "renderer/meshes/mesh_factory.h"
 #include "renderer/scene/scene_renderer.h"
+#include "scene/actor/components/transform_component.h"
 #include "scene/actor/components/lights/directional_light_component.h"
 #include "scene/actor/components/lights/point_light_component.h"
 #include "scene/actor/components/rendering/material_component.h"
@@ -122,13 +123,20 @@ void basic_application::setup_scene()
     dir_light_actor->add_component<luly::scene::directional_light_component>(
         std::make_shared<luly::renderer::directional_light>(glm::vec3(0.85f), glm::vec3(0.8f, 0.3f, -5.0f)));
 
-    const auto& point_light_actor = scene->create_actor("Point Light Emitter");
-    point_light_actor->add_component<luly::scene::point_light_component>(
-        std::make_shared<luly::renderer::point_light>(glm::vec3(0.85f), glm::vec3(0.0f)));
-    point_light_actor->add_component<luly::scene::model_renderer_component>(
-        luly::renderer::model_factory::create_model_from_meshes({
-            luly::renderer::mesh_factory::create_sphere_mesh(16, 16, 0.1f)
-        }));
+    auto sphere_mesh = luly::renderer::mesh_factory::create_sphere_mesh(16, 16, 0.1f);
+    for (int i = 0; i < 3; i++)
+    {
+        const auto& point_light_actor = scene->create_actor("Point Light Emitter: " + std::to_string(i));
+        point_light_actor->add_component<luly::scene::point_light_component>(
+            std::make_shared<luly::renderer::point_light>(glm::vec3(0.85f), glm::vec3(0.0f)));
+        point_light_actor->add_component<luly::scene::model_renderer_component>(
+            luly::renderer::model_factory::create_model_from_meshes({
+                sphere_mesh
+            }));
+        point_light_actor->get_component<luly::scene::transform_component>().get_transform()->set_location({
+            -1 + i, 0, 1.5f
+        });
+    }
 
     const auto& actor = scene->create_actor("Test Model");
     const auto& model = luly::renderer::model_factory::create_model_from_file("assets/models/gameboy.obj");

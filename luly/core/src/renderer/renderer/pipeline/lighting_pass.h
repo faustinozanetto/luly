@@ -12,19 +12,13 @@ namespace luly::renderer
         glm::vec4 color;
         glm::vec4 position;
     };
-    
+
     struct directional_light_data
     {
         glm::vec4 color;
         glm::vec4 direction;
     };
 
-    struct lights_data
-    {
-        directional_light_data directional_light;
-        point_light_data point_lights[10];
-    };
-    
     class lighting_pass : public render_pass
     {
     public:
@@ -38,10 +32,11 @@ namespace luly::renderer
         void update_lights();
 
     private:
-         void collect_lights();
-         void update_lights_buffer();
+        void collect_lights();
+        void update_lights_buffer();
 
-        lights_data m_lights_data;
+        directional_light_data m_directional_light;
+        point_light_data m_point_lights[10];
         std::shared_ptr<uniform_buffer_object> m_lights_ubo;
         std::shared_ptr<shader> m_lighting_shader;
         std::shared_ptr<mesh> m_screen_mesh;

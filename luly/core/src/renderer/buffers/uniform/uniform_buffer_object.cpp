@@ -1,15 +1,13 @@
 ﻿#include "lypch.h"
 #include "uniform_buffer_object.h"
 
-#include <cstring>
-
 namespace luly::renderer
 {
-    uniform_buffer_object::uniform_buffer_object()
+    uniform_buffer_object::uniform_buffer_object(uint32_t size, uint32_t binding)
     {
-        glGenBuffers(1, &m_handle_id);
-        m_data = nullptr;
-        m_size = 0;
+        glCreateBuffers(1, &m_handle_id);
+        glNamedBufferData(m_handle_id, size, nullptr, GL_DYNAMIC_DRAW);
+        glBindBufferBase(GL_UNIFORM_BUFFER, binding, m_handle_id);
     }
 
     uniform_buffer_object::~uniform_buffer_object()
@@ -17,13 +15,6 @@ namespace luly::renderer
         glDeleteBuffers(1, &m_handle_id);
     }
 
-    void uniform_buffer_object::initialize(uint32_t size, void* data)
-    {
-        m_data = static_cast<uint8_t*>(data);
-        m_size = size;
-        glBindBuffer(GL_UNIFORM_BUFFER, m_handle_id);
-        glBufferData(GL_UNIFORM_BUFFER, m_size, m_data, GL_DYNAMIC_DRAW);
-    }
 
     void uniform_buffer_object::bind(uint32_t slot) const
     {
@@ -40,24 +31,8 @@ namespace luly::renderer
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
     }
 
-    void uniform_buffer_object::set_data(uint32_t size, void* data)
+    void uniform_buffer_object::set_data(const void* data, uint32_t size, uint32_t offset)
     {
-        m_data = static_cast<uint8_t*>(data);
-        m_size = size;
-
-        glBindBuffer(GL_UNIFORM_BUFFER, m_handle_id);
-
-        if (size != m_size)
-        {
-            GLvoid* temp_data = glMapBuffer(GL_UNIFORM_BUFFER, GL_WRITE_ONLY);
-            m_size = size;
-
-            memcpy(temp_data, m_data, m_size);
-            glUnmapBuffer(GL_UNIFORM_BUFFER);
-        }
-        else
-        {
-            glBufferSubData(GL_UNIFORM_BUFFER, 0, m_size, m_data);
-        }
+        glNamedBufferSubData(m_handle_id, offset, size, data);
     }
 }

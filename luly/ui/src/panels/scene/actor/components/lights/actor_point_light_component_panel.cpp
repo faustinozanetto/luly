@@ -35,6 +35,12 @@ namespace luly::ui
             {
                 point_light->set_color(color);
             }
+
+            float intensity = point_light->get_intensity();
+            if (ui_utils::draw_property("Intensity", intensity, 0.0f, 5.0f, 0.01f))
+            {
+                point_light->set_intensity(intensity);
+            }
         }
         else
         {

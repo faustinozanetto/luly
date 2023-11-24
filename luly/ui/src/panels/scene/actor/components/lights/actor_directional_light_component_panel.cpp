@@ -43,6 +43,12 @@ namespace luly::ui
             {
                 directional_light->set_direction(direction);
             }
+
+            float intensity = directional_light->get_intensity();
+            if (ui_utils::draw_property("Intensity", intensity, 0.0f, 5.0f, 0.01f))
+            {
+                directional_light->set_intensity(intensity);
+            }
         }
         else
         {
