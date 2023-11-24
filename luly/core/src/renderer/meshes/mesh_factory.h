@@ -9,5 +9,6 @@ namespace luly::renderer
     public:
         static std::shared_ptr<mesh> create_screen_quad_mesh();
         static std::shared_ptr<mesh> create_cube_mesh();
+        static std::shared_ptr<mesh> create_sphere_mesh(int rings = 16, int sectors = 16, float radius = 1.0f);
     };
 }

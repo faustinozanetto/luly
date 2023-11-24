@@ -54,7 +54,7 @@ namespace luly::renderer
 
         const size_t shader_type_token_len = strlen(SHADER_TYPE_TOKEN);
         size_t pos = shader_source.find(SHADER_TYPE_TOKEN, 0);
-        
+
         while (pos != std::string::npos)
         {
             const size_t eol = shader_source.find_first_of("\r\n", pos);
@@ -101,7 +101,7 @@ namespace luly::renderer
                     }
                     else
                     {
-                        std::cerr << "Warning: Circular include detected in file " << include_path << std::endl;
+                        LY_ERROR("Circular dependency detected in shader file: {0}!", include_path);
                     }
                 }
                 else
@@ -126,8 +126,8 @@ namespace luly::renderer
         std::ifstream file_stream(full_path);
         if (!file_stream.is_open())
         {
-            std::cerr << "Error: Could not open shader file " << file_path << std::endl;
-            return "";
+            LY_ERROR("Failed to open shader include file: {0}!", file_path);
+            LY_ASSERT(false);
         }
 
         std::stringstream include_code;

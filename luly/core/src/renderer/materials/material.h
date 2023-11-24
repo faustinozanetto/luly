@@ -93,12 +93,11 @@ namespace luly::renderer
 
         /* Methods */
         void bind(const std::shared_ptr<shader>& shader);
+        static void bind_default(const std::shared_ptr<shader>& shader);
 
     private:
         void initialize_textures_map();
-        void initialize_texture_locations();
 
-        std::map<material_texture_type, std::string> m_material_texture_enabled_locations;
         material_specification m_material_specification;
     };
 }

@@ -24,7 +24,6 @@ namespace luly::renderer
         m_material_specification = material_specification;
 
         initialize_textures_map();
-        initialize_texture_locations();
     }
 
     material::~material()
@@ -44,14 +43,29 @@ namespace luly::renderer
         shader->set_float("u_material.ambient_occlusion", m_material_specification.ambient_occlusion);
         shader->set_float("u_material.tilling", m_material_specification.tilling);
 
-        for (auto& [type, texture] : m_material_specification.textures)
+        for (auto& [texture_type, texture] : m_material_specification.textures)
         {
-            shader->set_int(m_material_texture_enabled_locations[type], texture.is_enabled ? 1 : 0);
+            shader->set_int(material_utils::get_material_texture_bind_location(texture_type),
+                            texture.is_enabled ? 1 : 0);
 
             if (!texture.is_enabled || !texture.texture)
                 continue;
 
-            renderer::bind_texture(MATERIAL_TEXTURE_BIND_SLOTS.at(type), texture.texture->get_handle_id());
+            renderer::bind_texture(MATERIAL_TEXTURE_BIND_SLOTS.at(texture_type), texture.texture->get_handle_id());
+        }
+    }
+
+    void material::bind_default(const std::shared_ptr<shader>& shader)
+    {
+        shader->set_vec_float3("u_material.albedo", {0.1f, 0.1f, 0.1f});
+        shader->set_float("u_material.roughness", 1.0f);
+        shader->set_float("u_material.metallic", 0.5f);
+        shader->set_float("u_material.ambient_occlusion", 1.0f);
+        shader->set_float("u_material.tilling", 1.0f);
+
+        for (material_texture_type texture_type : MATERIAL_TEXTURE_TYPES)
+        {
+            shader->set_int(material_utils::get_material_texture_bind_location(texture_type), 0);
         }
     }
 
@@ -68,16 +82,6 @@ namespace luly::renderer
             texture.type = type;
             texture.texture = nullptr;
             m_material_specification.textures[type] = texture;
-        }
-    }
-
-    void material::initialize_texture_locations()
-    {
-        for (material_texture_type type : MATERIAL_TEXTURE_TYPES)
-        {
-            std::string location = std::format("u_material.{}_map_enabled",
-                                               material_utils::get_material_texture_type_to_string(type));
-            m_material_texture_enabled_locations.insert(std::make_pair(type, location));
         }
     }
 }

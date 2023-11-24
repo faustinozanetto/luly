@@ -14,6 +14,7 @@
 
 #include "renderer/materials/material.h"
 #include "renderer/materials/material_specification_builder.h"
+#include "renderer/meshes/mesh_factory.h"
 #include "renderer/scene/scene_renderer.h"
 #include "scene/actor/components/lights/directional_light_component.h"
 #include "scene/actor/components/lights/point_light_component.h"
@@ -43,7 +44,7 @@ void basic_application::on_create()
 void basic_application::on_update()
 {
     application::on_update();
-    
+
     if (!get_scene_manager()->get_current_scene())
         return;
 
@@ -124,6 +125,10 @@ void basic_application::setup_scene()
     const auto& point_light_actor = scene->create_actor("Point Light Emitter");
     point_light_actor->add_component<luly::scene::point_light_component>(
         std::make_shared<luly::renderer::point_light>(glm::vec3(0.85f), glm::vec3(0.0f)));
+    point_light_actor->add_component<luly::scene::model_renderer_component>(
+        luly::renderer::model_factory::create_model_from_meshes({
+            luly::renderer::mesh_factory::create_sphere_mesh(16, 16, 0.1f)
+        }));
 
     const auto& actor = scene->create_actor("Test Model");
     const auto& model = luly::renderer::model_factory::create_model_from_file("assets/models/gameboy.obj");

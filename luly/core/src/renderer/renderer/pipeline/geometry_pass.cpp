@@ -88,6 +88,10 @@ namespace luly::renderer
 
                 material->bind(m_geometry_shader);
             }
+            else
+            {
+                material::bind_default(m_geometry_shader);
+            }
 
             auto& model_renderer_component = registry->get<scene::model_renderer_component>(actor);
             auto& model = model_renderer_component.get_model();
