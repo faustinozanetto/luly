@@ -84,6 +84,10 @@ namespace luly::renderer
         m_fbo->un_bind();
     }
 
+    void lighting_pass::set_outputs()
+    {
+    }
+
     void lighting_pass::update_lights()
     {
         collect_lights();

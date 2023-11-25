@@ -37,6 +37,7 @@ namespace luly::renderer
         /* Overrides */
         void initialize() override;
         void execute() override;
+        void set_outputs() override;
 
         void update_lights();
 

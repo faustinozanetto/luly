@@ -8,6 +8,8 @@
 
 #include "actor/components/lights/point_light_component.h"
 #include "actor/components/lights/spot_light_component.h"
+#include "actor/components/rendering/skybox_component.h"
+#include "renderer/scene/scene_renderer.h"
 
 namespace luly::scene
 {

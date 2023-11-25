@@ -18,14 +18,17 @@ namespace luly::renderer
         /* Overrides */
         void initialize() override;
         void execute() override;
-
+    void set_outputs() override;
+        
         /* Getters */
         const std::shared_ptr<texture_cubemap>& get_irradiance_map() const { return m_environment_irradiance_texture; }
+
+        /* Methods */
+        void set_environment_map(const std::shared_ptr<texture_2d>& environment_map);
 
     private:
         void setup_environment();
         void setup_environment_fbo();
-        void setup_environment_texture();
         void setup_environment_cubemap();
         void setup_environment_equirectangular_map();
         void setup_irradiance_map();

@@ -56,6 +56,11 @@ namespace luly::renderer
         glDisable(get_renderer_state_to_opengl(state));
     }
 
+    void renderer::set_depth_func(renderer_depth_func depth_func)
+    {
+        glDepthFunc(get_renderer_depth_func_to_opengl(depth_func));
+    }
+
     glm::ivec2 renderer::get_viewport_size()
     {
         return glm::ivec2(s_data.window->get_data().width, s_data.window->get_data().height);
@@ -200,6 +205,31 @@ namespace luly::renderer
         }
         LY_ASSERT_MSG(false, "Unknown renderer state!");
         return -1;
+    }
+
+    uint32_t renderer::get_renderer_depth_func_to_opengl(renderer_depth_func depth_func)
+    {
+        switch (depth_func)
+        {
+        case renderer_depth_func::less:
+            return GL_LESS;
+        case renderer_depth_func::less_or_equal:
+            return GL_LEQUAL;
+        case renderer_depth_func::equal:
+            return GL_EQUAL;
+        case renderer_depth_func::greater:
+            return GL_GREATER;
+        case renderer_depth_func::greater_or_equal:
+            return GL_GEQUAL;
+        case renderer_depth_func::not_equal:
+            return GL_NOTEQUAL;
+        case renderer_depth_func::always:
+            return GL_ALWAYS;
+        case renderer_depth_func::never:
+            return GL_NEVER;
+        default:
+            return GL_LESS;
+        }
     }
 
     void renderer::open_gl_message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,

@@ -9,6 +9,7 @@
 #include "renderer/render_buffer/render_buffer.h"
 #include "renderer/shaders/shader_factory.h"
 #include "renderer/textures/texture_factory.h"
+#include "scene/actor/components/rendering/skybox_component.h"
 
 namespace luly::renderer
 {
@@ -23,6 +24,9 @@ namespace luly::renderer
 
     void environment_pass::initialize()
     {
+        setup_environment();
+
+
         auto viewport_size = renderer::get_viewport_size();
 
         std::vector<frame_buffer_attachment> attachments = {
@@ -41,9 +45,14 @@ namespace luly::renderer
         m_fbo = std::make_shared<frame_buffer>(
             viewport_size.x, viewport_size.y, attachments, depth_attachment);
         m_fbo->initialize();
+    }
 
-        setup_environment();
+    void environment_pass::execute()
+    {
+    }
 
+    void environment_pass::set_outputs()
+    {
         render_pass_output irradiance_output;
         irradiance_output.name = "irradiance_output";
         irradiance_output.pass_output = m_environment_irradiance_texture;
@@ -65,9 +74,21 @@ namespace luly::renderer
         add_output(environment_cubemap_texture);
     }
 
-    void environment_pass::execute()
+    void environment_pass::set_environment_map(const std::shared_ptr<texture_2d>& environment_map)
     {
-       
+        m_environment_hdr_texture = environment_map;
+
+        setup_environment_fbo();
+        setup_environment_cubemap();
+        setup_environment_equirectangular_map();
+        setup_environment_equirectangular_map();
+        setup_irradiance_map();
+        setup_prefilter_map();
+        setup_brdf_map();
+
+        set_outputs();
+
+        renderer::set_viewport_size(renderer::get_viewport_size());
     }
 
     void environment_pass::setup_environment()
@@ -85,16 +106,6 @@ namespace luly::renderer
         m_irradiance_shader = shader_factory::create_shader_from_file("assets/shaders/skybox/irradiance.lsh");
         m_prefilter_shader = shader_factory::create_shader_from_file("assets/shaders/skybox/prefilter.lsh");
         m_brdf_shader = shader_factory::create_shader_from_file("assets/shaders/skybox/brdf.lsh");
-
-        setup_environment_fbo();
-        setup_environment_texture();
-        setup_environment_cubemap();
-        setup_environment_equirectangular_map();
-        setup_irradiance_map();
-        setup_prefilter_map();
-        setup_brdf_map();
-
-        renderer::set_viewport_size(renderer::get_viewport_size());
     }
 
     void environment_pass::setup_environment_fbo()
@@ -105,12 +116,6 @@ namespace luly::renderer
             m_environment_map_size, m_environment_map_size,
             texture_internal_format::depth_component24);
         m_environment_capture_rbo->attach_to_frame_buffer(render_buffer_attachment_type::depth);
-    }
-
-    void environment_pass::setup_environment_texture()
-    {
-        m_environment_hdr_texture = texture_factory::create_environment_texture_from_file(
-            "assets/hdris/meadow_2_4k.hdr");
     }
 
     void environment_pass::setup_environment_cubemap()
@@ -141,7 +146,7 @@ namespace luly::renderer
 
         m_equirectangular_to_cubemap_shader->bind();
         m_equirectangular_to_cubemap_shader->set_mat4("u_projection_matrix", m_capture_projection);
-        renderer::bind_texture(0, m_environment_cubemap_texture->get_handle_id());
+        renderer::bind_texture(0, m_environment_hdr_texture->get_handle_id());
 
         renderer::set_viewport_size({m_environment_map_size, m_environment_map_size});
         m_environment_capture_fbo->bind();

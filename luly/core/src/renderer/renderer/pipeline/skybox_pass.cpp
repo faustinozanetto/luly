@@ -49,37 +49,43 @@ namespace luly::renderer
         const render_pass_input& geometry_input = m_inputs.at("geometry_pass_input");
         const std::shared_ptr<frame_buffer>& geometry_input_fbo = geometry_input.render_pass->get_frame_buffer();
 
-        const render_pass_input& lighting_pass_input = m_inputs.at("lighting_pass_input");
-        const std::shared_ptr<frame_buffer>& lighting_input_fbo = lighting_pass_input.render_pass->get_frame_buffer();
+        const render_pass_input& lighting_input = m_inputs.at("lighting_pass_input");
+        const std::shared_ptr<frame_buffer>& lighting_input_fbo = lighting_input.render_pass->get_frame_buffer();
 
         const render_pass_input& environment_pass_input = m_inputs.at("environment_pass_input");
         const render_pass_output& environment_cubemap_texture = environment_pass_input.render_pass->get_output(
             "environment_cubemap_output");
 
-        lighting_input_fbo->bind();
-
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, geometry_input_fbo->get_handle_id());
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, lighting_input_fbo->get_handle_id());
-        int width = m_fbo->get_width();
-        int height = m_fbo->get_height();
-        glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+        m_fbo->bind();
 
         renderer::set_state(renderer_state::depth, true);
-        glDepthFunc(GL_LEQUAL);
+        renderer::set_depth_func(renderer_depth_func::less_or_equal);
+
+        int width = m_fbo->get_width();
+        int height = m_fbo->get_height();
+
+        // Copy color buffer from lighting pass to this fbo.
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, lighting_input_fbo->get_handle_id());
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo->get_handle_id());
+        glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+        // Copy depth buffer from geometry pass to this fbo.
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, geometry_input_fbo->get_handle_id());
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo->get_handle_id());
+        glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+
+        // Render skybox cube using the environment cubemap texture.
         m_skybox_shader->bind();
         renderer::bind_texture(0, environment_cubemap_texture.pass_output->get_handle_id());
         renderer::submit_mesh(m_cube_mesh);
         m_skybox_shader->un_bind();
 
-        glDepthFunc(GL_LESS);
+        renderer::set_depth_func(renderer_depth_func::less);
 
-        lighting_input_fbo->un_bind();
-
-        m_fbo->bind();
-        m_screen_shader->bind();
-        renderer::bind_texture(0, lighting_input_fbo->get_attachment_id(0));
-        renderer::submit_mesh(m_screen_mesh);
-        m_screen_shader->un_bind();
         m_fbo->un_bind();
+    }
+
+    void skybox_pass::set_outputs()
+    {
     }
 }

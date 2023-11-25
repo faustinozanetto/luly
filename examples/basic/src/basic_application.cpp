@@ -14,11 +14,9 @@
 
 #include "renderer/materials/material.h"
 #include "renderer/materials/material_specification_builder.h"
-#include "renderer/meshes/mesh_factory.h"
 #include "renderer/scene/scene_renderer.h"
 #include "scene/actor/components/transform_component.h"
 #include "scene/actor/components/lights/directional_light_component.h"
-#include "scene/actor/components/lights/point_light_component.h"
 #include "scene/actor/components/lights/spot_light_component.h"
 #include "scene/actor/components/rendering/material_component.h"
 #include "scene/actor/components/rendering/model_renderer_component.h"
@@ -33,7 +31,7 @@ basic_application::basic_application(const luly::renderer::window_specification&
 
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     glEnable(GL_DEPTH_TEST);
-    
+
     luly::ui::engine_ui::set_render_target(
         luly::renderer::scene_renderer::get_data().final_pass->get_frame_buffer()->get_attachment_id(0));
 }
@@ -53,6 +51,9 @@ void basic_application::on_update()
 
     if (!get_scene_manager()->get_current_scene())
         return;
+
+    auto& transform = m_actor->get_component<luly::scene::transform_component>().get_transform();
+    transform->rotate(glm::angleAxis(1.0f * luly::app_time::get_delta_time(), glm::vec3(0, 1, 0)));
 
     luly::ui::engine_ui::begin_frame();
 
@@ -147,7 +148,8 @@ void basic_application::setup_scene()
 
     const auto& skybox_actor = scene->create_actor("Skybox Actor");
     skybox_actor->add_component<luly::scene::skybox_component>(
-        luly::renderer::texture_factory::create_texture_cubemap_from_file("assets/hdris/meadow_2_4k.hdr"));
+        luly::renderer::texture_factory::create_environment_texture_from_file(
+            "assets/hdris/kloofendal_43d_clear_puresky_4k.hdr"));
 
     const auto& spot_light_actor = scene->create_actor("Spot Light Emitter");
     spot_light_actor->add_component<luly::scene::spot_light_component>(
@@ -155,9 +157,9 @@ void basic_application::setup_scene()
                                                      25.0f));
     spot_light_actor->get_component<luly::scene::transform_component>().get_transform()->set_location({0, 0, 2});
 
-    const auto& actor = scene->create_actor("Test Model");
+    m_actor = scene->create_actor("Test Model");
     const auto& model = luly::renderer::model_factory::create_model_from_file("assets/models/gameboy.obj");
-    actor->add_component<luly::scene::model_renderer_component>(model);
+    m_actor->add_component<luly::scene::model_renderer_component>(model);
 
     const auto& albedo_texture = luly::renderer::texture_factory::create_texture_from_file(
         "assets/textures/gameboy/DefaultMaterial_Albedo.png");
@@ -213,7 +215,7 @@ void basic_application::setup_scene()
                                   with_textures(textures).build();
 
     auto material = std::make_shared<luly::renderer::material>(material_specification);
-    actor->add_component<luly::scene::material_component>(material);
+    m_actor->add_component<luly::scene::material_component>(material);
 }
 
 luly::core::application* luly::core::create_application()

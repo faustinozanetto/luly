@@ -11,6 +11,8 @@
 
 #include <logging/log.h>
 
+#include "scene/actor/components/rendering/skybox_component.h"
+
 namespace luly::renderer
 {
     scene_renderer_data scene_renderer::s_data = {};
@@ -50,6 +52,11 @@ namespace luly::renderer
     {
     }
 
+    void scene_renderer::set_environment_map(const std::shared_ptr<texture_2d>& environment_map)
+    {
+        s_data.environment_pass->set_environment_map(environment_map);
+    }
+
     scene_renderer_data& scene_renderer::get_data()
     {
         return s_data;
@@ -73,7 +80,7 @@ namespace luly::renderer
         s_data.skybox_pass->add_input({s_data.lighting_pass, "lighting_pass_input"});
 
         s_data.final_pass = std::make_shared<final_pass>();
-        s_data.final_pass->add_input({s_data.lighting_pass, "lighting_pass_input"});
+        s_data.final_pass->add_input({s_data.skybox_pass, "skybox_pass_input"});
         LY_TRACE("Pipeline passes created successfully!");
     }
 

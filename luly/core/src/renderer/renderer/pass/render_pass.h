@@ -38,6 +38,7 @@ namespace luly::renderer
         /* Virtuals */
         virtual void initialize() = 0;
         virtual void execute() = 0;
+        virtual void set_outputs() = 0;
 
         /* Methods */
         void add_input(const render_pass_input& render_pass_input)

@@ -28,12 +28,18 @@ namespace luly::renderer
             },
         };
 
+        frame_buffer_attachment depth_attachment = {
+            texture_internal_format::depth_component32f,
+            texture_filtering::linear,
+            texture_wrapping::clamp_to_edge, viewport_size
+        };
+
         m_fbo = std::make_shared<frame_buffer>(
-            viewport_size.x, viewport_size.y, attachments);
+            viewport_size.x, viewport_size.y, attachments, depth_attachment);
         m_fbo->initialize();
 
         // Create shader.
-        m_final_shader = shader_factory::create_shader_from_file("assets/shaders/final_pass_shader.lsh");
+        m_screen_shader = shader_factory::create_shader_from_file("assets/shaders/screen.lsh");
 
         // Create screen quad
         m_screen_mesh = mesh_factory::create_screen_quad_mesh();
@@ -43,14 +49,18 @@ namespace luly::renderer
     {
         m_fbo->bind();
         renderer::clear_screen();
-        m_final_shader->bind();
+        m_screen_shader->bind();
 
-        render_pass_input lighting_pass_input = m_inputs.at("lighting_pass_input");
+        render_pass_input skybox_pass_input = m_inputs.at("skybox_pass_input");
 
-        renderer::bind_texture(0, lighting_pass_input.render_pass->get_frame_buffer()->get_attachment_id(0));
+        renderer::bind_texture(0, skybox_pass_input.render_pass->get_frame_buffer()->get_attachment_id(0));
         renderer::submit_mesh(m_screen_mesh);
 
-        m_final_shader->un_bind();
+        m_screen_shader->un_bind();
         m_fbo->un_bind();
+    }
+
+    void final_pass::set_outputs()
+    {
     }
 }

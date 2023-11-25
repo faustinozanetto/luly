@@ -1,5 +1,6 @@
 ﻿#include "renderer_panel.h"
 
+#include "engine_ui.h"
 #include "renderer/renderer/renderer.h"
 #include "renderer/scene/scene_renderer.h"
 #include "utils/ui_utils.h"
@@ -31,7 +32,7 @@ namespace luly::ui
             }
             ImGui::Separator();
             ui_utils::draw_property("Render Passes");
-            
+
             ImGui::Separator();
             if (ImGui::TreeNode("Geometry Pass"))
             {
@@ -40,7 +41,10 @@ namespace luly::ui
                 ImGui::Columns(2);
                 for (uint32_t attachment_handle : geometry_fbo->get_attachments())
                 {
-                    ui_utils::draw_property(attachment_handle, {90, 90});
+                    if (ui_utils::draw_property(attachment_handle, {90, 90}))
+                    {
+                        engine_ui::set_render_target(attachment_handle);
+                    }
                     ImGui::NextColumn();
                 }
                 ImGui::Columns(1);
@@ -55,7 +59,29 @@ namespace luly::ui
                 ImGui::Columns(2);
                 for (uint32_t attachment_handle : lighting_fbo->get_attachments())
                 {
-                    ui_utils::draw_property(attachment_handle, {90, 90});
+                    if (ui_utils::draw_property(attachment_handle, {90, 90}))
+                    {
+                        engine_ui::set_render_target(attachment_handle);
+                    }
+                    ImGui::NextColumn();
+                }
+                ImGui::Columns(1);
+                ImGui::TreePop();
+            }
+
+
+            ImGui::Separator();
+            if (ImGui::TreeNode("Skybox Pass"))
+            {
+                auto& skybox_pass = renderer::scene_renderer::get_data().skybox_pass;
+                auto& skybox_fbo = skybox_pass->get_frame_buffer();
+                ImGui::Columns(2);
+                for (uint32_t attachment_handle : skybox_fbo->get_attachments())
+                {
+                    if (ui_utils::draw_property(attachment_handle, {90, 90}))
+                    {
+                        engine_ui::set_render_target(attachment_handle);
+                    }
                     ImGui::NextColumn();
                 }
                 ImGui::Columns(1);
@@ -70,7 +96,10 @@ namespace luly::ui
                 ImGui::Columns(2);
                 for (uint32_t attachment_handle : final_fbo->get_attachments())
                 {
-                    ui_utils::draw_property(attachment_handle, {90, 90});
+                    if (ui_utils::draw_property(attachment_handle, {90, 90}))
+                    {
+                        engine_ui::set_render_target(attachment_handle);
+                    }
                     ImGui::NextColumn();
                 }
                 ImGui::Columns(1);

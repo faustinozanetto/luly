@@ -105,4 +105,8 @@ namespace luly::renderer
         m_geometry_shader->un_bind();
         m_fbo->un_bind();
     }
+
+    void geometry_pass::set_outputs()
+    {
+    }
 }
