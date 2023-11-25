@@ -47,6 +47,11 @@ namespace luly::renderer
         prefilter_output.name = "prefilter_output";
         prefilter_output.pass_output = m_environment_prefilter_texture;
         add_output(prefilter_output);
+
+        render_pass_output brdf_output;
+        brdf_output.name = "brdf_output";
+        brdf_output.pass_output = m_brdf_texture;
+        add_output(brdf_output);
     }
 
     void environment_pass::execute()
@@ -57,15 +62,17 @@ namespace luly::renderer
     {
         m_irradiance_map_size = 128;
         m_prefilter_map_size = 1024;
-        m_brdf_map_size = 1024;
+        m_brdf_map_size = 512;
         m_environment_map_size = 2048;
 
         m_cube_mesh = mesh_factory::create_cube_mesh();
+        m_quad_mesh = mesh_factory::create_screen_quad_mesh();
 
         m_equirectangular_to_cubemap_shader = shader_factory::create_shader_from_file(
             "assets/shaders/skybox/equirectangular_to_cubemap.lsh");
         m_irradiance_shader = shader_factory::create_shader_from_file("assets/shaders/skybox/irradiance.lsh");
         m_prefilter_shader = shader_factory::create_shader_from_file("assets/shaders/skybox/prefilter.lsh");
+        m_brdf_shader = shader_factory::create_shader_from_file("assets/shaders/skybox/brdf.lsh");
 
         setup_environment_fbo();
         setup_environment_texture();
@@ -73,6 +80,7 @@ namespace luly::renderer
         setup_environment_equirectangular_map();
         setup_irradiance_map();
         setup_prefilter_map();
+        setup_brdf_map();
 
         renderer::set_viewport_size(renderer::get_viewport_size());
     }
@@ -225,6 +233,33 @@ namespace luly::renderer
                 renderer::submit_mesh(m_cube_mesh);
             }
         }
+        m_environment_capture_fbo->un_bind();
+    }
+
+    void environment_pass::setup_brdf_map()
+    {
+        texture_specification texture_specification;
+        texture_specification.width = m_brdf_map_size;
+        texture_specification.height = m_brdf_map_size;
+        texture_specification.channels = 2;
+        texture_specification.internal_format = texture_internal_format::rg16f;
+        texture_specification.data = nullptr;
+
+        m_brdf_texture = std::make_shared<texture_2d>(texture_specification);
+
+        m_environment_capture_fbo->bind();
+        m_environment_capture_rbo->bind();
+        m_environment_capture_rbo->set_storage_parameters(m_brdf_map_size, m_brdf_map_size,
+                                                          texture_internal_format::depth_component24);
+        m_environment_capture_fbo->attach_texture(m_brdf_texture, GL_FRAMEBUFFER, render_buffer_attachment_type::color,
+                                                  GL_TEXTURE_2D, 0);
+        //   m_environment_capture_fbo->attach_texture(m_environment_brdf_texture, GL_FRAMEBUFFER, retro::renderer::render_buffer_attachment_type::color, GL_TEXTURE_2D, 0);
+
+        renderer::set_viewport_size({m_brdf_map_size, m_brdf_map_size});
+        m_brdf_shader->bind();
+        renderer::clear_screen();
+
+        renderer::submit_mesh(m_quad_mesh, renderer_draw_mode::triangle_strip);
         m_environment_capture_fbo->un_bind();
     }
 }

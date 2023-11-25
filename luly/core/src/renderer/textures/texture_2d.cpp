@@ -6,6 +6,8 @@
 #include <logging/log.h>
 #include <utils/assert.h>
 
+#include "stb_image.h"
+
 namespace luly::renderer
 {
     texture_2d::texture_2d(const texture_specification& texture_specification)
@@ -44,13 +46,17 @@ namespace luly::renderer
         set_wrapping(texture_wrapping_type::wrap_t, texture_wrapping::clamp_to_edge);
 
         // Allocating Memory.
-        const texture_format format = texture_utils::get_texture_format_from_internal_format(
-            m_texture_specification.internal_format);
-        glTextureSubImage2D(m_handle, 0, 0, 0, m_texture_specification.width, m_texture_specification.height,
-                            texture_utils::get_texture_format_to_opengl(format),
-                            m_texture_specification.internal_format == texture_internal_format::r11g11b10
-                                ? GL_FLOAT
-                                : GL_UNSIGNED_BYTE,
-                            m_texture_specification.data);
+        if (m_texture_specification.data != nullptr)
+        {
+            const texture_format format = texture_utils::get_texture_format_from_internal_format(
+                m_texture_specification.internal_format);
+            glTextureSubImage2D(m_handle, 0, 0, 0, m_texture_specification.width, m_texture_specification.height,
+                                texture_utils::get_texture_format_to_opengl(format),
+                                m_texture_specification.internal_format == texture_internal_format::r11g11b10
+                                    ? GL_FLOAT
+                                    : GL_UNSIGNED_BYTE,
+                                m_texture_specification.data);
+            stbi_image_free(m_texture_specification.data);
+        }
     }
 }

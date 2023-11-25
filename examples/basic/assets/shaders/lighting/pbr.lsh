@@ -116,7 +116,7 @@ vec3 calculate_spot_light_luminance(spot_light spot_light, vec3 normal, vec3 vie
     return luminance;
 }
 
-vec3 calculate_ambient_ibl(vec3 albedo, vec3 normal, vec3 view_dir, vec3 irradiance, vec3 prefilter, float roughness, float metallic, float ambient_occlusion) {
+vec3 calculate_ambient_ibl(vec3 albedo, vec3 normal, vec3 view_dir, vec3 irradiance, vec3 prefilter, vec2 brdf_lut, float roughness, float metallic, float ambient_occlusion) {
     vec3 F0 = vec3(0.04);
     F0 = mix(F0, albedo, metallic);
 
@@ -127,7 +127,7 @@ vec3 calculate_ambient_ibl(vec3 albedo, vec3 normal, vec3 view_dir, vec3 irradia
     kD *= 1.0 - metallic;
 
     vec3 diffuse = kD * irradiance * albedo;
-    vec3 specular = prefilter;
+    vec3 specular = prefilter * (F * brdf_lut.x + brdf_lut.y);
 
     return (diffuse + specular ) * ambient_occlusion;
 }
