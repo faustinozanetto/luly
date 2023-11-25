@@ -10,6 +10,7 @@
 
 #include "renderer/renderer/pipeline/environment_pass.h"
 #include "renderer/renderer/pipeline/lighting_pass.h"
+#include "renderer/renderer/pipeline/skybox_pass.h"
 
 namespace luly::renderer
 {
@@ -30,6 +31,8 @@ namespace luly::renderer
 
         /* Lighting Pass */
         std::shared_ptr<lighting_pass> lighting_pass;
+
+        std::shared_ptr<skybox_pass> skybox_pass;
 
         /* Final Pass */
         std::shared_ptr<final_pass> final_pass;

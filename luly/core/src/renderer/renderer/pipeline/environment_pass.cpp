@@ -32,9 +32,15 @@ namespace luly::renderer
                 texture_wrapping::clamp_to_edge, viewport_size
             },
         };
+        frame_buffer_attachment depth_attachment = {
+            texture_internal_format::depth_component32f,
+            texture_filtering::linear,
+            texture_wrapping::clamp_to_edge, viewport_size
+        };
 
         m_fbo = std::make_shared<frame_buffer>(
-            viewport_size.x, viewport_size.y, attachments);
+            viewport_size.x, viewport_size.y, attachments, depth_attachment);
+        m_fbo->initialize();
 
         setup_environment();
 
@@ -52,10 +58,16 @@ namespace luly::renderer
         brdf_output.name = "brdf_output";
         brdf_output.pass_output = m_brdf_texture;
         add_output(brdf_output);
+
+        render_pass_output environment_cubemap_texture;
+        environment_cubemap_texture.name = "environment_cubemap_output";
+        environment_cubemap_texture.pass_output = m_environment_cubemap_texture;
+        add_output(environment_cubemap_texture);
     }
 
     void environment_pass::execute()
     {
+       
     }
 
     void environment_pass::setup_environment()

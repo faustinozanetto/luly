@@ -46,6 +46,16 @@ namespace luly::renderer
         glClearColor(s_data.clear_color.r, s_data.clear_color.g, s_data.clear_color.b, s_data.clear_color.a);
     }
 
+    void renderer::set_state(renderer_state state, bool is_enabled)
+    {
+        if (is_enabled)
+        {
+            glEnable(get_renderer_state_to_opengl(state));
+            return;
+        }
+        glDisable(get_renderer_state_to_opengl(state));
+    }
+
     glm::ivec2 renderer::get_viewport_size()
     {
         return glm::ivec2(s_data.window->get_data().width, s_data.window->get_data().height);
@@ -174,6 +184,21 @@ namespace luly::renderer
             return GL_TRIANGLES;
         }
         LY_ASSERT_MSG(false, "Unknown renderer draw mode!");
+        return -1;
+    }
+
+    uint32_t renderer::get_renderer_state_to_opengl(renderer_state state)
+    {
+        switch (state)
+        {
+        case renderer_state::depth:
+            return GL_DEPTH_TEST;
+        case renderer_state::blend:
+            return GL_BLEND;
+        case renderer_state::face_cull:
+            return GL_CULL_FACE;
+        }
+        LY_ASSERT_MSG(false, "Unknown renderer state!");
         return -1;
     }
 

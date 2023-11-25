@@ -29,6 +29,13 @@ namespace luly::renderer
         triangle_fan,
         triangles
     };
+    
+    enum class renderer_state
+    {
+        depth,
+        blend,
+        face_cull
+    };
 
     class renderer
     {
@@ -40,6 +47,7 @@ namespace luly::renderer
         static bool get_should_close();
         static void clear_screen();
         static void set_clear_color(const glm::vec4& clear_color);
+        static void set_state(renderer_state state, bool is_enabled);
 
         /* Getters */
         static glm::ivec2 get_viewport_size();
@@ -76,6 +84,7 @@ namespace luly::renderer
 
         /* Utils */
         static uint32_t get_renderer_draw_mode_to_opengl(renderer_draw_mode draw_mode);
+        static uint32_t get_renderer_state_to_opengl(renderer_state state);
 
     private:
         static void initialize_data();

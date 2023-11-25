@@ -32,8 +32,14 @@ namespace luly::renderer
             },
         };
 
+        frame_buffer_attachment depth_attachment = {
+            texture_internal_format::depth_component32f,
+            texture_filtering::linear,
+            texture_wrapping::clamp_to_edge, viewport_size
+        };
+
         m_fbo = std::make_shared<frame_buffer>(
-            viewport_size.x, viewport_size.y, attachments);
+            viewport_size.x, viewport_size.y, attachments, depth_attachment);
         m_fbo->initialize();
 
         // Create lights ubo.
@@ -51,6 +57,7 @@ namespace luly::renderer
 
     void lighting_pass::execute()
     {
+        renderer::set_state(renderer_state::depth, false);
         m_fbo->bind();
         renderer::clear_screen();
         m_lighting_shader->bind();
@@ -70,6 +77,7 @@ namespace luly::renderer
         renderer::bind_texture(
             6, environment_pass_input.render_pass->get_output("brdf_output").pass_output->get_handle_id());
 
+        // Render screen quad mesh.
         renderer::submit_mesh(m_screen_mesh);
 
         m_lighting_shader->un_bind();

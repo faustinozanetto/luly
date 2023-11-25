@@ -31,6 +31,9 @@ basic_application::basic_application(const luly::renderer::window_specification&
 
     setup_scene();
 
+    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+    glEnable(GL_DEPTH_TEST);
+    
     luly::ui::engine_ui::set_render_target(
         luly::renderer::scene_renderer::get_data().final_pass->get_frame_buffer()->get_attachment_id(0));
 }

@@ -66,6 +66,7 @@ namespace luly::renderer
 
     void geometry_pass::execute()
     {
+        renderer::set_state(renderer_state::depth, true);
         m_fbo->bind();
         renderer::clear_screen();
         m_geometry_shader->bind();
