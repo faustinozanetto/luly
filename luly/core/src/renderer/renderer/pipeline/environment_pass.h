@@ -19,6 +19,9 @@ namespace luly::renderer
         void initialize() override;
         void execute() override;
 
+        /* Getters */
+        const std::shared_ptr<texture_cubemap>& get_irradiance_map() const { return m_environment_irradiance_texture; }
+
     private:
         void setup_environment();
         void setup_environment_fbo();
@@ -36,7 +39,7 @@ namespace luly::renderer
         std::shared_ptr<texture_2d> m_environment_hdr_texture;
         std::shared_ptr<texture_cubemap> m_environment_irradiance_texture;
         std::shared_ptr<texture_cubemap> m_environment_cubemap_texture;
-        
+
         std::shared_ptr<mesh> m_cube_mesh;
 
         std::shared_ptr<frame_buffer> m_environment_capture_fbo;

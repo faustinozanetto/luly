@@ -56,12 +56,15 @@ namespace luly::renderer
         m_lighting_shader->bind();
 
         render_pass_input geometry_pass_input = m_inputs.at("geometry_pass_input");
+        render_pass_input environment_pass_input = m_inputs.at("environment_pass_input");
 
         // Bind geometry pass outputs.
         renderer::bind_texture(0, geometry_pass_input.render_pass->get_frame_buffer()->get_attachment_id(0));
         renderer::bind_texture(1, geometry_pass_input.render_pass->get_frame_buffer()->get_attachment_id(1));
         renderer::bind_texture(2, geometry_pass_input.render_pass->get_frame_buffer()->get_attachment_id(2));
         renderer::bind_texture(3, geometry_pass_input.render_pass->get_frame_buffer()->get_attachment_id(3));
+        renderer::bind_texture(
+            4, environment_pass_input.render_pass->get_output("irradiance_output").pass_output->get_handle_id());
 
         renderer::submit_mesh(m_screen_mesh);
 

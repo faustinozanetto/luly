@@ -26,6 +26,11 @@ layout (binding = 0) uniform sampler2D u_position_map;
 layout (binding = 1) uniform sampler2D u_albedo_map;
 layout (binding = 2) uniform sampler2D u_normal_map;
 layout (binding = 3) uniform sampler2D u_rough_metal_ao_map;
+layout (binding = 4) uniform samplerCube u_irradiance_map;
+
+vec3 sample_irradiance_map(vec3 normal_world_space) {
+    return texture(u_irradiance_map, normalize(normal_world_space)).rgb;
+}
 
 void main()
 {
@@ -52,6 +57,13 @@ void main()
         luminance += calculate_spot_light_luminance(lights.spot_lights[i], normal, view_dir, frag_pos, albedo, roughness, metallic);
     }
 
+    vec3 normal_world_space = mat3(transpose(camera.view_matrix)) * normal;
+    vec3 view_dir_world_space = mat3(inverse(camera.view_matrix)) * normalize(camera.position - frag_pos);
+
+    vec3 irradiance = sample_irradiance_map(normal_world_space);
+
+    luminance += calculate_ambient_ibl(albedo, normal_world_space, view_dir_world_space, irradiance, roughness, metallic, ambient_occlusion);
+        
     vec3 ambient = vec3(0.03) * albedo * ambient_occlusion;
     vec3 color   = ambient + luminance;
         

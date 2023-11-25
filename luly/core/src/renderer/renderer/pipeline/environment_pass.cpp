@@ -37,6 +37,11 @@ namespace luly::renderer
             viewport_size.x, viewport_size.y, attachments);
 
         setup_environment();
+
+        render_pass_output irradiance_output;
+        irradiance_output.name = "irradiance_output";
+        irradiance_output.pass_output = m_environment_irradiance_texture;
+        add_output(irradiance_output);
     }
 
     void environment_pass::execute()

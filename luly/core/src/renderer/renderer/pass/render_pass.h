@@ -15,6 +15,12 @@ namespace luly::renderer
         std::string name;
     };
 
+    struct render_pass_output
+    {
+        std::shared_ptr<texture> pass_output;
+        std::string name;
+    };
+
     class render_pass
     {
     public:
@@ -27,6 +33,7 @@ namespace luly::renderer
         /* Getters */
         const std::string& get_name() const { return m_name; }
         const std::shared_ptr<frame_buffer>& get_frame_buffer() const { return m_fbo; }
+        const render_pass_output& get_output(const std::string& name) const { return m_outputs.at(name); }
 
         /* Virtuals */
         virtual void initialize() = 0;
@@ -38,9 +45,15 @@ namespace luly::renderer
             m_inputs.insert({render_pass_input.name, render_pass_input});
         }
 
+        void add_output(const render_pass_output& render_pass_output)
+        {
+            m_outputs.insert({render_pass_output.name, render_pass_output});
+        }
+
     protected:
         std::string m_name;
         std::shared_ptr<frame_buffer> m_fbo;
         std::unordered_map<std::string, render_pass_input> m_inputs;
+        std::unordered_map<std::string, render_pass_output> m_outputs;
     };
 }

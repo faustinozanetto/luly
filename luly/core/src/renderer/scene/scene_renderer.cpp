@@ -61,6 +61,7 @@ namespace luly::renderer
 
         s_data.lighting_pass = std::make_shared<lighting_pass>();
         s_data.lighting_pass->add_input({s_data.geometry_pass, "geometry_pass_input"});
+        s_data.lighting_pass->add_input({s_data.environment_pass, "environment_pass_input"});
 
         s_data.final_pass = std::make_shared<final_pass>();
         s_data.final_pass->add_input({s_data.lighting_pass, "lighting_pass_input"});
