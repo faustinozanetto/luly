@@ -8,6 +8,7 @@
 
 #include <glad/glad.h>
 #include "glfw/glfw3.h"
+#include "renderer/render_buffer/render_buffer.h"
 
 namespace luly::renderer
 {
@@ -42,10 +43,12 @@ namespace luly::renderer
 
         /* Methods */
         void initialize();
+        void attach_texture(const std::shared_ptr<texture>& texture, uint32_t target,
+                            render_buffer_attachment_type attachment, uint32_t texture_target,
+                            bool register_attachment = true, int mipmaps_level = 0);
 
     private:
         void pre_initialize();
-        void cleanup();
 
         void attach_color_texture(const frame_buffer_attachment& attachment, uint32_t handle_id,
                                   unsigned int index) const;

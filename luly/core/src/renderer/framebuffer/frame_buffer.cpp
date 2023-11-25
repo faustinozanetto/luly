@@ -6,6 +6,8 @@
 #include <logging/log.h>
 #include <utils/assert.h>
 
+#include "renderer/render_buffer/render_buffer_utils.h"
+
 namespace luly::renderer
 {
     frame_buffer::frame_buffer(int width, int height) : frame_buffer(width, height, {}, {})
@@ -36,11 +38,11 @@ namespace luly::renderer
         m_width = width;
         m_height = height;
         m_has_depth_attachment = false;
-        m_handle = 0;
 
-        m_attachments = {};
         m_attachments_data = attachments;
+        m_attachments = {};
         m_depth_attachment = {};
+        m_depth_attachment_data = {};
 
         LY_TRACE("  - Width: {0} px", m_width);
         LY_TRACE("  - Height: {0} px", m_height);
@@ -59,13 +61,12 @@ namespace luly::renderer
         m_width = width;
         m_height = height;
         m_has_depth_attachment = true;
-        m_handle = 0;
 
-        m_attachments = {};
         m_attachments_data = attachments;
-        m_depth_attachment = {};
         m_depth_attachment_data = depth_attachment;
-
+        m_attachments = {};
+        m_depth_attachment = {};
+        
         LY_TRACE("  - Width: {0} px", m_width);
         LY_TRACE("  - Height: {0} px", m_height);
         LY_TRACE("  - Attachments Count: {0}", m_attachments_data.size());
@@ -78,7 +79,10 @@ namespace luly::renderer
 
     frame_buffer::~frame_buffer()
     {
-        cleanup();
+        glDeleteFramebuffers(1, &m_handle);
+        glDeleteTextures(m_attachments.size(), m_attachments.data());
+        if (m_has_depth_attachment)
+            glDeleteTextures(1, &m_depth_attachment);
     }
 
     void frame_buffer::bind()
@@ -119,10 +123,37 @@ namespace luly::renderer
         un_bind();
     }
 
+    void frame_buffer::attach_texture(const std::shared_ptr<texture>& texture, uint32_t target,
+                                      render_buffer_attachment_type attachment, uint32_t texture_target,
+                                      bool register_attachment, int mipmaps_level)
+    {
+        glFramebufferTexture2D(target, render_buffer_utils::get_render_buffer_attachment_type_to_opengl(attachment),
+                               texture_target, texture->get_handle_id(), mipmaps_level);
+        if (register_attachment)
+        {
+            frame_buffer_attachment attachment_data;
+            attachment_data.size = {texture->get_width(), texture->get_height()};
+            attachment_data.filtering = texture_filtering::linear;
+            attachment_data.wrapping = texture_wrapping::clamp_to_edge;
+            attachment_data.internal_format = texture->get_internal_format();
+            m_attachments_data.push_back(attachment_data);
+            m_attachments.push_back(texture->get_handle_id());
+        }
+    }
+
     void frame_buffer::pre_initialize()
     {
         if (m_handle)
-            cleanup();
+        {
+            glDeleteFramebuffers(1, &m_handle);
+            glDeleteTextures(m_attachments.size(), m_attachments.data());
+            m_attachments.clear();
+            if (m_has_depth_attachment)
+            {
+                glDeleteTextures(1, &m_depth_attachment);
+                m_depth_attachment = 0;
+            }
+        }
 
         // Create fbo
         glGenFramebuffers(1, &m_handle);
@@ -132,7 +163,7 @@ namespace luly::renderer
         if (!m_attachments_data.empty())
         {
             m_attachments.resize(m_attachments_data.size());
-            for (int i = 0; i < m_attachments.size(); i++)
+            for (unsigned int i = 0; i < m_attachments.size(); i++)
             {
                 glGenTextures(1, &m_attachments[i]);
                 attach_color_texture(m_attachments_data[i], m_attachments[i], i);
@@ -144,18 +175,6 @@ namespace luly::renderer
         {
             glGenTextures(1, &m_depth_attachment);
             attach_depth_texture(m_depth_attachment_data, m_depth_attachment);
-        }
-    }
-
-    void frame_buffer::cleanup()
-    {
-        glDeleteFramebuffers(1, &m_handle);
-        glDeleteTextures(m_attachments.size(), m_attachments.data());
-        m_attachments.clear();
-        if (m_has_depth_attachment)
-        {
-            glDeleteTextures(1, &m_depth_attachment);
-            m_depth_attachment = 0;
         }
     }
 

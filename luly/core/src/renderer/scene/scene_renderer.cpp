@@ -55,12 +55,12 @@ namespace luly::renderer
     void scene_renderer::create_pipeline_passes()
     {
         LY_TRACE("Started creating pipeling passes...");
+        s_data.environment_pass = std::make_shared<environment_pass>();
+
         s_data.geometry_pass = std::make_shared<geometry_pass>();
 
         s_data.lighting_pass = std::make_shared<lighting_pass>();
         s_data.lighting_pass->add_input({s_data.geometry_pass, "geometry_pass_input"});
-
-        s_data.environment_pass = std::make_shared<environment_pass>();
 
         s_data.final_pass = std::make_shared<final_pass>();
         s_data.final_pass->add_input({s_data.lighting_pass, "lighting_pass_input"});

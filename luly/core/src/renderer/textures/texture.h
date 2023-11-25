@@ -110,6 +110,7 @@ namespace luly::renderer
         int get_height() const { return m_texture_specification.height; }
         int get_channels() const { return m_texture_specification.channels; }
         int get_mip_maps_levels() const { return m_texture_specification.mip_map_levels; }
+        texture_internal_format get_internal_format() const { return m_texture_specification.internal_format; }
 
         /* Overrides */
         void bind() override;

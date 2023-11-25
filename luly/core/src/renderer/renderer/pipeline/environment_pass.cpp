@@ -6,6 +6,7 @@
 
 #include "renderer/meshes/mesh_factory.h"
 #include "renderer/renderer/renderer.h"
+#include "renderer/render_buffer/render_buffer.h"
 #include "renderer/shaders/shader_factory.h"
 #include "renderer/textures/texture_factory.h"
 
@@ -35,15 +36,7 @@ namespace luly::renderer
         m_fbo = std::make_shared<frame_buffer>(
             viewport_size.x, viewport_size.y, attachments);
 
-        m_capture_dimensions = glm::ivec2(1024, 1024);
-
-        m_cube_mesh = mesh_factory::create_cube_mesh();
-
-
-        m_capture_fbo = std::make_shared<>()
-
-        m_equirectangular_to_cubemap_shader = shader_factory::create_shader_from_file(
-            "assets/shaders/skybox/equirectangular_to_cubemap.lsh");
+        setup_environment();
     }
 
     void environment_pass::execute()
@@ -57,10 +50,19 @@ namespace luly::renderer
         m_brdf_map_size = 1024;
         m_environment_map_size = 2048;
 
+        m_cube_mesh = mesh_factory::create_cube_mesh();
+
+        m_equirectangular_to_cubemap_shader = shader_factory::create_shader_from_file(
+            "assets/shaders/skybox/equirectangular_to_cubemap.lsh");
+        m_irradiance_shader = shader_factory::create_shader_from_file("assets/shaders/skybox/irradiance.lsh");
+
         setup_environment_fbo();
         setup_environment_texture();
         setup_environment_cubemap();
         setup_environment_equirectangular_map();
+        setup_irradiance_map();
+
+        renderer::set_viewport_size(renderer::get_viewport_size());
     }
 
     void environment_pass::setup_environment_fbo()
@@ -75,7 +77,8 @@ namespace luly::renderer
 
     void environment_pass::setup_environment_texture()
     {
-        m_environment_map = texture_factory::create_environment_texture_from_file("assets/hdris/meadow_2_4k.hdr");
+        m_environment_hdr_texture = texture_factory::create_environment_texture_from_file(
+            "assets/hdris/meadow_2_4k.hdr");
     }
 
     void environment_pass::setup_environment_cubemap()
@@ -87,14 +90,14 @@ namespace luly::renderer
         texture_specification.internal_format = texture_internal_format::rgb16f;
         texture_specification.data = nullptr;
 
-        m_skybox_texture = std::make_shared<texture_cubemap>(texture_specification);
+        m_environment_cubemap_texture = std::make_shared<texture_cubemap>(texture_specification);
     }
 
     void environment_pass::setup_environment_equirectangular_map()
     {
         // Skyobox texture.
-        glm::mat4 capture_projections = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
-        glm::mat4 capture_views[] =
+        m_capture_projection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
+        m_capture_views =
         {
             glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)),
             glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)),
@@ -105,22 +108,65 @@ namespace luly::renderer
         };
 
         m_equirectangular_to_cubemap_shader->bind();
-        m_equirectangular_to_cubemap_shader->set_mat4("u_projection_matrix", capture_projections);
-        m_environment_map->bind();
+        m_equirectangular_to_cubemap_shader->set_mat4("u_projection_matrix", m_capture_projection);
+        renderer::bind_texture(0, m_environment_cubemap_texture->get_handle_id());
 
         renderer::set_viewport_size({m_environment_map_size, m_environment_map_size});
-        m_capture_fbo->bind();
+        m_environment_capture_fbo->bind();
 
         for (unsigned int i = 0; i < 6; ++i)
         {
-            m_equirectangular_to_cubemap_shader->set_mat4("u_view_matrix", capture_views[i]);
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, envCubemap,
-                                   0);
+            m_equirectangular_to_cubemap_shader->set_mat4("u_view_matrix", m_capture_views[i]);
+            m_environment_capture_fbo->attach_texture(m_environment_cubemap_texture, GL_FRAMEBUFFER,
+                                                      render_buffer_attachment_type::color,
+                                                      GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0);
             renderer::clear_screen();
 
             renderer::submit_mesh(m_cube_mesh);
         }
 
-        m_capture_fbo->un_bind();
+        m_environment_capture_fbo->un_bind();
+        m_equirectangular_to_cubemap_shader->un_bind();
+
+        glBindTexture(GL_TEXTURE_CUBE_MAP, m_environment_cubemap_texture->get_handle_id());
+        glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+    }
+
+    void environment_pass::setup_irradiance_map()
+    {
+        texture_specification texture_specification;
+        texture_specification.width = m_irradiance_map_size;
+        texture_specification.height = m_irradiance_map_size;
+        texture_specification.channels = 3;
+        texture_specification.internal_format = texture_internal_format::rgb16f;
+        texture_specification.data = nullptr;
+
+        m_environment_irradiance_texture = std::make_shared<texture_cubemap>(texture_specification);
+
+        m_environment_capture_fbo->bind();
+        m_environment_capture_rbo->bind();
+        m_environment_capture_rbo->set_storage_parameters(m_irradiance_map_size, m_irradiance_map_size,
+                                                          texture_internal_format::depth_component24);
+
+        m_irradiance_shader->bind();
+        m_irradiance_shader->set_mat4("u_projection_matrix", m_capture_projection);
+        renderer::bind_texture(0, m_environment_cubemap_texture->get_handle_id());
+
+        renderer::set_viewport_size({m_irradiance_map_size, m_irradiance_map_size});
+        m_environment_capture_fbo->bind();
+
+        for (unsigned int i = 0; i < 6; ++i)
+        {
+            m_irradiance_shader->set_mat4("u_view_matrix", m_capture_views[i]);
+            m_environment_capture_fbo->attach_texture(m_environment_irradiance_texture, GL_FRAMEBUFFER,
+                                                      render_buffer_attachment_type::color,
+                                                      GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0);
+
+            renderer::clear_screen();
+            renderer::submit_mesh(m_cube_mesh);
+        }
+        m_environment_capture_fbo->un_bind();
+        m_environment_capture_rbo->un_bind();
+        m_irradiance_shader->un_bind();
     }
 }
