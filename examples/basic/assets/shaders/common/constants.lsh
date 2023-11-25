@@ -5,3 +5,4 @@ const float point_light_quadratic = 0.032;
 const float spot_light_constant = 1.0;
 const float spot_light_linear = 0.09;
 const float spot_light_quadratic = 0.032;
+const vec2 inv_atan = vec2(0.1591, 0.3183);

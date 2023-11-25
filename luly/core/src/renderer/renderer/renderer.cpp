@@ -62,6 +62,11 @@ namespace luly::renderer
         glfwSwapInterval(vsync_enabled ? 1 : 0);
     }
 
+    void renderer::set_viewport_size(const glm::ivec2& viewport_size)
+    {
+        glViewport(0, 0, viewport_size.x, viewport_size.y);
+    }
+
     void renderer::submit_arrays(int count, renderer_draw_mode draw_mode)
     {
         glDrawArrays(get_renderer_draw_mode_to_opengl(draw_mode), 0, count);

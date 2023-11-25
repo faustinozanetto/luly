@@ -30,6 +30,7 @@ namespace luly::renderer
 
         m_fbo = std::make_shared<frame_buffer>(
             viewport_size.x, viewport_size.y, attachments);
+        m_fbo->initialize();
 
         // Create shader.
         m_final_shader = shader_factory::create_shader_from_file("assets/shaders/final_pass_shader.lsh");

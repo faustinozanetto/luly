@@ -9,6 +9,7 @@
 #include "components/lights/actor_spot_light_component_panel.h"
 #include "components/rendering/actor_material_component_panel.h"
 #include "components/rendering/actor_model_renderer_component_panel.h"
+#include "components/rendering/actor_skybox_component_panel.h"
 
 namespace luly::ui
 {
@@ -52,6 +53,7 @@ namespace luly::ui
         /* Rendering Components */
         m_component_panels.push_back(std::make_shared<actor_model_renderer_component_panel>());
         m_component_panels.push_back(std::make_shared<actor_material_component_panel>());
+        m_component_panels.push_back(std::make_shared<actor_skybox_component_panel>());
         /* Lights Components */
         m_component_panels.push_back(std::make_shared<actor_directional_light_component_panel>());
         m_component_panels.push_back(std::make_shared<actor_point_light_component_panel>());

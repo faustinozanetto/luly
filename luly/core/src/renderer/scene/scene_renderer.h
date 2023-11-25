@@ -8,6 +8,7 @@
 
 #include <memory>
 
+#include "renderer/renderer/pipeline/environment_pass.h"
 #include "renderer/renderer/pipeline/lighting_pass.h"
 
 namespace luly::renderer
@@ -23,6 +24,9 @@ namespace luly::renderer
     {
         /* Geometry Pass */
         std::shared_ptr<geometry_pass> geometry_pass;
+
+        /* Environment Pass */
+        std::shared_ptr<environment_pass> environment_pass;
 
         /* Lighting Pass */
         std::shared_ptr<lighting_pass> lighting_pass;

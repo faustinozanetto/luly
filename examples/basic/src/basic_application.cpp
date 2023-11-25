@@ -22,6 +22,7 @@
 #include "scene/actor/components/lights/spot_light_component.h"
 #include "scene/actor/components/rendering/material_component.h"
 #include "scene/actor/components/rendering/model_renderer_component.h"
+#include "scene/actor/components/rendering/skybox_component.h"
 
 basic_application::basic_application(const luly::renderer::window_specification& window_specification) : application(
     window_specification)
@@ -140,6 +141,10 @@ void basic_application::setup_scene()
         });
     }
     */
+
+    const auto& skybox_actor = scene->create_actor("Skybox Actor");
+    skybox_actor->add_component<luly::scene::skybox_component>(
+        luly::renderer::texture_factory::create_texture_cubemap_from_file("assets/hdris/meadow_2_4k.hdr"));
 
     const auto& spot_light_actor = scene->create_actor("Spot Light Emitter");
     spot_light_actor->add_component<luly::scene::spot_light_component>(

@@ -40,8 +40,11 @@ namespace luly::renderer
         void bind() override;
         void un_bind() override;
 
-    private:
+        /* Methods */
         void initialize();
+
+    private:
+        void pre_initialize();
         void cleanup();
 
         void attach_color_texture(const frame_buffer_attachment& attachment, uint32_t handle_id,

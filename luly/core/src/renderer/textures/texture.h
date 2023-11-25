@@ -96,12 +96,12 @@ namespace luly::renderer
 
         texture_specification() = default;
         texture_specification(int width, int height, int channels, void* data);
+        texture_specification(int width, int height, int channels, void* data, texture_internal_format internal_format);
     };
 
     class texture : public bindable_object
     {
     public:
-        texture(const texture_specification& texture_specification);
         ~texture() override;
 
         /* Getters */
@@ -119,9 +119,9 @@ namespace luly::renderer
         void set_filtering(texture_filtering_type filtering_type, texture_filtering filtering) const;
         void set_wrapping(texture_wrapping_type wrapping_type, texture_wrapping wrapping) const;
 
-    private:
+    protected:
         void calculate_mip_maps();
-        void initialize();
+        virtual void initialize() = 0;
 
         uint32_t m_handle;
         texture_specification m_texture_specification;

@@ -34,6 +34,7 @@ namespace luly::renderer
 
         m_fbo = std::make_shared<frame_buffer>(
             viewport_size.x, viewport_size.y, attachments);
+        m_fbo->initialize();
 
         // Create lights ubo.
         m_lights_ubo = std::make_shared<uniform_buffer_object>(

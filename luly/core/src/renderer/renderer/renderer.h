@@ -47,6 +47,7 @@ namespace luly::renderer
 
         /* Setters*/
         static void set_vsync_enabled(bool vsync_enabled);
+        static void set_viewport_size(const glm::ivec2& viewport_size);
 
         /* Primitive Rendering */
         static void submit_arrays(int count, renderer_draw_mode draw_mode = renderer_draw_mode::triangles);

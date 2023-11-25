@@ -58,6 +58,7 @@ namespace luly::renderer
 
         m_fbo = std::make_shared<frame_buffer>(
             viewport_size.x, viewport_size.y, attachments, depth_attachment);
+        m_fbo->initialize();
 
         // Load shaders.
         m_geometry_shader = shader_factory::create_shader_from_file("assets/shaders/geometry_pass_shader.lsh");

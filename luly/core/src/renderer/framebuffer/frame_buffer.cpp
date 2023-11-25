@@ -10,6 +10,24 @@ namespace luly::renderer
 {
     frame_buffer::frame_buffer(int width, int height) : frame_buffer(width, height, {}, {})
     {
+        LY_TRACE("Started creating frame buffer...");
+        m_width = width;
+        m_height = height;
+        m_has_depth_attachment = false;
+
+        m_attachments = {};
+        m_attachments_data = {};
+        m_depth_attachment = {};
+        m_depth_attachment_data = {};
+
+        LY_TRACE("  - Width: {0} px", m_width);
+        LY_TRACE("  - Height: {0} px", m_height);
+        LY_TRACE("  - Attachments Count: {0}", m_attachments_data.size());
+        LY_TRACE("  - Has Depth Attachment: '{0}'", m_has_depth_attachment ? "true" : "false");
+
+        pre_initialize();
+
+        LY_TRACE("Frame buffer created successfully.");
     }
 
     frame_buffer::frame_buffer(int width, int height, const std::vector<frame_buffer_attachment>& attachments)
@@ -29,7 +47,7 @@ namespace luly::renderer
         LY_TRACE("  - Attachments Count: {0}", m_attachments_data.size());
         LY_TRACE("  - Has Depth Attachment: '{0}'", m_has_depth_attachment ? "true" : "false");
 
-        initialize();
+        pre_initialize();
 
         LY_TRACE("Frame buffer created successfully.");
     }
@@ -53,7 +71,7 @@ namespace luly::renderer
         LY_TRACE("  - Attachments Count: {0}", m_attachments_data.size());
         LY_TRACE("  - Has Depth Attachment: '{0}'", m_has_depth_attachment ? "true" : "false");
 
-        initialize();
+        pre_initialize();
 
         LY_TRACE("Frame buffer created successfully.");
     }
@@ -75,32 +93,6 @@ namespace luly::renderer
 
     void frame_buffer::initialize()
     {
-        // If was previously created, cleanup data
-        if (m_handle)
-            cleanup();
-
-        // Create fbo
-        glGenFramebuffers(1, &m_handle);
-        glBindFramebuffer(GL_FRAMEBUFFER, m_handle);
-
-        // Add color attachments
-        if (!m_attachments_data.empty())
-        {
-            m_attachments.resize(m_attachments_data.size());
-            for (unsigned int i = 0; i < m_attachments.size(); i++)
-            {
-                glGenTextures(1, &m_attachments[i]);
-                attach_color_texture(m_attachments_data[i], m_attachments[i], i);
-            }
-        }
-
-        // Add depth attachment
-        if (m_has_depth_attachment)
-        {
-            glGenTextures(1, &m_depth_attachment);
-            attach_depth_texture(m_depth_attachment_data, m_depth_attachment);
-        }
-
         bind();
 
         // Draw buffers.
@@ -125,6 +117,34 @@ namespace luly::renderer
                       "An error occurred while creating frame buffer: " + std::to_string(fboStatus))
 
         un_bind();
+    }
+
+    void frame_buffer::pre_initialize()
+    {
+        if (m_handle)
+            cleanup();
+
+        // Create fbo
+        glGenFramebuffers(1, &m_handle);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_handle);
+
+        // Add color attachments
+        if (!m_attachments_data.empty())
+        {
+            m_attachments.resize(m_attachments_data.size());
+            for (int i = 0; i < m_attachments.size(); i++)
+            {
+                glGenTextures(1, &m_attachments[i]);
+                attach_color_texture(m_attachments_data[i], m_attachments[i], i);
+            }
+        }
+
+        // Add depth attachment
+        if (m_has_depth_attachment)
+        {
+            glGenTextures(1, &m_depth_attachment);
+            attach_depth_texture(m_depth_attachment_data, m_depth_attachment);
+        }
     }
 
     void frame_buffer::cleanup()
