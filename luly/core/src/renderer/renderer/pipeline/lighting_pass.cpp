@@ -65,6 +65,8 @@ namespace luly::renderer
         renderer::bind_texture(3, geometry_pass_input.render_pass->get_frame_buffer()->get_attachment_id(3));
         renderer::bind_texture(
             4, environment_pass_input.render_pass->get_output("irradiance_output").pass_output->get_handle_id());
+        renderer::bind_texture(
+            5, environment_pass_input.render_pass->get_output("prefilter_output").pass_output->get_handle_id());
 
         renderer::submit_mesh(m_screen_mesh);
 

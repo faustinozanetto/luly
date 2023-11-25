@@ -29,16 +29,19 @@ namespace luly::renderer
         void setup_environment_cubemap();
         void setup_environment_equirectangular_map();
         void setup_irradiance_map();
+        void setup_prefilter_map();
 
         glm::mat4 m_capture_projection;
         std::vector<glm::mat4> m_capture_views;
 
         std::shared_ptr<shader> m_equirectangular_to_cubemap_shader;
         std::shared_ptr<shader> m_irradiance_shader;
+        std::shared_ptr<shader> m_prefilter_shader;
 
         std::shared_ptr<texture_2d> m_environment_hdr_texture;
         std::shared_ptr<texture_cubemap> m_environment_irradiance_texture;
         std::shared_ptr<texture_cubemap> m_environment_cubemap_texture;
+        std::shared_ptr<texture_cubemap> m_environment_prefilter_texture;
 
         std::shared_ptr<mesh> m_cube_mesh;
 

@@ -42,6 +42,11 @@ namespace luly::renderer
         irradiance_output.name = "irradiance_output";
         irradiance_output.pass_output = m_environment_irradiance_texture;
         add_output(irradiance_output);
+
+        render_pass_output prefilter_output;
+        prefilter_output.name = "prefilter_output";
+        prefilter_output.pass_output = m_environment_prefilter_texture;
+        add_output(prefilter_output);
     }
 
     void environment_pass::execute()
@@ -60,12 +65,14 @@ namespace luly::renderer
         m_equirectangular_to_cubemap_shader = shader_factory::create_shader_from_file(
             "assets/shaders/skybox/equirectangular_to_cubemap.lsh");
         m_irradiance_shader = shader_factory::create_shader_from_file("assets/shaders/skybox/irradiance.lsh");
+        m_prefilter_shader = shader_factory::create_shader_from_file("assets/shaders/skybox/prefilter.lsh");
 
         setup_environment_fbo();
         setup_environment_texture();
         setup_environment_cubemap();
         setup_environment_equirectangular_map();
         setup_irradiance_map();
+        setup_prefilter_map();
 
         renderer::set_viewport_size(renderer::get_viewport_size());
     }
@@ -173,5 +180,51 @@ namespace luly::renderer
         m_environment_capture_fbo->un_bind();
         m_environment_capture_rbo->un_bind();
         m_irradiance_shader->un_bind();
+    }
+
+    void environment_pass::setup_prefilter_map()
+    {
+        texture_specification texture_specification;
+        texture_specification.width = m_irradiance_map_size;
+        texture_specification.height = m_irradiance_map_size;
+        texture_specification.channels = 3;
+        texture_specification.internal_format = texture_internal_format::rgb16f;
+        texture_specification.data = nullptr;
+
+        m_environment_prefilter_texture = std::make_shared<texture_cubemap>(texture_specification);
+
+        glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+
+        // pbr: run a quasi monte-carlo simulation on the environment lighting to create a prefilter (cube)map.
+        // ----------------------------------------------------------------------------------------------------
+        m_prefilter_shader->bind();
+        m_prefilter_shader->set_mat4("u_projection_matrix", m_capture_projection);
+        renderer::bind_texture(0, m_environment_cubemap_texture->get_handle_id());
+
+        m_environment_capture_fbo->bind();
+        unsigned int max_mip_map_levels = 5;
+        for (unsigned int mip = 0; mip < max_mip_map_levels; ++mip)
+        {
+            // reisze framebuffer according to mip-level size.
+            unsigned int mipWidth = static_cast<unsigned int>(m_prefilter_map_size * std::pow(0.5, mip));
+            unsigned int mipHeight = static_cast<unsigned int>(m_prefilter_map_size * std::pow(0.5, mip));
+            m_environment_capture_rbo->bind();
+            m_environment_capture_rbo->set_storage_parameters(mipWidth, mipHeight,
+                                                              texture_internal_format::depth_component24);
+            renderer::set_viewport_size({mipWidth, mipHeight});
+
+            float roughness = (float)mip / (float)(max_mip_map_levels - 1);
+            m_prefilter_shader->set_float("u_roughness", roughness);
+            for (unsigned int i = 0; i < 6; ++i)
+            {
+                m_prefilter_shader->set_mat4("u_view_matrix", m_capture_views[i]);
+                m_environment_capture_fbo->attach_texture(m_environment_prefilter_texture, GL_FRAMEBUFFER,
+                                                          render_buffer_attachment_type::color,
+                                                          GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, mip);
+                renderer::clear_screen();
+                renderer::submit_mesh(m_cube_mesh);
+            }
+        }
+        m_environment_capture_fbo->un_bind();
     }
 }
