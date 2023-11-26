@@ -8,6 +8,7 @@
 
 #include <memory>
 
+#include "renderer/renderer/pipeline/ambient_occlusion_pass.h"
 #include "renderer/renderer/pipeline/environment_pass.h"
 #include "renderer/renderer/pipeline/lighting_pass.h"
 #include "renderer/renderer/pipeline/skybox_pass.h"
@@ -23,18 +24,12 @@ namespace luly::renderer
 
     struct scene_renderer_data
     {
-        /* Geometry Pass */
+        /* Passes */
         std::shared_ptr<geometry_pass> geometry_pass;
-
-        /* Environment Pass */
         std::shared_ptr<environment_pass> environment_pass;
-
-        /* Lighting Pass */
         std::shared_ptr<lighting_pass> lighting_pass;
-
+        std::shared_ptr<ambient_occlusion_pass> ambient_occlusion_pass;
         std::shared_ptr<skybox_pass> skybox_pass;
-
-        /* Final Pass */
         std::shared_ptr<final_pass> final_pass;
 
         /* Camera */

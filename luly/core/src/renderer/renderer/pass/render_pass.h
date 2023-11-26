@@ -20,7 +20,7 @@ namespace luly::renderer
 
     struct render_pass_output
     {
-        std::shared_ptr<texture> pass_output;
+        uint32_t output;
         std::string name;
     };
 

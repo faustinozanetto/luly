@@ -19,7 +19,7 @@ namespace luly::ui
         void set_show_panel(bool show_panel) override;
 
     private:
-        void draw_render_pass_details(const std::shared_ptr<renderer::render_pass>& render_pass);
+        bool draw_render_pass_details(const std::shared_ptr<renderer::render_pass>& render_pass);
         void draw_render_pass_fbo_attachments(const std::shared_ptr<renderer::frame_buffer>& frame_buffer);
         static bool s_show;
     };

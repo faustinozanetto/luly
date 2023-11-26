@@ -63,7 +63,7 @@ namespace luly::renderer
 
         int width = m_fbo->get_width();
         int height = m_fbo->get_height();
-        
+
         // Copy color buffer from lighting pass to this fbo.
         glBindFramebuffer(GL_READ_FRAMEBUFFER, lighting_input_fbo->get_handle_id());
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo->get_handle_id());
@@ -73,10 +73,10 @@ namespace luly::renderer
         glBindFramebuffer(GL_READ_FRAMEBUFFER, geometry_input_fbo->get_handle_id());
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo->get_handle_id());
         glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-        
+
         // Render skybox cube using the environment cubemap texture.
         m_skybox_shader->bind();
-        renderer::bind_texture(0, environment_cubemap_texture.pass_output->get_handle_id());
+        renderer::bind_texture(0, environment_cubemap_texture.output);
         renderer::submit_mesh(m_cube_mesh);
         m_skybox_shader->un_bind();
 

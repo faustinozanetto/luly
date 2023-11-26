@@ -51,10 +51,7 @@ void basic_application::on_update()
 
     if (!get_scene_manager()->get_current_scene())
         return;
-
-    auto& transform = m_actor->get_component<luly::scene::transform_component>().get_transform();
-    transform->rotate(glm::angleAxis(1.0f * luly::app_time::get_delta_time(), glm::vec3(0, 1, 0)));
-
+    
     luly::ui::engine_ui::begin_frame();
 
     auto& camera = get_scene_manager()->get_current_scene()->get_camera_manager()->get_perspective_camera();
@@ -158,46 +155,39 @@ void basic_application::setup_scene()
     spot_light_actor->get_component<luly::scene::transform_component>().get_transform()->set_location({0, 0, 2});
 
     m_actor = scene->create_actor("Test Model");
-    const auto& model = luly::renderer::model_factory::create_model_from_file("assets/models/gameboy.obj");
+    const auto& model = luly::renderer::model_factory::create_model_from_file("assets/models/tv/tv.obj");
     m_actor->add_component<luly::scene::model_renderer_component>(model);
 
     const auto& albedo_texture = luly::renderer::texture_factory::create_texture_from_file(
-        "assets/textures/gameboy/DefaultMaterial_Albedo.png");
+        "assets/textures/tv/tv-albedo.png");
     luly::renderer::material_texture albedo;
     albedo.texture = albedo_texture;
     albedo.is_enabled = true;
     albedo.type = luly::renderer::material_texture_type::albedo;
 
     const auto& normal_texture = luly::renderer::texture_factory::create_texture_from_file(
-        "assets/textures/gameboy/DefaultMaterial_Normal.png");
+        "assets/textures/tv/tv-normal.png");
     luly::renderer::material_texture normal;
     normal.texture = normal_texture;
     normal.is_enabled = true;
     normal.type = luly::renderer::material_texture_type::normal;
 
     const auto& metallic_texture = luly::renderer::texture_factory::create_texture_from_file(
-        "assets/textures/gameboy/DefaultMaterial_Metallic.png");
+        "assets/textures/tv/tv-metallic.png");
     luly::renderer::material_texture metallic;
     metallic.texture = metallic_texture;
     metallic.is_enabled = true;
     metallic.type = luly::renderer::material_texture_type::metallic;
 
     const auto& roughness_texture = luly::renderer::texture_factory::create_texture_from_file(
-        "assets/textures/gameboy/DefaultMaterial_Rouhgness.png");
+        "assets/textures/tv/tv-roughness.png");
     luly::renderer::material_texture roughness;
     roughness.texture = roughness_texture;
     roughness.is_enabled = true;
     roughness.type = luly::renderer::material_texture_type::roughness;
 
-    const auto& opacity_texture = luly::renderer::texture_factory::create_texture_from_file(
-        "assets/textures/gameboy/DefaultMaterial_Opacity.png");
-    luly::renderer::material_texture opacity;
-    opacity.texture = opacity_texture;
-    opacity.is_enabled = true;
-    opacity.type = luly::renderer::material_texture_type::opacity;
-
     const auto& ao_texture = luly::renderer::texture_factory::create_texture_from_file(
-        "assets/textures/gameboy/DefaultMaterial_AO.png");
+        "assets/textures/tv/tv-ao.png");
     luly::renderer::material_texture ambient_occlusion;
     ambient_occlusion.texture = ao_texture;
     ambient_occlusion.is_enabled = true;
@@ -209,7 +199,6 @@ void basic_application::setup_scene()
     textures.insert({luly::renderer::material_texture_type::metallic, metallic});
     textures.insert({luly::renderer::material_texture_type::roughness, roughness});
     textures.insert({luly::renderer::material_texture_type::ambient_occlusion, ambient_occlusion});
-    textures.insert({luly::renderer::material_texture_type::opacity, opacity});
 
     auto material_specification = std::make_shared<luly::renderer::material_specification_builder>()->
                                   with_textures(textures).build();

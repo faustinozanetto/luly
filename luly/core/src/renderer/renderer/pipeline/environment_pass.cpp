@@ -55,22 +55,22 @@ namespace luly::renderer
     {
         render_pass_output irradiance_output;
         irradiance_output.name = "irradiance_output";
-        irradiance_output.pass_output = m_environment_irradiance_texture;
+        irradiance_output.output = m_environment_irradiance_texture->get_handle_id();
         add_output(irradiance_output);
 
         render_pass_output prefilter_output;
         prefilter_output.name = "prefilter_output";
-        prefilter_output.pass_output = m_environment_prefilter_texture;
+        prefilter_output.output = m_environment_prefilter_texture->get_handle_id();
         add_output(prefilter_output);
 
         render_pass_output brdf_output;
         brdf_output.name = "brdf_output";
-        brdf_output.pass_output = m_brdf_texture;
+        brdf_output.output = m_brdf_texture->get_handle_id();
         add_output(brdf_output);
 
         render_pass_output environment_cubemap_texture;
         environment_cubemap_texture.name = "environment_cubemap_output";
-        environment_cubemap_texture.pass_output = m_environment_cubemap_texture;
+        environment_cubemap_texture.output = m_environment_cubemap_texture->get_handle_id();
         add_output(environment_cubemap_texture);
     }
 

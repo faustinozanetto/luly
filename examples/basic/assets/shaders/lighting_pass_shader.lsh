@@ -29,6 +29,7 @@ layout (binding = 3) uniform sampler2D u_rough_metal_ao_map;
 layout (binding = 4) uniform samplerCube u_irradiance_map;
 layout (binding = 5) uniform samplerCube u_prefilter_map;
 layout (binding = 6) uniform sampler2D u_brdf_map;
+layout (binding = 7) uniform sampler2D u_ambient_occlusion_map;
 
 vec3 sample_irradiance_map(vec3 normal_world_space) {
     return texture(u_irradiance_map, normalize(normal_world_space)).rgb;
@@ -57,16 +58,19 @@ void main()
     float roughness = rough_metal_ao.r;
     float metallic = rough_metal_ao.g;
     float ambient_occlusion = rough_metal_ao.b;
+        
+    float world_ambient_occlusion = texture(u_ambient_occlusion_map, o_tex_coord).r;
+    ambient_occlusion *= world_ambient_occlusion;        
             
     vec3 view_dir = normalize(camera.position - frag_pos);
         
     vec3 luminance = calculate_directional_light_luminance(lights.directional_light, normal, view_dir, albedo, roughness, metallic);
         
-    for (int i = 0; i < lights.point_lights_count; i++) {
+    for (int i = 0; i < lights.lights_data.point_lights_count; i++) {
         luminance += calculate_point_light_luminance(lights.point_lights[i], normal, view_dir, frag_pos, albedo, roughness, metallic);   
     }
 
-    for (int i = 0; i < lights.spot_lights_count; i++) {
+    for (int i = 0; i < 1; i++) {
         luminance += calculate_spot_light_luminance(lights.spot_lights[i], normal, view_dir, frag_pos, albedo, roughness, metallic);
     }
 

@@ -41,6 +41,9 @@ namespace luly::renderer
         s_data.lighting_pass->update_lights();
 
         perform_geometry_pass();
+        
+        s_data.ambient_occlusion_pass->execute();
+        
         perform_lighting_pass();
 
         s_data.skybox_pass->execute();
@@ -69,10 +72,14 @@ namespace luly::renderer
 
         s_data.environment_pass = std::make_shared<environment_pass>();
         s_data.environment_pass->add_input({s_data.geometry_pass, "geometry_pass_input"});
+        
+        s_data.ambient_occlusion_pass = std::make_shared<ambient_occlusion_pass>();
+        s_data.ambient_occlusion_pass->add_input({s_data.geometry_pass, "geometry_pass_input"});
 
         s_data.lighting_pass = std::make_shared<lighting_pass>();
         s_data.lighting_pass->add_input({s_data.geometry_pass, "geometry_pass_input"});
         s_data.lighting_pass->add_input({s_data.environment_pass, "environment_pass_input"});
+        s_data.lighting_pass->add_input({s_data.ambient_occlusion_pass, "ambient_occlusion_pass_input"});
 
         s_data.skybox_pass = std::make_shared<skybox_pass>();
         s_data.skybox_pass->add_input({s_data.environment_pass, "environment_pass_input"});

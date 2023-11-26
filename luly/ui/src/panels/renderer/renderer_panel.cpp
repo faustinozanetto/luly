@@ -35,7 +35,10 @@ namespace luly::ui
 
             // Geometry Pass.
             ImGui::Separator();
-            draw_render_pass_details(renderer::scene_renderer::get_data().geometry_pass);
+            if (draw_render_pass_details(renderer::scene_renderer::get_data().geometry_pass))
+            {
+                ImGui::TreePop();
+            }
 
             ImGui::Separator();
             if (ImGui::TreeNode("Environment Pass"))
@@ -44,24 +47,66 @@ namespace luly::ui
                     renderer::scene_renderer::get_data().environment_pass;
 
                 const renderer::render_pass_output& brdf_output = environment_pass->get_output("brdf_output");
-                if (ui_utils::draw_property(brdf_output.pass_output->get_handle_id(), {90, 90}))
+                if (ui_utils::draw_property(brdf_output.output, {90, 90}))
                 {
-                    engine_ui::set_render_target(brdf_output.pass_output->get_handle_id());
+                    engine_ui::set_render_target(brdf_output.output);
                 }
                 ImGui::TreePop();
             }
 
             // Lighting Pass.
             ImGui::Separator();
-            draw_render_pass_details(renderer::scene_renderer::get_data().lighting_pass);
+            if (draw_render_pass_details(renderer::scene_renderer::get_data().lighting_pass))
+            {
+                ImGui::TreePop();
+            }
+
+            // AO Pass
+            ImGui::Separator();
+            if (draw_render_pass_details(renderer::scene_renderer::get_data().ambient_occlusion_pass))
+            {
+                float bias = renderer::scene_renderer::get_data().ambient_occlusion_pass->get_ssao_bias();
+                if (ui_utils::draw_property("Bias", bias, 0.001f, 1.0f, 0.001f))
+                {
+                    renderer::scene_renderer::get_data().ambient_occlusion_pass->set_ssao_bias(bias);
+                }
+
+                float radius = renderer::scene_renderer::get_data().ambient_occlusion_pass->get_ssao_radius();
+                if (ui_utils::draw_property("Radius", radius, 0.001f, 5.0f, 0.001f))
+                {
+                    renderer::scene_renderer::get_data().ambient_occlusion_pass->set_ssao_radius(radius);
+                }
+
+                float noise_size = renderer::scene_renderer::get_data().ambient_occlusion_pass->get_ssao_noise_size();
+                if (ui_utils::draw_property("Noise Size", noise_size, 0.01f, 10.0f, 0.01f))
+                {
+                    renderer::scene_renderer::get_data().ambient_occlusion_pass->set_ssao_noise_size(noise_size);
+                }
+
+                ui_utils::draw_property(
+                    renderer::scene_renderer::get_data().ambient_occlusion_pass->get_output("ssao_blur_output").output,
+                    {90.0f, 90.0f});
+                ui_utils::draw_property(
+                    renderer::scene_renderer::get_data().ambient_occlusion_pass->get_output("ssao_noise_output").output,
+                    {90.0f, 90.0f});
+
+
+                ImGui::TreePop();
+            }
 
             // Skybox Pass.
             ImGui::Separator();
-            draw_render_pass_details(renderer::scene_renderer::get_data().skybox_pass);
+            if (draw_render_pass_details(renderer::scene_renderer::get_data().skybox_pass))
+            {
+                ImGui::TreePop();
+            }
 
             // Final Pass.
             ImGui::Separator();
-            draw_render_pass_details(renderer::scene_renderer::get_data().final_pass);
+            if (draw_render_pass_details(renderer::scene_renderer::get_data().final_pass))
+            {
+                ImGui::TreePop();
+            }
 
             ImGui::End();
         }
@@ -77,15 +122,16 @@ namespace luly::ui
         s_show = show_panel;
     }
 
-    void renderer_panel::draw_render_pass_details(const std::shared_ptr<renderer::render_pass>& render_pass)
+    bool renderer_panel::draw_render_pass_details(const std::shared_ptr<renderer::render_pass>& render_pass)
     {
         if (ImGui::TreeNode(render_pass->get_name().c_str()))
         {
             const std::shared_ptr<renderer::frame_buffer>& pass_fbo = render_pass->get_frame_buffer();
             draw_render_pass_fbo_attachments(pass_fbo);
 
-            ImGui::TreePop();
+            return true;
         }
+        return false;
     }
 
     void renderer_panel::draw_render_pass_fbo_attachments(const std::shared_ptr<renderer::frame_buffer>& frame_buffer)
