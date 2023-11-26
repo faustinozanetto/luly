@@ -56,7 +56,7 @@ namespace luly::renderer
         const render_pass_output& environment_cubemap_texture = environment_pass_input.render_pass->get_output(
             "environment_cubemap_output");
 
-        lighting_input_fbo->bind();
+        m_fbo->bind();
 
         renderer::set_state(renderer_state::depth, true);
         renderer::set_depth_func(renderer_depth_func::less_or_equal);
@@ -73,12 +73,7 @@ namespace luly::renderer
         glBindFramebuffer(GL_READ_FRAMEBUFFER, geometry_input_fbo->get_handle_id());
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo->get_handle_id());
         glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-
-/*
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, geometry_input_fbo->get_handle_id());
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, lighting_input_fbo->get_handle_id());
-        glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-        */
+        
         // Render skybox cube using the environment cubemap texture.
         m_skybox_shader->bind();
         renderer::bind_texture(0, environment_cubemap_texture.pass_output->get_handle_id());
@@ -86,8 +81,7 @@ namespace luly::renderer
         m_skybox_shader->un_bind();
 
         renderer::set_depth_func(renderer_depth_func::less);
-
-        lighting_input_fbo->un_bind();
+        m_fbo->un_bind();
     }
 
     void skybox_pass::set_outputs()

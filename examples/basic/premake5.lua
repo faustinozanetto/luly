@@ -1,7 +1,7 @@
 project "basic"
     kind "ConsoleApp"
     language "C++"
-    cppdialect "C++17"
+    cppdialect "C++20"
     
     targetdir("%{_WORKING_DIR}/binaries/" .. output_dir .. "/%{prj.name}")
     objdir("%{_WORKING_DIR}/intermediates/" .. output_dir .. "/%{prj.name}")

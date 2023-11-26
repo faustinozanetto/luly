@@ -18,6 +18,8 @@ struct spot_light {
 
 layout(binding = 1) uniform lights_ubo
 {
+    int point_lights_count;
+    int spot_lights_count;
     point_light point_lights[10];
     spot_light spot_lights[10];
     directional_light directional_light;

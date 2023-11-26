@@ -1,7 +1,9 @@
 ﻿#include "actor_model_renderer_component_panel.h"
 
 #include "engine_ui.h"
+#include "renderer/models/model_factory.h"
 #include "scene/actor/components/rendering/model_renderer_component.h"
+#include "utils/file_utils.h"
 #include "utils/ui_utils.h"
 
 namespace luly::ui
@@ -20,11 +22,26 @@ namespace luly::ui
 
     void actor_model_renderer_component_panel::on_render_component_details()
     {
-        const auto& model_renderer_component = engine_ui::get_ui_data().selected_actor->get_component<
+        auto& model_renderer_component = engine_ui::get_ui_data().selected_actor->get_component<
             scene::model_renderer_component>();
 
         if (model_renderer_component.get_model())
         {
+            if (ImGui::Button("Load Model"))
+            {
+                const std::string& model_file_path = utils::file_utils::open_file_dialog(
+                    "Open Model", {"*.obj", "*.fbx"});
+                if (model_file_path.empty())
+                {
+                    LY_WARN("Failed to open file path for model!");
+                }
+                else
+                {
+                    const std::shared_ptr<renderer::model>& model = renderer::model_factory::create_model_from_file(
+                        model_file_path);
+                    model_renderer_component.set_model(model);
+                }
+            }
             ui_utils::draw_property("Mesh Count: ",
                                     std::to_string(model_renderer_component.get_model()->get_meshes().size()));
             if (ImGui::TreeNode("Meshes"))

@@ -76,6 +76,12 @@ namespace luly::renderer
 
     void environment_pass::set_environment_map(const std::shared_ptr<texture_2d>& environment_map)
     {
+        m_environment_cubemap_texture.reset();
+        m_brdf_texture.reset();
+        m_environment_prefilter_texture.reset();
+        m_environment_irradiance_texture.reset();
+        m_environment_hdr_texture.reset();
+
         m_environment_hdr_texture = environment_map;
 
         setup_environment_fbo();
@@ -116,6 +122,7 @@ namespace luly::renderer
             m_environment_map_size, m_environment_map_size,
             texture_internal_format::depth_component24);
         m_environment_capture_rbo->attach_to_frame_buffer(render_buffer_attachment_type::depth);
+        m_environment_capture_fbo->initialize();
     }
 
     void environment_pass::setup_environment_cubemap()

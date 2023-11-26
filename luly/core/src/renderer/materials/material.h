@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "renderer/textures/texture.h"
+#include "renderer/textures/texture_2d.h"
 #include "renderer/shaders/shader.h"
 
 #include <glm/glm.hpp>
@@ -20,7 +20,7 @@ namespace luly::renderer
 
     struct material_texture
     {
-        std::shared_ptr<texture> texture;
+        std::shared_ptr<texture_2d> texture;
         material_texture_type type;
         bool is_enabled;
     };
@@ -73,7 +73,7 @@ namespace luly::renderer
         float get_roughness() const { return m_material_specification.roughness; }
         float get_metallic() const { return m_material_specification.metallic; }
 
-        const std::map<material_texture_type, material_texture>& get_textures() const
+        std::map<material_texture_type, material_texture>& get_textures()
         {
             return m_material_specification.textures;
         }

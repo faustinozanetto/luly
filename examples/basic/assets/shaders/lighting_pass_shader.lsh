@@ -62,11 +62,11 @@ void main()
         
     vec3 luminance = calculate_directional_light_luminance(lights.directional_light, normal, view_dir, albedo, roughness, metallic);
         
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < lights.point_lights_count; i++) {
         luminance += calculate_point_light_luminance(lights.point_lights[i], normal, view_dir, frag_pos, albedo, roughness, metallic);   
     }
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < lights.spot_lights_count; i++) {
         luminance += calculate_spot_light_luminance(lights.spot_lights[i], normal, view_dir, frag_pos, albedo, roughness, metallic);
     }
 

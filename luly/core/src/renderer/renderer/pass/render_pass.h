@@ -4,6 +4,9 @@
 
 #include <memory>
 #include <string>
+#include <unordered_map>
+
+#include "logging/log.h"
 
 namespace luly::renderer
 {
@@ -34,6 +37,7 @@ namespace luly::renderer
         const std::string& get_name() const { return m_name; }
         const std::shared_ptr<frame_buffer>& get_frame_buffer() const { return m_fbo; }
         const render_pass_output& get_output(const std::string& name) const { return m_outputs.at(name); }
+        const std::unordered_map<std::string, render_pass_output>& get_outputs() const { return m_outputs; }
 
         /* Virtuals */
         virtual void initialize() = 0;
@@ -48,7 +52,13 @@ namespace luly::renderer
 
         void add_output(const render_pass_output& render_pass_output)
         {
-            m_outputs.insert({render_pass_output.name, render_pass_output});
+            if (m_outputs.contains(render_pass_output.name))
+            {
+                LY_WARN("Replacing old output pass with name '{0}' to render pass with name '{1}'!",
+                        render_pass_output.name, m_name);
+            }
+
+            m_outputs[render_pass_output.name] = render_pass_output;
         }
 
     protected:

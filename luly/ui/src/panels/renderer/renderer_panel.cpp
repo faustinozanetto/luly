@@ -33,78 +33,36 @@ namespace luly::ui
             ImGui::Separator();
             ui_utils::draw_property("Render Passes");
 
+            // Geometry Pass.
             ImGui::Separator();
-            if (ImGui::TreeNode("Geometry Pass"))
+            draw_render_pass_details(renderer::scene_renderer::get_data().geometry_pass);
+
+            ImGui::Separator();
+            if (ImGui::TreeNode("Environment Pass"))
             {
-                auto& geometry_pass = renderer::scene_renderer::get_data().geometry_pass;
-                auto& geometry_fbo = geometry_pass->get_frame_buffer();
-                ImGui::Columns(2);
-                for (uint32_t attachment_handle : geometry_fbo->get_attachments())
+                const std::shared_ptr<renderer::environment_pass>& environment_pass =
+                    renderer::scene_renderer::get_data().environment_pass;
+
+                const renderer::render_pass_output& brdf_output = environment_pass->get_output("brdf_output");
+                if (ui_utils::draw_property(brdf_output.pass_output->get_handle_id(), {90, 90}))
                 {
-                    if (ui_utils::draw_property(attachment_handle, {90, 90}))
-                    {
-                        engine_ui::set_render_target(attachment_handle);
-                    }
-                    ImGui::NextColumn();
+                    engine_ui::set_render_target(brdf_output.pass_output->get_handle_id());
                 }
-                ImGui::Columns(1);
                 ImGui::TreePop();
             }
 
+            // Lighting Pass.
             ImGui::Separator();
-            if (ImGui::TreeNode("Lighting Pass"))
-            {
-                auto& lighting_pass = renderer::scene_renderer::get_data().lighting_pass;
-                auto& lighting_fbo = lighting_pass->get_frame_buffer();
-                ImGui::Columns(2);
-                for (uint32_t attachment_handle : lighting_fbo->get_attachments())
-                {
-                    if (ui_utils::draw_property(attachment_handle, {90, 90}))
-                    {
-                        engine_ui::set_render_target(attachment_handle);
-                    }
-                    ImGui::NextColumn();
-                }
-                ImGui::Columns(1);
-                ImGui::TreePop();
-            }
+            draw_render_pass_details(renderer::scene_renderer::get_data().lighting_pass);
 
-
+            // Skybox Pass.
             ImGui::Separator();
-            if (ImGui::TreeNode("Skybox Pass"))
-            {
-                auto& skybox_pass = renderer::scene_renderer::get_data().skybox_pass;
-                auto& skybox_fbo = skybox_pass->get_frame_buffer();
-                ImGui::Columns(2);
-                for (uint32_t attachment_handle : skybox_fbo->get_attachments())
-                {
-                    if (ui_utils::draw_property(attachment_handle, {90, 90}))
-                    {
-                        engine_ui::set_render_target(attachment_handle);
-                    }
-                    ImGui::NextColumn();
-                }
-                ImGui::Columns(1);
-                ImGui::TreePop();
-            }
+            draw_render_pass_details(renderer::scene_renderer::get_data().skybox_pass);
 
+            // Final Pass.
             ImGui::Separator();
-            if (ImGui::TreeNode("Final Pass"))
-            {
-                auto& final_pass = renderer::scene_renderer::get_data().final_pass;
-                auto& final_fbo = final_pass->get_frame_buffer();
-                ImGui::Columns(2);
-                for (uint32_t attachment_handle : final_fbo->get_attachments())
-                {
-                    if (ui_utils::draw_property(attachment_handle, {90, 90}))
-                    {
-                        engine_ui::set_render_target(attachment_handle);
-                    }
-                    ImGui::NextColumn();
-                }
-                ImGui::Columns(1);
-                ImGui::TreePop();
-            }
+            draw_render_pass_details(renderer::scene_renderer::get_data().final_pass);
+
             ImGui::End();
         }
     }
@@ -117,5 +75,30 @@ namespace luly::ui
     void renderer_panel::set_show_panel(bool show_panel)
     {
         s_show = show_panel;
+    }
+
+    void renderer_panel::draw_render_pass_details(const std::shared_ptr<renderer::render_pass>& render_pass)
+    {
+        if (ImGui::TreeNode(render_pass->get_name().c_str()))
+        {
+            const std::shared_ptr<renderer::frame_buffer>& pass_fbo = render_pass->get_frame_buffer();
+            draw_render_pass_fbo_attachments(pass_fbo);
+
+            ImGui::TreePop();
+        }
+    }
+
+    void renderer_panel::draw_render_pass_fbo_attachments(const std::shared_ptr<renderer::frame_buffer>& frame_buffer)
+    {
+        ImGui::Columns(2);
+        for (uint32_t attachment_handle : frame_buffer->get_attachments())
+        {
+            if (ui_utils::draw_property(attachment_handle, {90, 90}))
+            {
+                engine_ui::set_render_target(attachment_handle);
+            }
+            ImGui::NextColumn();
+        }
+        ImGui::Columns(1);
     }
 }

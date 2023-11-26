@@ -44,7 +44,8 @@ namespace luly::renderer
 
         // Create lights ubo.
         m_lights_ubo = std::make_shared<uniform_buffer_object>(
-            sizeof(m_directional_light) + sizeof(m_point_lights) + sizeof(m_spot_lights), 1);
+            sizeof(m_point_lights_count) + sizeof(m_spot_lights_count) + sizeof(m_directional_light) + sizeof(
+                m_point_lights) + sizeof(m_spot_lights), 1);
 
         // Create lighting shader.
         m_lighting_shader = shader_factory::create_shader_from_file("assets/shaders/lighting_pass_shader.lsh");
@@ -114,6 +115,8 @@ namespace luly::renderer
 
         m_directional_light.color = glm::vec4(0);
         m_directional_light.direction = glm::vec4(0);
+        m_point_lights_count = 0;
+        m_spot_lights_count = 0;
     }
 
     void lighting_pass::collect_lights()
@@ -123,7 +126,7 @@ namespace luly::renderer
 
         // Point lights.
         const auto& point_view = registry->view<scene::point_light_component>();
-        int point_light_index = 0;
+        m_point_lights_count = 0;
         for (auto [actor, point_light_component] : point_view.each())
         {
             auto& point_light = point_light_component.get_point_light();
@@ -132,12 +135,12 @@ namespace luly::renderer
             point_light_data.position = glm::vec4(point_light->get_position(), 1.0);
             point_light_data.color = glm::vec4(point_light->get_color(), point_light->get_intensity());
 
-            m_point_lights[point_light_index++] = point_light_data;
+            m_point_lights[m_point_lights_count++] = point_light_data;
         }
 
         // Spot lights.
         const auto& spot_view = registry->view<scene::spot_light_component>();
-        int spot_light_index = 0;
+        m_spot_lights_count = 0;
         for (auto [actor, spot_light_component] : spot_view.each())
         {
             auto& spot_light = spot_light_component.get_spot_light();
@@ -149,7 +152,7 @@ namespace luly::renderer
             spot_light_data.inner_cone_angle = spot_light->get_inner_cone_angle();
             spot_light_data.outer_cone_angle = spot_light->get_outer_cone_angle();
 
-            m_spot_lights[spot_light_index++] = spot_light_data;
+            m_spot_lights[m_spot_lights_count++] = spot_light_data;
         }
 
         // Directional lights.
@@ -169,9 +172,14 @@ namespace luly::renderer
 
     void lighting_pass::update_lights_buffer()
     {
-        m_lights_ubo->set_data(&m_point_lights, sizeof(m_point_lights));
-        m_lights_ubo->set_data(&m_spot_lights, sizeof(m_spot_lights), sizeof(m_point_lights));
+        m_lights_ubo->set_data(&m_point_lights_count, sizeof(m_point_lights_count));
+        m_lights_ubo->set_data(&m_spot_lights_count, sizeof(m_spot_lights_count), sizeof(m_point_lights_count));
+        m_lights_ubo->set_data(&m_point_lights, sizeof(m_point_lights),
+                               sizeof(m_point_lights_count) + sizeof(m_spot_lights_count));
+        m_lights_ubo->set_data(&m_spot_lights, sizeof(m_spot_lights),
+                               sizeof(m_point_lights) + sizeof(m_point_lights_count) + sizeof(m_spot_lights_count));
         m_lights_ubo->set_data(&m_directional_light, sizeof(m_directional_light),
-                               sizeof(m_point_lights) + sizeof(m_spot_lights));
+                               sizeof(m_point_lights) + sizeof(m_spot_lights) + sizeof(m_point_lights_count) + sizeof(
+                                   m_spot_lights_count));
     }
 }

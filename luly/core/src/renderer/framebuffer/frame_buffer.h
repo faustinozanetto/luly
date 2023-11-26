@@ -33,7 +33,8 @@ namespace luly::renderer
         uint32_t get_handle_id() const { return m_handle; }
         uint32_t get_depth_attachment() const { return m_depth_attachment; }
         uint32_t get_attachment_id(int index = 0) const { return m_attachments[index]; }
-        std::vector<uint32_t> get_attachments() const { return m_attachments; }
+        const std::vector<uint32_t>& get_attachments() const { return m_attachments; }
+        const std::vector<frame_buffer_attachment>& get_attachments_data() const { return m_attachments_data; }
         int get_width() const { return m_width; }
         int get_height() const { return m_height; }
 
