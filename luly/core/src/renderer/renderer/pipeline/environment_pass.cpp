@@ -95,8 +95,8 @@ namespace luly::renderer
     {
         m_irradiance_map_size = 128;
         m_prefilter_map_size = 1024;
-        m_brdf_map_size = 512;
-        m_environment_map_size = 2048;
+        m_brdf_map_size = 256;
+        m_environment_map_size = 1024;
 
         m_cube_mesh = mesh_factory::create_cube_mesh();
         m_quad_mesh = mesh_factory::create_screen_quad_mesh();

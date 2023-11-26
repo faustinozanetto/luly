@@ -1,7 +1,9 @@
 ﻿#include "actor_skybox_component_panel.h"
 
 #include "engine_ui.h"
+#include "renderer/textures/texture_factory.h"
 #include "scene/actor/components/rendering/skybox_component.h"
+#include "utils/file_utils.h"
 #include "utils/ui_utils.h"
 
 namespace luly::ui
@@ -20,7 +22,7 @@ namespace luly::ui
 
     void actor_skybox_component_panel::on_render_component_details()
     {
-        const auto& skybox_component = engine_ui::get_ui_data().selected_actor->get_component<
+        auto& skybox_component = engine_ui::get_ui_data().selected_actor->get_component<
             scene::skybox_component>();
 
         if (skybox_component.get_environment_texture())
@@ -30,6 +32,17 @@ namespace luly::ui
 
             if (ui_utils::draw_property("Environemt Map", skybox_component.get_environment_texture()))
             {
+                std::string file_path = utils::file_utils::open_file_dialog("Environment Map", {"*.hdr"});
+                if (file_path.empty())
+                {
+                    LY_WARN("Failed to load environment map from file dialog!");
+                }
+                else
+                {
+                    const auto& new_environment_map = renderer::texture_factory::create_environment_texture_from_file(
+                        file_path);
+                    skybox_component.set_environment_texture(new_environment_map);
+                }
             }
         }
         else

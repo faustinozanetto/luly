@@ -149,7 +149,7 @@ void basic_application::setup_scene()
     const auto& skybox_actor = scene->create_actor("Skybox Actor");
     skybox_actor->add_component<luly::scene::skybox_component>(
         luly::renderer::texture_factory::create_environment_texture_from_file(
-            "assets/hdris/kloofendal_43d_clear_puresky_4k.hdr"));
+            "assets/hdris/kart_club_4k.hdr"));
 
     const auto& spot_light_actor = scene->create_actor("Spot Light Emitter");
     spot_light_actor->add_component<luly::scene::spot_light_component>(

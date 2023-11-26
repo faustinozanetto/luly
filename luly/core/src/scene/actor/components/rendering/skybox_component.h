@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "renderer/scene/scene_renderer.h"
 #include "renderer/textures/texture_2d.h"
 #include "scene/actor/components/base_component.h"
 
@@ -20,6 +21,7 @@ namespace luly::scene
         void set_environment_texture(const std::shared_ptr<renderer::texture_2d>& environment_texture)
         {
             m_environment_texture = environment_texture;
+            renderer::scene_renderer::set_environment_map(m_environment_texture);
         }
 
     private:
