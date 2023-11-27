@@ -219,11 +219,18 @@ void basic_application::setup_scene()
     textures.insert({luly::renderer::material_texture_type::roughness, roughness});
     textures.insert({luly::renderer::material_texture_type::ambient_occlusion, ao});
 
-    auto material_specification = std::make_shared<luly::renderer::material_specification_builder>()->
-                                  with_textures(textures).build();
+    const luly::renderer::material_specification& material_specification =
+        std::make_shared<luly::renderer::material_specification_builder>()->
+        with_textures(textures).build();
 
-    auto material = std::make_shared<luly::renderer::material>(material_specification);
-    m_actor->add_component<luly::scene::material_component>(material);
+    const std::shared_ptr<luly::renderer::material>& tv_material = std::make_shared<luly::renderer::material>(
+        material_specification);
+
+    const std::shared_ptr<luly::assets::asset>& tv_material_asset = luly::assets::asset_factory::create_asset<
+        luly::renderer::material>(
+        "tv-material", luly::assets::asset_type::material, tv_material);
+
+    m_actor->add_component<luly::scene::material_component>(tv_material_asset->get_data<luly::renderer::material>());
 }
 
 luly::core::application* luly::core::create_application()

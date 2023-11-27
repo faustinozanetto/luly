@@ -21,6 +21,7 @@
 #include <logging/log.h>
 #include <utils/assert.h>
 
+#include "panels/assets/assets_panel.h"
 #include "panels/renderer/renderer_panel.h"
 
 namespace luly::ui
@@ -52,7 +53,7 @@ namespace luly::ui
     {
         ImVec4* colors = ImGui::GetStyle().Colors;
 
-        
+
         colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
         colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
         colors[ImGuiCol_WindowBg] = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
@@ -144,6 +145,7 @@ namespace luly::ui
         s_engine_ui_data.panels.push_back(std::make_shared<actor_details_panel>());
         s_engine_ui_data.panels.push_back(std::make_shared<camera_panel>());
         s_engine_ui_data.panels.push_back(std::make_shared<renderer_panel>());
+        s_engine_ui_data.panels.push_back(std::make_shared<assets_panel>());
     }
 
     void engine_ui::initialize_log_sink()

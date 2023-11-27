@@ -15,6 +15,7 @@ namespace luly::assets
     public:
         /* Getters */
         static assets_manager& get();
+        const std::unordered_map<asset_type, std::vector<std::shared_ptr<asset>>>& get_assets() { return m_assets_map; }
 
         template <class T, asset_type P>
         std::shared_ptr<T> get_asset(const std::string& asset_name)

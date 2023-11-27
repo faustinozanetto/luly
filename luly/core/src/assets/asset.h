@@ -10,7 +10,8 @@ namespace luly::assets
     {
         shader,
         texture,
-        model
+        model,
+        material
     };
 
     struct asset_metadata

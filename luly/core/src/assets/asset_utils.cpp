@@ -3,7 +3,7 @@
 
 namespace luly::assets
 {
-    const char* asset_utils::get_asset_type_to_string(asset_type type)
+    const char* asset_utils::get_asset_type_to_string(const asset_type type)
     {
         switch (type)
         {
