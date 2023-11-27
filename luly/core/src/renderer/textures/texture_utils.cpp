@@ -4,9 +4,6 @@
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
 
-#include <logging/log.h>
-#include <utils/assert.h>
-
 namespace luly::renderer
 {
     const char* texture_utils::get_texture_filtering_to_string(texture_filtering filtering)

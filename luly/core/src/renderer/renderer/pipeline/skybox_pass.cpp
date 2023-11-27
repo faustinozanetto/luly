@@ -1,6 +1,8 @@
 ﻿#include "lypch.h"
 #include "skybox_pass.h"
 
+#include "geometry_pass.h"
+#include "lighting_pass.h"
 #include "renderer/meshes/mesh_factory.h"
 #include "renderer/renderer/renderer.h"
 #include "renderer/shaders/shader_factory.h"
@@ -18,11 +20,12 @@ namespace luly::renderer
 
     void skybox_pass::initialize()
     {
-        auto viewport_size = renderer::get_viewport_size();
+        // Setup pass frame buffer.
+        const glm::ivec2& viewport_size = renderer::get_viewport_size();
 
         std::vector<frame_buffer_attachment> attachments = {
             {
-                texture_internal_format::rgba16f,
+                texture_internal_format::rgba16,
                 texture_filtering::linear,
                 texture_wrapping::clamp_to_edge, viewport_size
             },
@@ -38,8 +41,10 @@ namespace luly::renderer
             viewport_size.x, viewport_size.y, attachments, depth_attachment);
         m_fbo->initialize();
 
+        // Load shaders.
         m_skybox_shader = shader_factory::create_shader_from_file("assets/shaders/skybox/skybox.lsh");
         m_screen_shader = shader_factory::create_shader_from_file("assets/shaders/screen.lsh");
+        // Load meshes.
         m_cube_mesh = mesh_factory::create_cube_mesh();
         m_screen_mesh = mesh_factory::create_screen_quad_mesh();
 
@@ -48,13 +53,8 @@ namespace luly::renderer
 
     void skybox_pass::execute()
     {
-        const render_pass_input& geometry_input = m_inputs.at("geometry_pass_input");
-        
-//        const std::shared_ptr<frame_buffer>& geometry_input_fbo = geometry_input.render_pass->get_frame_buffer();
-
-        const render_pass_input& lighting_input = m_inputs.at("lighting_pass_input");
-  //      const std::shared_ptr<frame_buffer>& lighting_input_fbo = lighting_input.render_pass->get_frame_buffer();
-
+        const render_pass_input& geometry_pass_input = m_inputs.at("geometry_pass_input");
+        const render_pass_input& lighting_pass_input = m_inputs.at("lighting_pass_input");
         const render_pass_input& environment_pass_input = m_inputs.at("environment_pass_input");
         const render_pass_output& environment_cubemap_texture = environment_pass_input.render_pass->get_output(
             "environment_cubemap_output");
@@ -67,16 +67,18 @@ namespace luly::renderer
         int width = m_fbo->get_width();
         int height = m_fbo->get_height();
 
-        /*
+      
         // Copy color buffer from lighting pass to this fbo.
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, lighting_input_fbo->get_handle_id());
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, lighting_pass_input.render_pass->get_fbo()->get_handle_id());
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo->get_handle_id());
-        glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 
         // Copy depth buffer from geometry pass to this fbo.
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, geometry_input_fbo->get_handle_id());
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo->get_handle_id());
+        /*
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, geometry_input.render_pass->get_fbo()->get_handle_id());
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, ));
         glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+
 */
         // Render skybox cube using the environment cubemap texture.
         m_skybox_shader->bind();

@@ -5,6 +5,7 @@
 #include "renderer/render_buffer/render_buffer.h"
 #include "renderer/shaders/shader.h"
 #include "renderer/textures/texture_2d.h"
+#include "renderer/framebuffer/frame_buffer.h"
 #include "renderer/textures/texture_cubemap.h"
 
 namespace luly::renderer

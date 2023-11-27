@@ -18,7 +18,8 @@ namespace luly::renderer
 
     void final_pass::initialize()
     {
-        auto viewport_size = renderer::get_viewport_size();
+        // Setup pass frame buffer.
+        const glm::ivec2& viewport_size = renderer::get_viewport_size();
 
         std::vector<frame_buffer_attachment> attachments = {
             {

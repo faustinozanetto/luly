@@ -1,9 +1,6 @@
 ﻿#include "lypch.h"
 #include "vertex_array_object.h"
 
-#include <utils/assert.h>
-#include <logging/log.h>
-
 namespace luly::renderer
 {
     vertex_array_object::vertex_array_object()

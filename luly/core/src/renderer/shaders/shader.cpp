@@ -2,8 +2,6 @@
 #include "shader.h"
 
 #include "shader_utils.h"
-#include "logging/log.h"
-#include "utils/assert.h"
 
 #include <glm/gtc/type_ptr.hpp>
 

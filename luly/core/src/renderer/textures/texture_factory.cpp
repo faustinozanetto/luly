@@ -1,9 +1,6 @@
 ﻿#include "lypch.h"
 #include "texture_factory.h"
 
-#include <logging/log.h>
-#include <utils/assert.h>
-
 #include <stb_image.h>
 
 namespace luly::renderer

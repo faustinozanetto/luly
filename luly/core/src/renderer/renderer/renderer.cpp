@@ -1,8 +1,7 @@
 ﻿#include "lypch.h"
 #include "renderer.h"
 
-#include <utils/assert.h>
-#include <logging/log.h>
+#include "renderer/textures/texture_utils.h"
 
 namespace luly::renderer
 {
@@ -12,9 +11,9 @@ namespace luly::renderer
     {
         LY_TRACE("Started initializing renderer...");
         s_data.window = window;
-        s_data.clear_color = glm::vec4(0.85f);
 
         initialize_glad();
+        initialize_data();
         initialize_debug();
         set_clear_color(s_data.clear_color);
         LY_TRACE("Renderer initialized successfully!");
@@ -142,6 +141,17 @@ namespace luly::renderer
         glBindTextureUnit(slot, handle);
     }
 
+    void renderer::blit_frame_buffer(const glm::ivec2& source_position, const glm::ivec2& source_dimensions,
+                                     const glm::ivec2& target_position, const glm::ivec2& target_dimensions,
+                                     renderer_bit_mask mask, texture_filtering filter)
+    {
+        glBlitFramebuffer(source_position.x, source_position.y, source_dimensions.x, source_dimensions.y,
+                          target_position.x,
+                          target_position.y, target_dimensions.x, target_dimensions.y,
+                          get_renderer_bit_mask_to_opengl(mask),
+                          texture_utils::get_texture_filtering_to_opengl(filter));
+    }
+
     void renderer::initialize_glad()
     {
         const int glad_initialize_status = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
@@ -166,7 +176,7 @@ namespace luly::renderer
     {
         glEnable(GL_DEBUG_OUTPUT);
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-        //  glDebugMessageCallback(renderer::open_gl_message_callback, nullptr);
+        //   glDebugMessageCallback(renderer::open_gl_message_callback, nullptr);
     }
 
     uint32_t renderer::get_renderer_draw_mode_to_opengl(renderer_draw_mode draw_mode)
@@ -230,6 +240,26 @@ namespace luly::renderer
         default:
             return GL_LESS;
         }
+    }
+
+    uint32_t renderer::get_renderer_bit_mask_to_opengl(renderer_bit_mask bit_mask)
+    {
+        switch (bit_mask)
+        {
+        case renderer_bit_mask::depth:
+            return GL_DEPTH_BUFFER_BIT;
+        case renderer_bit_mask::stencil:
+            return GL_STENCIL_BUFFER_BIT;
+        case renderer_bit_mask::color:
+            return GL_COLOR_BUFFER_BIT;
+        }
+        LY_ASSERT_MSG(false, "Invalid bit mask value!");
+        return 0;
+    }
+
+    void renderer::initialize_data()
+    {
+        s_data.clear_color = glm::vec4(0.85f);
     }
 
     void renderer::open_gl_message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,

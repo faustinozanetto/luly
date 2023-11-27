@@ -24,6 +24,21 @@ namespace luly::renderer
 
     void environment_pass::initialize()
     {
+        // Create pass frame buffer.
+        const glm::ivec2& viewport_size = renderer::get_viewport_size();
+        std::vector<frame_buffer_attachment> attachments = {
+            {
+                texture_internal_format::r16f,
+                texture_filtering::nearest,
+                texture_wrapping::none, viewport_size
+            },
+        };
+
+        m_fbo = std::make_shared<frame_buffer>(
+            viewport_size.x, viewport_size.y, attachments);
+        m_fbo->initialize();
+
+        // Setup environment
         setup_environment();
     }
 
@@ -79,10 +94,10 @@ namespace luly::renderer
 
     void environment_pass::setup_environment()
     {
-        m_irradiance_map_size = 128;
-        m_prefilter_map_size = 1024;
+        m_irradiance_map_size = 256;
+        m_prefilter_map_size = 2048;
         m_brdf_map_size = 256;
-        m_environment_map_size = 1024;
+        m_environment_map_size = 2048;
 
         m_cube_mesh = mesh_factory::create_cube_mesh();
         m_quad_mesh = mesh_factory::create_screen_quad_mesh();
@@ -257,7 +272,6 @@ namespace luly::renderer
                                                           texture_internal_format::depth_component24);
         m_environment_capture_fbo->attach_texture(m_brdf_texture, GL_FRAMEBUFFER, render_buffer_attachment_type::color,
                                                   GL_TEXTURE_2D, 0);
-        //   m_environment_capture_fbo->attach_texture(m_environment_brdf_texture, GL_FRAMEBUFFER, retro::renderer::render_buffer_attachment_type::color, GL_TEXTURE_2D, 0);
 
         renderer::set_viewport_size({m_brdf_map_size, m_brdf_map_size});
         m_brdf_shader->bind();

@@ -1,8 +1,6 @@
 ﻿#include "lypch.h"
 #include "render_buffer.h"
 
-#include <logging/log.h>
-
 #include "render_buffer_utils.h"
 #include "renderer/textures/texture_utils.h"
 

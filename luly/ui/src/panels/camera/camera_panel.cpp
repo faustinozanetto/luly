@@ -22,7 +22,8 @@ namespace luly::ui
 
         if (ImGui::Begin("Camera", &s_show))
         {
-            if (auto& current_scene = core::application::get().get_scene_manager()->get_current_scene())
+            const std::shared_ptr<scene::scene>& current_scene = scene::scene_manager::get().get_current_scene();
+            if (current_scene)
             {
                 auto& camera_manager = current_scene->get_camera_manager();
                 auto& camera = camera_manager->get_perspective_camera();

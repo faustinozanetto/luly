@@ -1,9 +1,6 @@
 #include "lypch.h"
 #include "vertex_buffer_layout_descriptor.h"
 
-#include <utils/assert.h>
-#include <logging/log.h>
-
 namespace luly::renderer
 {
     vertex_buffer_layout_entry::vertex_buffer_layout_entry(const std::string& name, vertex_buffer_entry_type type,

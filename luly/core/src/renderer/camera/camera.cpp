@@ -3,9 +3,6 @@
 
 #include "renderer/renderer/renderer.h"
 
-#include <logging/log.h>
-#include <utils/assert.h>
-
 namespace luly::renderer
 {
     camera::camera()

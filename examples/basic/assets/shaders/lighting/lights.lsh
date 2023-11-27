@@ -16,15 +16,9 @@ struct spot_light {
     float outer_cone_angle;
 };
 
-struct lights_data {
-    int point_lights_count;
-    int spot_lights_count;
-};
-
 layout (binding = 1) uniform lights_ubo
 {
-    point_light point_lights[10];
-    spot_light spot_lights[10];
+    point_light point_lights[4];
+    spot_light spot_lights[4];
     directional_light directional_light;
-    lights_data lights_data;
 } lights;

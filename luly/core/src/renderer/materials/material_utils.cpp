@@ -1,9 +1,6 @@
 ﻿#include "lypch.h"
 #include "material_utils.h"
 
-#include <utils/assert.h>
-#include <logging/log.h>
-
 namespace luly::renderer
 {
     const char* material_utils::get_material_texture_type_to_string(material_texture_type texture_type)

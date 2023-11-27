@@ -3,13 +3,24 @@
 
 namespace luly::scene
 {
+    scene_manager* scene_manager::s_instance = nullptr;
+
     scene_manager::scene_manager()
     {
+        LY_INFO("Started creating scene manager...");
+        s_instance = this;
         m_scenes_pool = std::set<std::shared_ptr<scene>>();
+        LY_INFO("Scene manager created successfully!");
     }
 
     scene_manager::~scene_manager()
     {
+    }
+
+    scene_manager& scene_manager::get()
+    {
+        LY_ASSERT_MSG(s_instance, "Tried to get scene_manager instance when not initialized!");
+        return *s_instance;
     }
 
     void scene_manager::add_scene(const std::shared_ptr<scene>& scene)
@@ -28,5 +39,10 @@ namespace luly::scene
         {
             m_current_scene->on_update(delta_time);
         }
+    }
+
+    void scene_manager::initialize()
+    {
+        s_instance = new scene_manager();
     }
 }

@@ -21,37 +21,38 @@ namespace luly::renderer
 
     void geometry_pass::initialize()
     {
-        auto viewport_size = renderer::get_viewport_size();
+        // Setup pass frame buffer.
+        const glm::ivec2& viewport_size = renderer::get_viewport_size();
 
         std::vector<frame_buffer_attachment> attachments = {
             // Position
             {
-                texture_internal_format::rgba16f,
+                texture_internal_format::rgba16,
                 texture_filtering::linear,
                 texture_wrapping::clamp_to_edge, viewport_size
             },
             // Albedo
             {
-                texture_internal_format::rgba16f,
+                texture_internal_format::rgba16,
                 texture_filtering::linear,
                 texture_wrapping::clamp_to_edge, viewport_size
             },
             // Normal
             {
-                texture_internal_format::rgba16f,
+                texture_internal_format::rgba16,
                 texture_filtering::linear,
                 texture_wrapping::clamp_to_edge, viewport_size
             },
             // Roughness-Metallic-AO
             {
-                texture_internal_format::rgba16f,
+                texture_internal_format::rgba16,
                 texture_filtering::linear,
                 texture_wrapping::clamp_to_edge, viewport_size
             },
         };
 
         frame_buffer_attachment depth_attachment = {
-            texture_internal_format::depth_component32f,
+            texture_internal_format::depth_component32,
             texture_filtering::linear,
             texture_wrapping::clamp_to_edge, viewport_size
         };
@@ -60,7 +61,7 @@ namespace luly::renderer
             viewport_size.x, viewport_size.y, attachments, depth_attachment);
         m_fbo->initialize();
 
-        // Load shaders.
+        // Load shader.
         m_geometry_shader = shader_factory::create_shader_from_file("assets/shaders/geometry_pass_shader.lsh");
 
         set_outputs();
@@ -73,7 +74,8 @@ namespace luly::renderer
         renderer::clear_screen();
         m_geometry_shader->bind();
 
-        auto& current_scene = core::application::get().get_scene_manager()->get_current_scene();
+        const std::shared_ptr<scene::scene>& current_scene = scene::scene_manager::get().get_current_scene();
+
         const auto& registry = current_scene->get_registry();
         const auto& view = registry->view<scene::transform_component>();
 

@@ -3,9 +3,6 @@
 
 #include "renderer/textures/texture_utils.h"
 
-#include <logging/log.h>
-#include <utils/assert.h>
-
 #include "renderer/render_buffer/render_buffer_utils.h"
 
 namespace luly::renderer

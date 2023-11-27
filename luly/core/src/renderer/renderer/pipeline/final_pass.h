@@ -18,7 +18,6 @@ namespace luly::renderer
         void set_outputs() override;
 
     private:
-        std::shared_ptr<frame_buffer> m_fbo;
         std::shared_ptr<shader> m_screen_shader;
         std::shared_ptr<mesh> m_screen_mesh;
     };

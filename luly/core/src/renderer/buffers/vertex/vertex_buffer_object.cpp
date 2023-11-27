@@ -1,9 +1,6 @@
 ﻿#include "lypch.h"
 #include "vertex_buffer_object.h"
 
-#include <utils/assert.h>
-#include <logging/log.h>
-
 namespace luly::renderer
 {
     vertex_buffer_object::vertex_buffer_object()

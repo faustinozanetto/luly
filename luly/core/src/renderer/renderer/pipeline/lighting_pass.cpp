@@ -22,18 +22,19 @@ namespace luly::renderer
 
     void lighting_pass::initialize()
     {
-        auto viewport_size = renderer::get_viewport_size();
+        // Create pass frame buffer.
+        const glm::ivec2& viewport_size = renderer::get_viewport_size();
 
         std::vector<frame_buffer_attachment> attachments = {
             {
-                texture_internal_format::rgba16f,
+                texture_internal_format::rgba16,
                 texture_filtering::linear,
                 texture_wrapping::clamp_to_edge, viewport_size
             },
         };
 
         frame_buffer_attachment depth_attachment = {
-            texture_internal_format::depth_component32f,
+            texture_internal_format::depth_component32,
             texture_filtering::linear,
             texture_wrapping::clamp_to_edge, viewport_size
         };
@@ -42,18 +43,15 @@ namespace luly::renderer
             viewport_size.x, viewport_size.y, attachments, depth_attachment);
         m_fbo->initialize();
 
-        // Create lights ubo.
+        // Setup lights uniform buffer object.
+        initialize_lights_data();
         m_lights_ubo = std::make_shared<uniform_buffer_object>(
-            sizeof(m_directional_light) + sizeof(
-                m_point_lights) + sizeof(m_spot_lights) + sizeof(m_lights_data), 1);
+            sizeof(m_point_lights) + sizeof(m_spot_lights) + sizeof(m_directional_light), 1);
 
-        // Create lighting shader.
+        // Load shader.
         m_lighting_shader = shader_factory::create_shader_from_file("assets/shaders/lighting_pass_shader.lsh");
 
-        // Create screen quad
         m_screen_mesh = mesh_factory::create_screen_quad_mesh();
-
-        initialize_lights_data();
 
         set_outputs();
     }
@@ -76,6 +74,14 @@ namespace luly::renderer
             "normals_output");
         const render_pass_output& geometry_rough_metal_ao_output = geometry_pass_input.render_pass->get_output(
             "rough_metal_ao_output");
+
+        int width = m_fbo->get_width();
+        int height = m_fbo->get_height();
+
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, geometry_pass_input.render_pass->get_fbo()->get_handle_id());
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo->get_handle_id());
+        renderer::blit_frame_buffer({0, 0}, {width, height}, {0, 0}, {width, height}, renderer_bit_mask::depth,
+                                    texture_filtering::nearest);
 
         // Bind geometry pass outputs.
         renderer::bind_texture(0, geometry_position_output.output);
@@ -111,13 +117,13 @@ namespace luly::renderer
 
     void lighting_pass::initialize_lights_data()
     {
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 4; i++)
         {
             m_point_lights[i].color = glm::vec4(0);
             m_point_lights[i].position = glm::vec4(0);
         }
 
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 4; i++)
         {
             m_spot_lights[i].color = glm::vec4(0);
             m_spot_lights[i].position = glm::vec4(0);
@@ -128,18 +134,16 @@ namespace luly::renderer
 
         m_directional_light.color = glm::vec4(0);
         m_directional_light.direction = glm::vec4(0);
-        m_lights_data.point_lights_count = 0;
-        m_lights_data.spot_lights_count = 0;
     }
 
     void lighting_pass::collect_lights()
     {
-        auto& current_scene = core::application::get().get_scene_manager()->get_current_scene();
+        const std::shared_ptr<scene::scene>& current_scene = scene::scene_manager::get().get_current_scene();
         const auto& registry = current_scene->get_registry();
 
         // Point lights.
         const auto& point_view = registry->view<scene::point_light_component>();
-        m_lights_data.point_lights_count = 0;
+        int point_lights_count = 0;
         for (auto [actor, point_light_component] : point_view.each())
         {
             auto& point_light = point_light_component.get_point_light();
@@ -148,12 +152,12 @@ namespace luly::renderer
             point_light_data.position = glm::vec4(point_light->get_position(), 1.0);
             point_light_data.color = glm::vec4(point_light->get_color(), point_light->get_intensity());
 
-            m_point_lights[m_lights_data.point_lights_count++] = point_light_data;
+            m_point_lights[point_lights_count++] = point_light_data;
         }
 
         // Spot lights.
         const auto& spot_view = registry->view<scene::spot_light_component>();
-        m_lights_data.spot_lights_count = 0;
+        int spot_lights_count = 0;
         for (auto [actor, spot_light_component] : spot_view.each())
         {
             auto& spot_light = spot_light_component.get_spot_light();
@@ -165,7 +169,7 @@ namespace luly::renderer
             spot_light_data.inner_cone_angle = spot_light->get_inner_cone_angle();
             spot_light_data.outer_cone_angle = spot_light->get_outer_cone_angle();
 
-            m_spot_lights[m_lights_data.spot_lights_count++] = spot_light_data;
+            m_spot_lights[spot_lights_count++] = spot_light_data;
         }
 
         // Directional lights.
@@ -174,12 +178,9 @@ namespace luly::renderer
         {
             auto& directional_light = directional_light_component.get_directional_light();
 
-            directional_light_data directional_light_data;
-            directional_light_data.direction = glm::vec4(directional_light->get_direction(), 1.0);
-            directional_light_data.color =
+            m_directional_light.direction = glm::vec4(directional_light->get_direction(), 1.0);
+            m_directional_light.color =
                 glm::vec4(directional_light->get_color(), directional_light->get_intensity());
-
-            m_directional_light = directional_light_data;
         }
     }
 
@@ -189,8 +190,5 @@ namespace luly::renderer
         m_lights_ubo->set_data(&m_spot_lights, sizeof(m_spot_lights), sizeof(m_point_lights));
         m_lights_ubo->set_data(&m_directional_light, sizeof(m_directional_light),
                                sizeof(m_point_lights) + sizeof(m_spot_lights));
-
-        m_lights_ubo->set_data(&m_lights_data, sizeof(m_lights_data),
-                               sizeof(m_point_lights) + sizeof(m_spot_lights) + sizeof(m_directional_light));
     }
 }

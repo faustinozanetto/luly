@@ -3,8 +3,6 @@
 
 #include "shader_utils.h"
 
-#include <logging/log.h>
-#include <utils/assert.h>
 #include <fstream>
 
 #define SHADER_TYPE_TOKEN "#shader"

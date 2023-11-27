@@ -1,9 +1,6 @@
 ﻿#include "lypch.h"
 #include "assets_manager.h"
 
-#include <logging/log.h>
-#include <utils/assert.h>
-
 namespace luly::assets
 {
     assets_manager* assets_manager::s_instance = nullptr;

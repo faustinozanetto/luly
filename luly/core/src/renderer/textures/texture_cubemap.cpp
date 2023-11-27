@@ -1,9 +1,6 @@
 ﻿#include "lypch.h"
 #include "texture_cubemap.h"
 
-#include <logging/log.h>
-#include <utils/assert.h>
-
 #include "texture_utils.h"
 
 namespace luly::renderer

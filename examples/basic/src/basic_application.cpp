@@ -51,12 +51,13 @@ void basic_application::on_update()
 {
     application::on_update();
 
-    if (!get_scene_manager()->get_current_scene())
-        return;
+    const std::shared_ptr<luly::scene::scene>& current_scene = luly::scene::scene_manager::get().get_current_scene();
+    if (!current_scene) return;
 
     luly::ui::engine_ui::begin_frame();
 
-    auto& camera = get_scene_manager()->get_current_scene()->get_camera_manager()->get_perspective_camera();
+    const std::shared_ptr<luly::renderer::perspective_camera>& camera = current_scene->get_camera_manager()->
+        get_perspective_camera();
 
     luly::renderer::scene_renderer::begin_render(camera);
     luly::renderer::scene_renderer::end_render();
@@ -73,10 +74,11 @@ void basic_application::on_handle_event(luly::events::base_event& event)
 
 bool basic_application::on_key_pressed_event(const luly::events::key_pressed_event& key_pressed_event)
 {
-    if (!get_scene_manager()->get_current_scene()) return false;
+    const std::shared_ptr<luly::scene::scene>& current_scene = luly::scene::scene_manager::get().get_current_scene();
+    if (!current_scene) return false;
 
-    auto& camera_controller = get_scene_manager()->get_current_scene()->get_camera_manager()->
-                                                   get_perspective_camera_controller();
+    const std::shared_ptr<luly::renderer::perspective_camera_controller>& camera_controller = current_scene->
+        get_camera_manager()->get_perspective_camera_controller();
 
     if (key_pressed_event.get_key_code() == luly::input::key::w)
     {
@@ -120,15 +122,15 @@ bool basic_application::on_key_pressed_event(const luly::events::key_pressed_eve
 
 void basic_application::setup_scene()
 {
-    const auto& scene = std::make_shared<luly::scene::scene>("Test Scene");
-    get_scene_manager()->add_scene(scene);
-    get_scene_manager()->switch_scene(scene);
+    const std::shared_ptr<luly::scene::scene>& scene = std::make_shared<luly::scene::scene>("Test Scene");
 
-    /*
+    luly::scene::scene_manager::get().add_scene(scene);
+    luly::scene::scene_manager::get().switch_scene(scene);
+
     const auto& dir_light_actor = scene->create_actor("Light Emitter");
     dir_light_actor->add_component<luly::scene::directional_light_component>(
-        std::make_shared<luly::renderer::directional_light>(glm::vec3(0.85f), glm::vec3(0.8f, 0.3f, -5.0f)));
-
+        std::make_shared<luly::renderer::directional_light>(glm::vec3(0.85f), glm::vec3(0.8f, 0.3f, -5.0f))); /*
+    
     auto sphere_mesh = luly::renderer::mesh_factory::create_sphere_mesh(16, 16, 0.1f);
     for (int i = 0; i < 3; i++)
     {
@@ -145,17 +147,18 @@ void basic_application::setup_scene()
     }
     */
 
-    const auto& skybox_actor = scene->create_actor("Skybox Actor");
+    const std::shared_ptr<luly::scene::scene_actor>& skybox_actor = scene->create_actor("Skybox Actor");
     skybox_actor->add_component<luly::scene::skybox_component>(
         luly::renderer::texture_factory::create_environment_texture_from_file(
             "assets/hdris/kart_club_4k.hdr"));
 
+    /*
     const auto& spot_light_actor = scene->create_actor("Spot Light Emitter");
     spot_light_actor->add_component<luly::scene::spot_light_component>(
         std::make_shared<luly::renderer::spot_light>(glm::vec3(0.85f), glm::vec3(0, 0, 3), glm::vec3(0, 0, -1), 12.5f,
                                                      25.0f));
     spot_light_actor->get_component<luly::scene::transform_component>().get_transform()->set_location({0, 0, 2});
-
+*/
     m_actor = scene->create_actor("Test Model");
 
     // Loading TV model and creating asset.

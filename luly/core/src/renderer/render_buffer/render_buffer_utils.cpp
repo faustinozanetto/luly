@@ -1,9 +1,6 @@
 ﻿#include "lypch.h"
 #include "render_buffer_utils.h"
 
-#include <logging/log.h>
-#include <utils/assert.h>
-
 namespace luly::renderer
 {
     uint32_t render_buffer_utils::get_render_buffer_attachment_type_to_opengl(

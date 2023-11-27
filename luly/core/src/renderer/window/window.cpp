@@ -9,9 +9,6 @@
 #include <events/mouse/mouse_moved_event.h>
 #include <events/mouse/mouse_scrolled_event.h>
 
-#include <logging/log.h>
-#include <utils/assert.h>
-
 namespace luly::renderer
 {
     window::window(const window_specification& window_specification)

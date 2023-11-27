@@ -1,4 +1,5 @@
 ﻿#pragma once
+
 #include "renderer/meshes/mesh.h"
 #include "renderer/renderer/pass/render_pass.h"
 #include "renderer/shaders/shader.h"
@@ -21,6 +22,5 @@ namespace luly::renderer
         std::shared_ptr<shader> m_screen_shader;
         std::shared_ptr<mesh> m_cube_mesh;
         std::shared_ptr<mesh> m_screen_mesh;
-        std::shared_ptr<frame_buffer> m_fbo;
     };
 }

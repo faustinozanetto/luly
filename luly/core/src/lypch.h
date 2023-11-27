@@ -16,7 +16,6 @@
 #include <unordered_set>
 #include <vector>
 
-#include "utils/memory.h"
 #include <utils/assert.h>
 #include <logging/log.h>
 

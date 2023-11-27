@@ -22,48 +22,47 @@ namespace luly::renderer
 
     void ambient_occlusion_pass::initialize()
     {
-        auto viewport_size = renderer::get_viewport_size();
+        // Create pass frame buffer.
+        const glm::ivec2& viewport_size = renderer::get_viewport_size();
+        std::vector<frame_buffer_attachment> fbo_attachments = {
+            {
+                texture_internal_format::r16f,
+                texture_filtering::nearest,
+                texture_wrapping::none, viewport_size
+            },
+        };
 
-        {
-            std::vector<frame_buffer_attachment> attachments = {
-                {
-                    texture_internal_format::r16f,
-                    texture_filtering::nearest,
-                    texture_wrapping::none, viewport_size
-                },
-            };
+        m_fbo = std::make_shared<frame_buffer>(
+            viewport_size.x, viewport_size.y, fbo_attachments);
+        m_fbo->initialize();
 
-            m_fbo = std::make_shared<frame_buffer>(
-                viewport_size.x, viewport_size.y, attachments);
-            m_fbo->initialize();
-        }
-        {
-            std::vector<frame_buffer_attachment> attachments = {
-                {
-                    texture_internal_format::r16f,
-                    texture_filtering::nearest,
-                    texture_wrapping::none, viewport_size
-                },
-            };
+        // Create blur frame buffer.
+        std::vector<frame_buffer_attachment> blur_fbo_attachments = {
+            {
+                texture_internal_format::r16f,
+                texture_filtering::nearest,
+                texture_wrapping::none, viewport_size
+            },
+        };
 
-            m_blur_fbo = std::make_shared<frame_buffer>(
-                viewport_size.x, viewport_size.y, attachments);
-            m_blur_fbo->initialize();
-        }
+        m_blur_fbo = std::make_shared<frame_buffer>(
+            viewport_size.x, viewport_size.y, blur_fbo_attachments);
+        m_blur_fbo->initialize();
 
-        // Create shader.
+        // Create shaders.
         m_ssao_shader = shader_factory::create_shader_from_file("assets/shaders/ambient_occlusion/ssao.lsh");
         m_blur_shader = shader_factory::create_shader_from_file("assets/shaders/ambient_occlusion/blur.lsh");
         // Create screen quad
         m_screen_mesh = mesh_factory::create_screen_quad_mesh();
 
+        // Setup parameters.
         m_ssao_radius = 0.5f;
         m_ssao_bias = 0.025f;
         m_ssao_noise_size = 4.0f;
         m_ssao_kernel_size = 64;
         m_ssao_noise_sample_size = 16;
 
-        // 1. Setup ssao kernel
+        // Setup ssao kernel
         std::uniform_real_distribution<float> random_floats(0.0, 1.0);
         std::default_random_engine generator;
 
@@ -84,7 +83,7 @@ namespace luly::renderer
             m_ssao_kernel.push_back(sample);
         }
 
-        // 2. Setup ssao noise
+        // Setup ssao noise texture.
         m_ssao_noise.reserve(m_ssao_noise_sample_size);
 
         for (int i = 0; i < m_ssao_noise_sample_size; i++)
@@ -94,7 +93,6 @@ namespace luly::renderer
         }
 
         m_ssao_noise_texture = std::make_shared<texture_2d>(texture_specification({4, 4, 3, m_ssao_noise.data()}));
-
         m_ssao_noise_texture->set_filtering(texture_filtering_type::filter_min,
                                             texture_filtering::nearest);
         m_ssao_noise_texture->set_filtering(texture_filtering_type::filter_mag,

@@ -1,9 +1,6 @@
 ﻿#include "lypch.h"
 #include "shader_utils.h"
 
-#include <utils/assert.h>
-#include <logging/log.h>
-
 namespace luly::renderer
 {
     uint32_t shader_utils::get_shader_type_to_opengl(shader_type shader_type)

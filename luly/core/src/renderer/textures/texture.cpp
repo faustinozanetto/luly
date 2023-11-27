@@ -4,7 +4,6 @@
 #include "texture_utils.h"
 
 #include <cmath>
-#include <logging/log.h>
 
 namespace luly::renderer
 {
@@ -53,5 +52,4 @@ namespace luly::renderer
         m_texture_specification.mip_map_levels = static_cast<int>(floor(
             log2((std::min)(m_texture_specification.width, m_texture_specification.height))));
     }
-
 }

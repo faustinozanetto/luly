@@ -23,7 +23,6 @@ namespace luly::core
         /* Getters */
         static application& get() { return *s_instance; }
         std::shared_ptr<renderer::window>& get_window() { return m_window; }
-        std::shared_ptr<scene::scene_manager>& get_scene_manager() { return m_scene_manager; }
 
         /* Virtual Methods */
         virtual void on_create();
@@ -36,7 +35,6 @@ namespace luly::core
         void on_event(events::base_event& event);
 
         std::shared_ptr<renderer::window> m_window;
-        std::shared_ptr<scene::scene_manager> m_scene_manager;
         float m_frame_delay;
 
         friend int ::main(int argc, char** argv);

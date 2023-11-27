@@ -1,8 +1,6 @@
 ﻿#include "lypch.h"
 #include "model_factory.h"
 
-#include <logging/log.h>
-#include <utils/assert.h>
 #include <assimp/postprocess.h>
 #include <assimp/Importer.hpp>
 

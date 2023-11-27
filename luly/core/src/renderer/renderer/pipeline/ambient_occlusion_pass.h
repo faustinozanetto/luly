@@ -4,6 +4,7 @@
 #include "renderer/renderer/pass/render_pass.h"
 #include "renderer/shaders/shader.h"
 #include "renderer/textures/texture_2d.h"
+#include "renderer/framebuffer/frame_buffer.h"
 
 namespace luly::renderer
 {
@@ -33,7 +34,6 @@ namespace luly::renderer
         std::shared_ptr<shader> m_blur_shader;
         std::shared_ptr<mesh> m_screen_mesh;
         
-        std::shared_ptr<frame_buffer> m_fbo;
         std::shared_ptr<frame_buffer> m_blur_fbo;
 
         std::vector<glm::vec3> m_ssao_kernel;

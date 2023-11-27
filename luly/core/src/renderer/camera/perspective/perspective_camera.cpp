@@ -1,12 +1,10 @@
 ﻿#include "lypch.h"
 #include "perspective_camera.h"
 
+#include "renderer/renderer/renderer.h"
+
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
-
-#include "renderer/renderer/renderer.h"
-#include <utils/assert.h>
-#include <logging/log.h>
 
 namespace luly::renderer
 {

@@ -8,6 +8,8 @@
 #include "panels/scene/scene_hierarchy_panel.h"
 #include "panels/scene/actor/actor_details_panel.h"
 #include "panels/viewport/viewport_panel.h"
+#include "panels/assets/assets_panel.h"
+#include "panels/renderer/renderer_panel.h"
 
 #include "renderer/renderer/renderer.h"
 #include "application/application.h"
@@ -20,9 +22,6 @@
 
 #include <logging/log.h>
 #include <utils/assert.h>
-
-#include "panels/assets/assets_panel.h"
-#include "panels/renderer/renderer_panel.h"
 
 namespace luly::ui
 {

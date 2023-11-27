@@ -1,16 +1,12 @@
 ﻿#include "lypch.h"
 #include "application.h"
 
-#include <time/app_time.h>
-
 #include "renderer/renderer/renderer.h"
 #include "renderer/scene/scene_renderer.h"
+#include "assets/assets_manager.h"
 
 #include <events/event_dispatcher.h>
-#include <utils/assert.h>
-#include <logging/log.h>
-
-#include "assets/assets_manager.h"
+#include <time/app_time.h>
 
 namespace luly::core
 {
@@ -20,7 +16,7 @@ namespace luly::core
     {
         s_instance = this;
         app_time::update_time();
-        
+
         assets::assets_manager::initialize();
 
         LY_TRACE("Started creating application...");
@@ -29,9 +25,8 @@ namespace luly::core
 
         renderer::renderer::initialize(m_window);
         renderer::scene_renderer::initialize();
+        scene::scene_manager::initialize();
 
-
-        m_scene_manager = std::make_shared<scene::scene_manager>();
         app_time::update_time();
 
         application::on_create();
@@ -47,7 +42,7 @@ namespace luly::core
 
     void application::on_update()
     {
-        m_scene_manager->on_update(app_time::get_delta_time());
+        scene::scene_manager::get().on_update(app_time::get_delta_time());
     }
 
     void application::run()

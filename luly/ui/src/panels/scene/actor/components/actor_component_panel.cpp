@@ -17,8 +17,6 @@ namespace luly::ui
 
     void actor_component_panel::on_render_panel()
     {
-        auto current_scene = core::application::get().get_scene_manager();
-
         auto [has_component, component_hash] = get_actor_component_details();
         if (!has_component)
             return;

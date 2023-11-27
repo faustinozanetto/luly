@@ -6,7 +6,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "logging/log.h"
+#include <logging/log.h>
 
 namespace luly::renderer
 {
@@ -37,6 +37,7 @@ namespace luly::renderer
         const std::string& get_name() const { return m_name; }
         const render_pass_output& get_output(const std::string& name) const { return m_outputs.at(name); }
         const std::unordered_map<std::string, render_pass_output>& get_outputs() const { return m_outputs; }
+        const std::shared_ptr<frame_buffer>& get_fbo() const { return m_fbo; }
 
         /* Virtuals */
         virtual void initialize() = 0;
@@ -62,6 +63,7 @@ namespace luly::renderer
 
     protected:
         std::string m_name;
+        std::shared_ptr<frame_buffer> m_fbo;
         std::unordered_map<std::string, render_pass_input> m_inputs;
         std::unordered_map<std::string, render_pass_output> m_outputs;
     };

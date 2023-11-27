@@ -4,14 +4,10 @@
 #include "renderer/renderer/pipeline/geometry_pass.h"
 #include "renderer/renderer/pipeline/final_pass.h"
 #include "renderer/renderer/renderer.h"
-#include "scene/actor/components/rendering/model_renderer_component.h"
 #include "scene/actor/components/transform_component.h"
 #include "scene/actor/components/rendering/material_component.h"
-#include "application/application.h"
-
-#include <logging/log.h>
-
 #include "scene/actor/components/rendering/skybox_component.h"
+#include "application/application.h"
 
 namespace luly::renderer
 {
@@ -28,7 +24,7 @@ namespace luly::renderer
 
     void scene_renderer::begin_render(const std::shared_ptr<camera>& camera)
     {
-        auto& current_scene = core::application::get().get_scene_manager()->get_current_scene();
+        const std::shared_ptr<scene::scene>& current_scene = scene::scene_manager::get().get_current_scene();
         if (!current_scene) return;
 
         /* Camera setup */
@@ -41,9 +37,9 @@ namespace luly::renderer
         s_data.lighting_pass->update_lights();
 
         perform_geometry_pass();
-        
+
         s_data.ambient_occlusion_pass->execute();
-        
+
         perform_lighting_pass();
 
         s_data.skybox_pass->execute();
@@ -72,7 +68,7 @@ namespace luly::renderer
 
         s_data.environment_pass = std::make_shared<environment_pass>();
         s_data.environment_pass->add_input({s_data.geometry_pass, "geometry_pass_input"});
-        
+
         s_data.ambient_occlusion_pass = std::make_shared<ambient_occlusion_pass>();
         s_data.ambient_occlusion_pass->add_input({s_data.geometry_pass, "geometry_pass_input"});
 

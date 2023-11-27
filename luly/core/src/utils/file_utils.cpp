@@ -3,7 +3,6 @@
 
 #include "application/application.h"
 
-#include <logging/log.h>
 #include <commdlg.h>
 #include <combaseapi.h>
 

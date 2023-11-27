@@ -10,6 +10,8 @@
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
 
+#include "renderer/textures/texture.h"
+
 namespace luly::renderer
 {
     struct renderer_data
@@ -47,6 +49,13 @@ namespace luly::renderer
         not_equal,
         always,
         never
+    };
+
+    enum class renderer_bit_mask
+    {
+        depth,
+        stencil,
+        color
     };
 
     class renderer
@@ -95,10 +104,15 @@ namespace luly::renderer
         /* Textures */
         static void bind_texture(int slot, uint32_t handle);
 
+        static void blit_frame_buffer(const glm::ivec2& source_position, const glm::ivec2& source_dimensions,
+                                      const glm::ivec2& target_position, const glm::ivec2& target_dimensions,
+                                      renderer_bit_mask mask, texture_filtering filter);
+
         /* Utils */
         static uint32_t get_renderer_draw_mode_to_opengl(renderer_draw_mode draw_mode);
         static uint32_t get_renderer_state_to_opengl(renderer_state state);
         static uint32_t get_renderer_depth_func_to_opengl(renderer_depth_func depth_func);
+        static uint32_t get_renderer_bit_mask_to_opengl(renderer_bit_mask bit_mask);
 
     private:
         static void initialize_data();
