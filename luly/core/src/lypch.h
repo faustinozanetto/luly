@@ -17,5 +17,7 @@
 #include <vector>
 
 #include "utils/memory.h"
+#include <utils/assert.h>
+#include <logging/log.h>
 
 #include <Windows.h>

@@ -10,6 +10,8 @@
 #include <utils/assert.h>
 #include <logging/log.h>
 
+#include "assets/assets_manager.h"
+
 namespace luly::core
 {
     application* application::s_instance = nullptr;
@@ -18,6 +20,8 @@ namespace luly::core
     {
         s_instance = this;
         app_time::update_time();
+        
+        assets::assets_manager::initialize();
 
         LY_TRACE("Started creating application...");
         m_window = std::make_shared<renderer::window>(window_specification);
@@ -25,6 +29,7 @@ namespace luly::core
 
         renderer::renderer::initialize(m_window);
         renderer::scene_renderer::initialize();
+
 
         m_scene_manager = std::make_shared<scene::scene_manager>();
         app_time::update_time();
