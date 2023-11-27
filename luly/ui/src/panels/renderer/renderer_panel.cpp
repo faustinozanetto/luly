@@ -41,16 +41,8 @@ namespace luly::ui
             }
 
             ImGui::Separator();
-            if (ImGui::TreeNode("Environment Pass"))
+            if (draw_render_pass_details(renderer::scene_renderer::get_data().environment_pass))
             {
-                const std::shared_ptr<renderer::environment_pass>& environment_pass =
-                    renderer::scene_renderer::get_data().environment_pass;
-
-                const renderer::render_pass_output& brdf_output = environment_pass->get_output("brdf_output");
-                if (ui_utils::draw_property(brdf_output.output, {90, 90}))
-                {
-                    engine_ui::set_render_target(brdf_output.output);
-                }
                 ImGui::TreePop();
             }
 
@@ -82,14 +74,6 @@ namespace luly::ui
                 {
                     renderer::scene_renderer::get_data().ambient_occlusion_pass->set_ssao_noise_size(noise_size);
                 }
-
-                ui_utils::draw_property(
-                    renderer::scene_renderer::get_data().ambient_occlusion_pass->get_output("ssao_blur_output").output,
-                    {90.0f, 90.0f});
-                ui_utils::draw_property(
-                    renderer::scene_renderer::get_data().ambient_occlusion_pass->get_output("ssao_noise_output").output,
-                    {90.0f, 90.0f});
-
 
                 ImGui::TreePop();
             }
@@ -126,22 +110,21 @@ namespace luly::ui
     {
         if (ImGui::TreeNode(render_pass->get_name().c_str()))
         {
-            const std::shared_ptr<renderer::frame_buffer>& pass_fbo = render_pass->get_frame_buffer();
-            draw_render_pass_fbo_attachments(pass_fbo);
-
+            draw_render_pass_outputs(render_pass->get_outputs());
             return true;
         }
         return false;
     }
 
-    void renderer_panel::draw_render_pass_fbo_attachments(const std::shared_ptr<renderer::frame_buffer>& frame_buffer)
+    void renderer_panel::draw_render_pass_outputs(
+        const std::unordered_map<std::string, renderer::render_pass_output>& pass_outputs)
     {
         ImGui::Columns(2);
-        for (uint32_t attachment_handle : frame_buffer->get_attachments())
+        for (std::pair<std::string, renderer::render_pass_output> pair : pass_outputs)
         {
-            if (ui_utils::draw_property(attachment_handle, {90, 90}))
+            if (ui_utils::draw_property(pair.second.output, {90, 90}))
             {
-                engine_ui::set_render_target(attachment_handle);
+                engine_ui::set_render_target(pair.second.output);
             }
             ImGui::NextColumn();
         }

@@ -125,11 +125,15 @@ namespace luly::renderer
             m_ssao_shader->set_vec_float3("u_ssao_kernel[" + std::to_string(i) + "]", m_ssao_kernel[i]);
         }
 
-        render_pass_input geometry_pass_input = m_inputs.at("geometry_pass_input");
+        const render_pass_input& geometry_pass_input = m_inputs.at("geometry_pass_input");
+        const render_pass_output& geometry_position_output = geometry_pass_input.render_pass->get_output(
+            "position_output");
+        const render_pass_output& geometry_normal_output = geometry_pass_input.render_pass->
+                                                                               get_output("normals_output");
 
-        renderer::bind_texture(0, geometry_pass_input.render_pass->get_frame_buffer()->get_attachment_id(0));
+        renderer::bind_texture(0, geometry_position_output.output);
         // Geometry Pass Position.
-        renderer::bind_texture(1, geometry_pass_input.render_pass->get_frame_buffer()->get_attachment_id(2));
+        renderer::bind_texture(1, geometry_normal_output.output);
         // Geometry Pass Normal
         renderer::bind_texture(2, m_ssao_noise_texture->get_handle_id()); // SSAO Noise
         renderer::submit_mesh(m_screen_mesh);

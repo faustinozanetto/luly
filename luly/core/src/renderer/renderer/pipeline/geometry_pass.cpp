@@ -62,6 +62,8 @@ namespace luly::renderer
 
         // Load shaders.
         m_geometry_shader = shader_factory::create_shader_from_file("assets/shaders/geometry_pass_shader.lsh");
+
+        set_outputs();
     }
 
     void geometry_pass::execute()
@@ -108,5 +110,29 @@ namespace luly::renderer
 
     void geometry_pass::set_outputs()
     {
+        render_pass_output position_output;
+        position_output.name = "position_output";
+        position_output.output = m_fbo->get_attachment_id(0);
+        add_output(position_output);
+
+        render_pass_output albedo_output;
+        albedo_output.name = "albedo_output";
+        albedo_output.output = m_fbo->get_attachment_id(1);
+        add_output(albedo_output);
+
+        render_pass_output normals_output;
+        normals_output.name = "normals_output";
+        normals_output.output = m_fbo->get_attachment_id(2);
+        add_output(normals_output);
+
+        render_pass_output rough_metal_ao_output;
+        rough_metal_ao_output.name = "rough_metal_ao_output";
+        rough_metal_ao_output.output = m_fbo->get_attachment_id(3);
+        add_output(rough_metal_ao_output);
+
+        render_pass_output depth_output;
+        depth_output.name = "depth_output";
+        depth_output.output = m_fbo->get_depth_attachment();
+        add_output(depth_output);
     }
 }

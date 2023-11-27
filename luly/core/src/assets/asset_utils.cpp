@@ -13,6 +13,8 @@ namespace luly::assets
             return "texture";
         case asset_type::model:
             return "model";
+        case asset_type::material:
+            return "material";
         }
         LY_ASSERT_MSG(false, "Invalid asset type!")
         return nullptr;

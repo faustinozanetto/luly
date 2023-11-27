@@ -54,6 +54,8 @@ namespace luly::renderer
         m_screen_mesh = mesh_factory::create_screen_quad_mesh();
 
         initialize_lights_data();
+
+        set_outputs();
     }
 
     void lighting_pass::execute()
@@ -63,15 +65,23 @@ namespace luly::renderer
         renderer::clear_screen();
         m_lighting_shader->bind();
 
-        render_pass_input geometry_pass_input = m_inputs.at("geometry_pass_input");
-        render_pass_input environment_pass_input = m_inputs.at("environment_pass_input");
-        render_pass_input ambient_occlusion_pass_input = m_inputs.at("ambient_occlusion_pass_input");
+        const render_pass_input& geometry_pass_input = m_inputs.at("geometry_pass_input");
+        const render_pass_input& environment_pass_input = m_inputs.at("environment_pass_input");
+        const render_pass_input& ambient_occlusion_pass_input = m_inputs.at("ambient_occlusion_pass_input");
+
+        const render_pass_output& geometry_position_output = geometry_pass_input.render_pass->get_output(
+            "position_output");
+        const render_pass_output& geometry_albedo_output = geometry_pass_input.render_pass->get_output("albedo_output");
+        const render_pass_output& geometry_normals_output = geometry_pass_input.render_pass->get_output(
+            "normals_output");
+        const render_pass_output& geometry_rough_metal_ao_output = geometry_pass_input.render_pass->get_output(
+            "rough_metal_ao_output");
 
         // Bind geometry pass outputs.
-        renderer::bind_texture(0, geometry_pass_input.render_pass->get_frame_buffer()->get_attachment_id(0));
-        renderer::bind_texture(1, geometry_pass_input.render_pass->get_frame_buffer()->get_attachment_id(1));
-        renderer::bind_texture(2, geometry_pass_input.render_pass->get_frame_buffer()->get_attachment_id(2));
-        renderer::bind_texture(3, geometry_pass_input.render_pass->get_frame_buffer()->get_attachment_id(3));
+        renderer::bind_texture(0, geometry_position_output.output);
+        renderer::bind_texture(1, geometry_albedo_output.output);
+        renderer::bind_texture(2, geometry_normals_output.output);
+        renderer::bind_texture(3, geometry_rough_metal_ao_output.output);
         renderer::bind_texture(4, environment_pass_input.render_pass->get_output("irradiance_output").output);
         renderer::bind_texture(5, environment_pass_input.render_pass->get_output("prefilter_output").output);
         renderer::bind_texture(6, environment_pass_input.render_pass->get_output("brdf_output").output);
@@ -86,6 +96,10 @@ namespace luly::renderer
 
     void lighting_pass::set_outputs()
     {
+        render_pass_output lighting_output;
+        lighting_output.name = "lighting_output";
+        lighting_output.output = m_fbo->get_attachment_id(0);
+        add_output(lighting_output);
     }
 
     void lighting_pass::update_lights()

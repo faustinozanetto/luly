@@ -35,7 +35,7 @@ basic_application::basic_application(const luly::renderer::window_specification&
     glEnable(GL_DEPTH_TEST);
 
     luly::ui::engine_ui::set_render_target(
-        luly::renderer::scene_renderer::get_data().final_pass->get_frame_buffer()->get_attachment_id(0));
+        luly::renderer::scene_renderer::get_data().final_pass->get_output("final_output").output);
 }
 
 basic_application::~basic_application()

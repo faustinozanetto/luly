@@ -35,7 +35,6 @@ namespace luly::renderer
 
         /* Getters */
         const std::string& get_name() const { return m_name; }
-        const std::shared_ptr<frame_buffer>& get_frame_buffer() const { return m_fbo; }
         const render_pass_output& get_output(const std::string& name) const { return m_outputs.at(name); }
         const std::unordered_map<std::string, render_pass_output>& get_outputs() const { return m_outputs; }
 
@@ -63,7 +62,6 @@ namespace luly::renderer
 
     protected:
         std::string m_name;
-        std::shared_ptr<frame_buffer> m_fbo;
         std::unordered_map<std::string, render_pass_input> m_inputs;
         std::unordered_map<std::string, render_pass_output> m_outputs;
     };

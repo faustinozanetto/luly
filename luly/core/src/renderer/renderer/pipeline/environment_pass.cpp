@@ -25,26 +25,6 @@ namespace luly::renderer
     void environment_pass::initialize()
     {
         setup_environment();
-
-
-        auto viewport_size = renderer::get_viewport_size();
-
-        std::vector<frame_buffer_attachment> attachments = {
-            {
-                texture_internal_format::rgba16f,
-                texture_filtering::linear,
-                texture_wrapping::clamp_to_edge, viewport_size
-            },
-        };
-        frame_buffer_attachment depth_attachment = {
-            texture_internal_format::depth_component32f,
-            texture_filtering::linear,
-            texture_wrapping::clamp_to_edge, viewport_size
-        };
-
-        m_fbo = std::make_shared<frame_buffer>(
-            viewport_size.x, viewport_size.y, attachments, depth_attachment);
-        m_fbo->initialize();
     }
 
     void environment_pass::execute()

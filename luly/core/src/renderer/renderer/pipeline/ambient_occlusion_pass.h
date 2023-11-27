@@ -32,6 +32,8 @@ namespace luly::renderer
         std::shared_ptr<shader> m_ssao_shader;
         std::shared_ptr<shader> m_blur_shader;
         std::shared_ptr<mesh> m_screen_mesh;
+        
+        std::shared_ptr<frame_buffer> m_fbo;
         std::shared_ptr<frame_buffer> m_blur_fbo;
 
         std::vector<glm::vec3> m_ssao_kernel;

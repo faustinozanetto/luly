@@ -42,15 +42,18 @@ namespace luly::renderer
         m_screen_shader = shader_factory::create_shader_from_file("assets/shaders/screen.lsh");
         m_cube_mesh = mesh_factory::create_cube_mesh();
         m_screen_mesh = mesh_factory::create_screen_quad_mesh();
+
+        set_outputs();
     }
 
     void skybox_pass::execute()
     {
         const render_pass_input& geometry_input = m_inputs.at("geometry_pass_input");
-        const std::shared_ptr<frame_buffer>& geometry_input_fbo = geometry_input.render_pass->get_frame_buffer();
+        
+//        const std::shared_ptr<frame_buffer>& geometry_input_fbo = geometry_input.render_pass->get_frame_buffer();
 
         const render_pass_input& lighting_input = m_inputs.at("lighting_pass_input");
-        const std::shared_ptr<frame_buffer>& lighting_input_fbo = lighting_input.render_pass->get_frame_buffer();
+  //      const std::shared_ptr<frame_buffer>& lighting_input_fbo = lighting_input.render_pass->get_frame_buffer();
 
         const render_pass_input& environment_pass_input = m_inputs.at("environment_pass_input");
         const render_pass_output& environment_cubemap_texture = environment_pass_input.render_pass->get_output(
@@ -64,6 +67,7 @@ namespace luly::renderer
         int width = m_fbo->get_width();
         int height = m_fbo->get_height();
 
+        /*
         // Copy color buffer from lighting pass to this fbo.
         glBindFramebuffer(GL_READ_FRAMEBUFFER, lighting_input_fbo->get_handle_id());
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo->get_handle_id());
@@ -73,7 +77,7 @@ namespace luly::renderer
         glBindFramebuffer(GL_READ_FRAMEBUFFER, geometry_input_fbo->get_handle_id());
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo->get_handle_id());
         glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-
+*/
         // Render skybox cube using the environment cubemap texture.
         m_skybox_shader->bind();
         renderer::bind_texture(0, environment_cubemap_texture.output);
@@ -86,5 +90,9 @@ namespace luly::renderer
 
     void skybox_pass::set_outputs()
     {
+        render_pass_output skybox_output;
+        skybox_output.name = "skybox_output";
+        skybox_output.output = m_fbo->get_attachment_id(0);
+        add_output(skybox_output);
     }
 }
