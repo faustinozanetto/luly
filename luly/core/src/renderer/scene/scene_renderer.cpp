@@ -31,10 +31,6 @@ namespace luly::renderer
         s_data.camera = camera;
         update_camera_data();
         update_camera_buffer();
-        s_data.camera_ubo->bind(0);
-
-        /* Lights */
-        s_data.lighting_pass->update_lights();
 
         perform_geometry_pass();
 
@@ -100,7 +96,7 @@ namespace luly::renderer
     {
         s_data.camera_data.view_matrix = s_data.camera->get_view_matrix();
         s_data.camera_data.projection_matrix = s_data.camera->get_projection_matrix();
-        s_data.camera_data.position = s_data.camera->get_position();
+        s_data.camera_data.position = glm::vec4(s_data.camera->get_position(), 1.0);
     }
 
     void scene_renderer::update_camera_buffer()

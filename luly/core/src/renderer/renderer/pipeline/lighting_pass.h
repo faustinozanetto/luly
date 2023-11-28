@@ -20,14 +20,20 @@ namespace luly::renderer
         glm::vec4 color;
         glm::vec4 position;
         glm::vec4 direction;
-        float inner_cone_angle;
-        float outer_cone_angle;
+        glm::vec4 angles;
     };
 
     struct directional_light_data
     {
         glm::vec4 color;
         glm::vec4 direction;
+    };
+
+    struct lights_data
+    {
+        point_light_data point_lights[4];
+        spot_light_data spot_lights[4];
+        directional_light_data directional_light;
     };
 
     class lighting_pass : public render_pass
@@ -48,9 +54,7 @@ namespace luly::renderer
         void collect_lights();
         void update_lights_buffer();
 
-        point_light_data m_point_lights[4];
-        spot_light_data m_spot_lights[4];
-        directional_light_data m_directional_light;
+        lights_data m_lights_data;
 
         std::shared_ptr<uniform_buffer_object> m_lights_ubo;
         std::shared_ptr<shader> m_lighting_shader;

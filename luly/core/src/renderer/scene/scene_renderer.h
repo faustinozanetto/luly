@@ -19,7 +19,7 @@ namespace luly::renderer
     {
         glm::mat4 view_matrix;
         glm::mat4 projection_matrix;
-        glm::vec3 position;
+        glm::vec4 position;
     };
 
     struct scene_renderer_data

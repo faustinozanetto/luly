@@ -62,30 +62,28 @@ void main()
     float world_ambient_occlusion = texture(u_ambient_occlusion_map, o_tex_coord).r;
     ambient_occlusion *= world_ambient_occlusion;        
             
-    vec3 view_dir = normalize(camera.position - frag_pos);
+    vec3 view_dir = normalize(camera.position.xyz - frag_pos);
     vec3 reflect_dir = reflect(-view_dir, normal);
 
     vec3 luminance = calculate_directional_light_luminance(lights.directional_light, normal, view_dir, albedo, roughness, metallic);
-        /*
-    for (int i = 0; i < lights.lights_data.point_lights_count; i++) {
+ 
+    for (int i = 0; i < 4; i++) {
         luminance += calculate_point_light_luminance(lights.point_lights[i], normal, view_dir, frag_pos, albedo, roughness, metallic);   
     }
-
-        /*
-    for (int i = 0; i < 1; i++) {
+        
+    for (int i = 0; i < 4; i++) {
         luminance += calculate_spot_light_luminance(lights.spot_lights[i], normal, view_dir, frag_pos, albedo, roughness, metallic);
     }
-*/
-        
+    
     vec3 normal_world_space = mat3(transpose(camera.view_matrix)) * normal;
-    vec3 view_dir_world_space = mat3(inverse(camera.view_matrix)) * normalize(camera.position - frag_pos);
+    vec3 view_dir_world_space = mat3(inverse(camera.view_matrix)) * normalize(camera.position.xyz - frag_pos);
     vec3 reflection_dir_world_space = reflect(-view_dir_world_space, normal_world_space);
-        
-    vec3 irradiance = sample_irradiance_map(normal_world_space);
-    vec3 prefilter = sample_prefilter_map(reflection_dir_world_space, roughness);
-    vec2 brdf_lut = sample_brdf_lut_map(view_dir_world_space, normal_world_space, roughness);
+ 
+    vec3 irradiance = sample_irradiance_map(normal);
+    vec3 prefilter = sample_prefilter_map(reflect_dir, roughness);
+    vec2 brdf_lut = sample_brdf_lut_map(view_dir, normal, roughness);
 
-    luminance += calculate_ambient_ibl(albedo, normal_world_space, view_dir_world_space, irradiance,
+    luminance += calculate_ambient_ibl(albedo, normal, view_dir, irradiance,
          prefilter, brdf_lut, roughness, metallic, ambient_occlusion);
         
     vec3 ambient = vec3(0.03) * albedo * ambient_occlusion;

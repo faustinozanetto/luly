@@ -12,11 +12,10 @@ struct spot_light {
     vec4 color;
     vec4 position;
     vec4 direction;
-    float inner_cone_angle;
-    float outer_cone_angle;
+    vec4 angles;
 };
 
-layout (binding = 1) uniform lights_ubo
+layout (std140, binding = 1) uniform lights_ubo
 {
     point_light point_lights[4];
     spot_light spot_lights[4];

@@ -99,8 +99,10 @@ vec3 calculate_spot_light_luminance(spot_light spot_light, vec3 normal, vec3 vie
     float NdotL = max(dot(normalize(normal), light_dir), 0.0);
 
     // Check if the fragment is within the spot light cone
+    float inner_angle = spot_light.angles.x;
+    float outer_angle = spot_light.angles.y;
     float spot_angle = dot(normalize(-light_dir), normalize(spot_light.direction.xyz));
-    float spot_factor = smoothstep(cos(radians(spot_light.outer_cone_angle)), cos(radians(spot_light.inner_cone_angle)), spot_angle);
+    float spot_factor = smoothstep(cos(radians(outer_angle)), cos(radians(inner_angle)), spot_angle);
 
     vec3 diffuse = albedo / PI;
 

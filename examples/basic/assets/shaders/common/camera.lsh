@@ -1,6 +1,6 @@
-﻿layout(set = 0, binding = 0) uniform camera_ubo
+﻿layout(std140, binding = 0) uniform camera_ubo
 {
     mat4 view_matrix;
     mat4 projection_matrix;
-    vec3 position;
+    vec4 position;
 } camera;

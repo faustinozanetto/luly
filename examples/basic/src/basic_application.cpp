@@ -16,9 +16,11 @@
 #include "assets/asset_factory.h"
 #include "renderer/materials/material.h"
 #include "renderer/materials/material_specification_builder.h"
+#include "renderer/meshes/mesh_factory.h"
 #include "renderer/scene/scene_renderer.h"
 #include "scene/actor/components/transform_component.h"
 #include "scene/actor/components/lights/directional_light_component.h"
+#include "scene/actor/components/lights/point_light_component.h"
 #include "scene/actor/components/lights/spot_light_component.h"
 #include "scene/actor/components/rendering/material_component.h"
 #include "scene/actor/components/rendering/model_renderer_component.h"
@@ -127,10 +129,12 @@ void basic_application::setup_scene()
     luly::scene::scene_manager::get().add_scene(scene);
     luly::scene::scene_manager::get().switch_scene(scene);
 
+    /*
     const auto& dir_light_actor = scene->create_actor("Light Emitter");
     dir_light_actor->add_component<luly::scene::directional_light_component>(
         std::make_shared<luly::renderer::directional_light>(glm::vec3(0.85f), glm::vec3(0.8f, 0.3f, -5.0f))); /*
-    
+    */
+
     auto sphere_mesh = luly::renderer::mesh_factory::create_sphere_mesh(16, 16, 0.1f);
     for (int i = 0; i < 3; i++)
     {
@@ -142,10 +146,12 @@ void basic_application::setup_scene()
                 sphere_mesh
             }));
         point_light_actor->get_component<luly::scene::transform_component>().get_transform()->set_location({
-            -1 + i, 0, 1.5f
+            -1 + i / 2, 0, 0.5f
+        });
+        point_light_actor->get_component<luly::scene::transform_component>().get_transform()->set_scale({
+            0.3f, 0.3f, 0.3f
         });
     }
-    */
 
     const std::shared_ptr<luly::scene::scene_actor>& skybox_actor = scene->create_actor("Skybox Actor");
     skybox_actor->add_component<luly::scene::skybox_component>(
@@ -160,6 +166,7 @@ void basic_application::setup_scene()
     spot_light_actor->get_component<luly::scene::transform_component>().get_transform()->set_location({0, 0, 2});
 */
     m_actor = scene->create_actor("Test Model");
+    m_actor->get_component<luly::scene::transform_component>().get_transform()->set_scale({1.5f, 1.5f, 1.5f});
 
     // Loading TV model and creating asset.
     const std::shared_ptr<luly::renderer::model> tv_model = luly::renderer::model_factory::create_model_from_file(
