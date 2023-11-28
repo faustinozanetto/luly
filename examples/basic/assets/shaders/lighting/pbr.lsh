@@ -131,5 +131,5 @@ vec3 calculate_ambient_ibl(vec3 albedo, vec3 normal, vec3 view_dir, vec3 irradia
     vec3 diffuse = kD * irradiance * albedo;
     vec3 specular = prefilter * (F * brdf_lut.x + brdf_lut.y);
 
-    return (diffuse + specular ) * ambient_occlusion;
+    return (diffuse + specular) * ambient_occlusion;
 }

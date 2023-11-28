@@ -75,7 +75,6 @@ namespace luly::renderer
 
         s_data.skybox_pass = std::make_shared<skybox_pass>();
         s_data.skybox_pass->add_input({s_data.environment_pass, "environment_pass_input"});
-        s_data.skybox_pass->add_input({s_data.geometry_pass, "geometry_pass_input"});
         s_data.skybox_pass->add_input({s_data.lighting_pass, "lighting_pass_input"});
 
         s_data.final_pass = std::make_shared<final_pass>();
@@ -96,6 +95,8 @@ namespace luly::renderer
     {
         s_data.camera_data.view_matrix = s_data.camera->get_view_matrix();
         s_data.camera_data.projection_matrix = s_data.camera->get_projection_matrix();
+        s_data.camera_data.view_projection_matrix = s_data.camera_data.
+                                                           projection_matrix * s_data.camera_data.view_matrix;
         s_data.camera_data.position = glm::vec4(s_data.camera->get_position(), 1.0);
     }
 

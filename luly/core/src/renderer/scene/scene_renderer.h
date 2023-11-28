@@ -19,6 +19,7 @@ namespace luly::renderer
     {
         glm::mat4 view_matrix;
         glm::mat4 projection_matrix;
+        glm::mat4 view_projection_matrix;
         glm::vec4 position;
     };
 

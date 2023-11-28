@@ -32,7 +32,7 @@ namespace luly::renderer
         };
 
         frame_buffer_attachment depth_attachment = {
-            texture_internal_format::depth_component32f,
+            texture_internal_format::depth_component32,
             texture_filtering::linear,
             texture_wrapping::clamp_to_edge, viewport_size
         };
@@ -53,7 +53,6 @@ namespace luly::renderer
 
     void skybox_pass::execute()
     {
-        const render_pass_input& geometry_pass_input = m_inputs.at("geometry_pass_input");
         const render_pass_input& lighting_pass_input = m_inputs.at("lighting_pass_input");
         const render_pass_input& environment_pass_input = m_inputs.at("environment_pass_input");
         const render_pass_output& environment_cubemap_texture = environment_pass_input.render_pass->get_output(
@@ -67,19 +66,12 @@ namespace luly::renderer
         int width = m_fbo->get_width();
         int height = m_fbo->get_height();
 
-      
-        // Copy color buffer from lighting pass to this fbo.
+        // Copy depth & color buffer from lighting pass to this fbo.
         glBindFramebuffer(GL_READ_FRAMEBUFFER, lighting_pass_input.render_pass->get_fbo()->get_handle_id());
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo->get_handle_id());
-        glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+        renderer::blit_frame_buffer({0, 0}, {width, height}, {0, 0}, {width, height},
+                                    renderer_bit_mask::color | renderer_bit_mask::depth, texture_filtering::nearest);
 
-        // Copy depth buffer from geometry pass to this fbo.
-        /*
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, geometry_input.render_pass->get_fbo()->get_handle_id());
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, ));
-        glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-
-*/
         // Render skybox cube using the environment cubemap texture.
         m_skybox_shader->bind();
         renderer::bind_texture(0, environment_cubemap_texture.output);

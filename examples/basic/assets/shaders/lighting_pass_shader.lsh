@@ -31,18 +31,18 @@ layout (binding = 5) uniform samplerCube u_prefilter_map;
 layout (binding = 6) uniform sampler2D u_brdf_map;
 layout (binding = 7) uniform sampler2D u_ambient_occlusion_map;
 
-vec3 sample_irradiance_map(vec3 normal_world_space) {
-    return texture(u_irradiance_map, normalize(normal_world_space)).rgb;
+vec3 sample_irradiance_map(vec3 normal) {
+    return texture(u_irradiance_map, normalize(normal)).rgb;
 }
 
-vec3 sample_prefilter_map(vec3 reflection_dir_world_space, float roughness) {
+vec3 sample_prefilter_map(vec3 reflection_dir, float roughness) {
     const float MAX_REFLECTION_LOD = 4.0;
     float mip_level = roughness * MAX_REFLECTION_LOD;
-    return textureLod(u_prefilter_map, reflection_dir_world_space, mip_level).rgb;
+    return textureLod(u_prefilter_map, reflection_dir, mip_level).rgb;
 }
 
-vec2 sample_brdf_lut_map(vec3 view_dir_world_space, vec3 normal_world_space, float roughness) {
-    float NdotV = clamp(dot(normal_world_space, view_dir_world_space), 0.0, 1.0);
+vec2 sample_brdf_lut_map(vec3 view_dir, vec3 normal, float roughness) {
+    float NdotV = clamp(dot(normal, view_dir), 0.0, 1.0);
     return texture(u_brdf_map, vec2(NdotV, roughness)).rg;
 }
 
@@ -65,6 +65,9 @@ void main()
     vec3 view_dir = normalize(camera.position.xyz - frag_pos);
     vec3 reflect_dir = reflect(-view_dir, normal);
 
+    vec3 F0 = vec3(0.04);
+    F0 = mix(F0, albedo, metallic);
+
     vec3 luminance = calculate_directional_light_luminance(lights.directional_light, normal, view_dir, albedo, roughness, metallic);
  
     for (int i = 0; i < 4; i++) {
@@ -74,11 +77,7 @@ void main()
     for (int i = 0; i < 4; i++) {
         luminance += calculate_spot_light_luminance(lights.spot_lights[i], normal, view_dir, frag_pos, albedo, roughness, metallic);
     }
-    
-    vec3 normal_world_space = mat3(transpose(camera.view_matrix)) * normal;
-    vec3 view_dir_world_space = mat3(inverse(camera.view_matrix)) * normalize(camera.position.xyz - frag_pos);
-    vec3 reflection_dir_world_space = reflect(-view_dir_world_space, normal_world_space);
- 
+        
     vec3 irradiance = sample_irradiance_map(normal);
     vec3 prefilter = sample_prefilter_map(reflect_dir, roughness);
     vec2 brdf_lut = sample_brdf_lut_map(view_dir, normal, roughness);
@@ -88,7 +87,7 @@ void main()
         
     vec3 ambient = vec3(0.03) * albedo * ambient_occlusion;
     vec3 color   = ambient + luminance;
-        
+
     color = color / (color + vec3(1.0));
     color = pow(color, vec3(1.0/2.2));
 

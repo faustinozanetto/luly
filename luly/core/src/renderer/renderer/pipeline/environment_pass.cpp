@@ -28,7 +28,7 @@ namespace luly::renderer
         const glm::ivec2& viewport_size = renderer::get_viewport_size();
         std::vector<frame_buffer_attachment> attachments = {
             {
-                texture_internal_format::r16f,
+                texture_internal_format::r16,
                 texture_filtering::nearest,
                 texture_wrapping::none, viewport_size
             },

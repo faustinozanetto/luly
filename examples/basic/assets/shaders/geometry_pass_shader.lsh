@@ -21,19 +21,18 @@ struct geometry_out {
 layout (location = 0) out geometry_out o_geometry;
 
 void main() {
-    vec4 view_pos  = camera.view_matrix * u_transform * vec4(a_pos, 1.0f);
-    o_geometry.tex_coords = a_tex_coord;
-    o_geometry.frag_pos = vec3(u_transform * vec4(a_pos, 1.0));
-    
     mat3 normalMatrix = transpose(inverse(mat3(u_transform)));
     vec3 T = normalize(normalMatrix * a_tangent);
     vec3 N = normalize(normalMatrix * a_normals);
     T = normalize(T - dot(T, N) * N);
     vec3 B = cross(N, T);
-    o_geometry.tbn =  mat3(T, B, N);
+        
+    o_geometry.tbn = mat3(T, B, N);
     o_geometry.normal = N;
-    
-    gl_Position = camera.projection_matrix * view_pos;
+    o_geometry.tex_coords = a_tex_coord;
+    o_geometry.frag_pos = vec3(u_transform * vec4(a_pos, 1.0));
+        
+    gl_Position = camera.view_projection_matrix * u_transform * vec4(a_pos, 1.0);
 }
 
 #shader fragment
@@ -62,13 +61,13 @@ layout (binding = 4) uniform sampler2D u_ambient_occlusion_map;
 layout (binding = 5) uniform sampler2D u_opacity_map;
 
 // G-Buffer outputs
-layout(location = 0) out vec4 g_position;
+layout(location = 0) out vec3 g_position;
 layout(location = 1) out vec4 g_albedo_opacity;
-layout(location = 2) out vec4 g_normal;
-layout(location = 3) out vec4 g_roughmetalao;
+layout(location = 2) out vec3 g_normal;
+layout(location = 3) out vec3 g_roughmetalao;
         
 void main() {
-    g_position = vec4(o_geometry.frag_pos, 1.0);
+    g_position = o_geometry.frag_pos;
 
     vec3 albedo = u_material.albedo;
     if (u_material.albedo_map_enabled == 1)
@@ -79,13 +78,14 @@ void main() {
         opacity = texture(u_opacity_map, o_geometry.tex_coords * u_material.tilling).r;
 
     g_albedo_opacity = vec4(albedo, opacity);
-
-    vec3 normal = o_geometry.normal;
+        
     if (u_material.normal_map_enabled == 1) {
-        normal = texture(u_normal_map, o_geometry.tex_coords * u_material.tilling).rgb;
+        vec3 normal = texture(u_normal_map, o_geometry.tex_coords * u_material.tilling).rgb;
         normal = normalize(normal * 2.0 - 1.0);
+        g_normal = normalize(o_geometry.tbn * normal);
+    } else {
+        g_normal = o_geometry.normal;
     }
-    g_normal = vec4(normalize(o_geometry.tbn * normal), 1.0);
     
     float roughness = u_material.roughness;
     if (u_material.roughness_map_enabled == 1)
@@ -99,5 +99,5 @@ void main() {
     if (u_material.ambient_occlusion_map_enabled == 1)
         ambient_occlusion *= texture(u_ambient_occlusion_map, o_geometry.tex_coords * u_material.tilling).r;
     
-    g_roughmetalao = vec4(roughness, metallic, ambient_occlusion, 1.0);
+    g_roughmetalao = vec3(roughness, metallic, ambient_occlusion);
 }

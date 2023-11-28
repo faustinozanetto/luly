@@ -53,10 +53,15 @@ namespace luly::renderer
 
     enum class renderer_bit_mask
     {
-        depth,
-        stencil,
-        color
+        depth = 0x00000100,
+        stencil = 0x00000400,
+        color = 0x00004000
     };
+
+    inline renderer_bit_mask operator|(renderer_bit_mask lhs, renderer_bit_mask rhs)
+    {
+        return static_cast<renderer_bit_mask>(static_cast<int>(lhs) | static_cast<int>(rhs));
+    }
 
     class renderer
     {

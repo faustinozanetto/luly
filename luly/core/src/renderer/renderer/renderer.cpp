@@ -148,7 +148,7 @@ namespace luly::renderer
         glBlitFramebuffer(source_position.x, source_position.y, source_dimensions.x, source_dimensions.y,
                           target_position.x,
                           target_position.y, target_dimensions.x, target_dimensions.y,
-                          get_renderer_bit_mask_to_opengl(mask),
+                          static_cast<uint32_t>(mask),
                           texture_utils::get_texture_filtering_to_opengl(filter));
     }
 
@@ -253,7 +253,7 @@ namespace luly::renderer
         case renderer_bit_mask::color:
             return GL_COLOR_BUFFER_BIT;
         }
-        LY_ASSERT_MSG(false, "Invalid bit mask value!");
+        LY_ASSERT_MSG(false, "Invalid bit mask value!")
         return 0;
     }
 

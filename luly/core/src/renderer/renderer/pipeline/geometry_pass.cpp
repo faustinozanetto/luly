@@ -27,7 +27,7 @@ namespace luly::renderer
         std::vector<frame_buffer_attachment> attachments = {
             // Position
             {
-                texture_internal_format::rgba16,
+                texture_internal_format::rgb16,
                 texture_filtering::linear,
                 texture_wrapping::clamp_to_edge, viewport_size
             },
@@ -39,13 +39,13 @@ namespace luly::renderer
             },
             // Normal
             {
-                texture_internal_format::rgba16,
+                texture_internal_format::rgb16,
                 texture_filtering::linear,
                 texture_wrapping::clamp_to_edge, viewport_size
             },
             // Roughness-Metallic-AO
             {
-                texture_internal_format::rgba16,
+                texture_internal_format::rgb16,
                 texture_filtering::linear,
                 texture_wrapping::clamp_to_edge, viewport_size
             },
