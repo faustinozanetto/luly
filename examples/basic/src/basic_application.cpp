@@ -135,22 +135,51 @@ void basic_application::setup_scene()
         std::make_shared<luly::renderer::directional_light>(glm::vec3(0.85f), glm::vec3(0.8f, 0.3f, -5.0f))); /*
     */
 
-    auto sphere_mesh = luly::renderer::mesh_factory::create_sphere_mesh(16, 16, 0.1f);
-    for (int i = 0; i < 3; i++)
+    const std::shared_ptr<luly::renderer::mesh>& sphere_mesh = luly::renderer::mesh_factory::create_sphere_mesh(
+        10, 10, 0.05f);
+    float grid_gap = 0.15f;
+    int rows = 4;
+    int cols = 4;
+
+    float startX = -(rows - 1) * grid_gap * 0.5f;
+    float startY = -(cols - 1) * grid_gap * 0.5f;
+
+    for (int row = 0; row < rows; row++)
     {
-        const auto& point_light_actor = scene->create_actor("Point Light Emitter: " + std::to_string(i));
-        point_light_actor->add_component<luly::scene::point_light_component>(
-            std::make_shared<luly::renderer::point_light>(glm::vec3(0.85f), glm::vec3(0.0f)));
-        point_light_actor->add_component<luly::scene::model_renderer_component>(
-            luly::renderer::model_factory::create_model_from_meshes({
-                sphere_mesh
-            }));
-        point_light_actor->get_component<luly::scene::transform_component>().get_transform()->set_location({
-            -1 + i / 2, 0, 0.5f
-        });
-        point_light_actor->get_component<luly::scene::transform_component>().get_transform()->set_scale({
-            0.3f, 0.3f, 0.3f
-        });
+        for (int col = 0; col < cols; col++)
+        {
+            float xPos = startX + row * grid_gap;
+            float yPos = startY + col * grid_gap;
+
+            // Calculate color based on row and col
+            glm::vec3 color = glm::vec3(0.5f, 0.5f, 0.5f);
+            color.r += row / static_cast<float>(rows);
+            color.g += col / static_cast<float>(cols);
+
+            const std::shared_ptr<luly::scene::scene_actor>& point_light_actor = scene->create_actor(
+                std::format("Point Light: [{},{}]", row, col));
+
+            // Point light component with dynamic color
+            point_light_actor->add_component<luly::scene::point_light_component>(
+                std::make_shared<luly::renderer::point_light>(color));
+
+            // Model renderer component
+            point_light_actor->add_component<luly::scene::model_renderer_component>(
+                luly::renderer::model_factory::create_model_from_meshes({
+                    sphere_mesh
+                }));
+
+            // Transform component.
+            const luly::scene::transform_component& transform_component =
+                point_light_actor->get_component<luly::scene::transform_component>();
+
+            transform_component.get_transform()->set_location(
+                glm::vec3(xPos, yPos, 0.75f)
+            );
+            transform_component.get_transform()->set_scale({
+                0.3f, 0.3f, 0.3f
+            });
+        }
     }
 
     const std::shared_ptr<luly::scene::scene_actor>& skybox_actor = scene->create_actor("Skybox Actor");
@@ -166,7 +195,7 @@ void basic_application::setup_scene()
     spot_light_actor->get_component<luly::scene::transform_component>().get_transform()->set_location({0, 0, 2});
 */
     m_actor = scene->create_actor("Test Model");
-    m_actor->get_component<luly::scene::transform_component>().get_transform()->set_scale({1.5f, 1.5f, 1.5f});
+    m_actor->get_component<luly::scene::transform_component>().get_transform()->set_scale({2.0f, 2.0f, 2.0f});
 
     // Loading TV model and creating asset.
     const std::shared_ptr<luly::renderer::model> tv_model = luly::renderer::model_factory::create_model_from_file(

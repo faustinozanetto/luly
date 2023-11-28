@@ -17,7 +17,7 @@ struct spot_light {
 
 layout (std140, binding = 1) uniform lights_ubo
 {
-    point_light point_lights[4];
-    spot_light spot_lights[4];
+    point_light point_lights[16];
+    spot_light spot_lights[16];
     directional_light directional_light;
 } lights;

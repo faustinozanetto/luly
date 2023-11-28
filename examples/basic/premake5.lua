@@ -33,13 +33,19 @@ project "basic"
         "glad",
         "stb",
     }
-    
+
     filter "configurations:debug"
         defines "LY_DEBUG"
         runtime "Debug"
         symbols "on"
+        links {
+            "%{library_dirs.assimp_debug}"
+        }
     
     filter "configurations:release"
         defines "LY_RELEASE;NDEBUG"
         runtime "Release"
         optimize "on"
+        links {
+            "%{library_dirs.assimp_release}"
+        } 

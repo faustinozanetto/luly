@@ -68,14 +68,14 @@ void main()
     vec3 F0 = vec3(0.04);
     F0 = mix(F0, albedo, metallic);
 
-    vec3 luminance = calculate_directional_light_luminance(lights.directional_light, normal, view_dir, albedo, roughness, metallic);
+    vec3 luminance = calculate_directional_light_luminance(lights.directional_light, normal, view_dir, albedo, F0, roughness, metallic);
  
-    for (int i = 0; i < 4; i++) {
-        luminance += calculate_point_light_luminance(lights.point_lights[i], normal, view_dir, frag_pos, albedo, roughness, metallic);   
+    for (int i = 0; i < 16; i++) {
+        luminance += calculate_point_light_luminance(lights.point_lights[i], normal, view_dir, frag_pos, albedo, F0, roughness, metallic);   
     }
         
-    for (int i = 0; i < 4; i++) {
-        luminance += calculate_spot_light_luminance(lights.spot_lights[i], normal, view_dir, frag_pos, albedo, roughness, metallic);
+    for (int i = 0; i < 16; i++) {
+        luminance += calculate_spot_light_luminance(lights.spot_lights[i], normal, view_dir, frag_pos, albedo, F0, roughness, metallic);
     }
         
     vec3 irradiance = sample_irradiance_map(normal);
@@ -83,7 +83,7 @@ void main()
     vec2 brdf_lut = sample_brdf_lut_map(view_dir, normal, roughness);
 
     luminance += calculate_ambient_ibl(albedo, normal, view_dir, irradiance,
-         prefilter, brdf_lut, roughness, metallic, ambient_occlusion);
+         prefilter, brdf_lut, F0, roughness, metallic, ambient_occlusion);
         
     vec3 ambient = vec3(0.03) * albedo * ambient_occlusion;
     vec3 color   = ambient + luminance;

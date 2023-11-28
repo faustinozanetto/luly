@@ -54,14 +54,12 @@ vec3 cook_torrance_brdf(vec3 normal, vec3 view_dir, vec3 light_dir, float roughn
     return D * F * G / (4.0 * max(dot(normal, view_dir), 0.001) * max(dot(normal, light_dir), 0.001));
 }
 
-vec3 calculate_directional_light_luminance(directional_light dir_light, vec3 normal, vec3 view_dir, vec3 albedo, float roughness, float metallic) {
+vec3 calculate_directional_light_luminance(directional_light dir_light, vec3 normal, vec3 view_dir, vec3 albedo, vec3 F0, float roughness, float metallic) {
     // Lambertian diffuse reflection
     float NdotL = max(dot(normalize(normal), normalize(-dir_light.direction.xyz)), 0.0);
     vec3 diffuse = albedo / PI;
 
     // Cook-Torrance specular reflection
-    vec3 F0 = vec3(0.04); // Default value for non-metallic surfaces
-    F0 = mix(F0, albedo, metallic).rgb;
     vec3 specular = cook_torrance_brdf(normalize(normal), view_dir, normalize(-dir_light.direction.xyz), roughness, F0);
 
     // Final lighting equation
@@ -71,17 +69,17 @@ vec3 calculate_directional_light_luminance(directional_light dir_light, vec3 nor
     return luminance;
 }
 
-vec3 calculate_point_light_luminance(point_light point_light, vec3 normal, vec3 view_dir, vec3 frag_pos, vec3 albedo, float roughness, float metallic) {
+vec3 calculate_point_light_luminance(point_light point_light, vec3 normal, vec3 view_dir, vec3 frag_pos, vec3 albedo, vec3 F0, float roughness, float metallic) {
     // Lambertian diffuse reflection
     vec3 light_dir = normalize(point_light.position.xyz - frag_pos);
+    
     float distance = length(point_light.position.xyz - frag_pos);
     float attenuation = 1.0 / (point_light_constant + point_light_linear * distance + point_light_quadratic * (distance * distance));
     float NdotL = max(dot(normalize(normal), light_dir), 0.0);
+    
     vec3 diffuse = albedo / PI;
 
     // Cook-Torrance specular reflection
-    vec3 F0 = vec3(0.04); // Default value for non-metallic surfaces
-    F0 = mix(F0, albedo, metallic).rgb;
     vec3 specular = cook_torrance_brdf(normalize(normal), view_dir, light_dir, roughness, F0);
 
     // Final lighting equation with attenuation
@@ -91,7 +89,7 @@ vec3 calculate_point_light_luminance(point_light point_light, vec3 normal, vec3 
     return luminance;
 }
 
-vec3 calculate_spot_light_luminance(spot_light spot_light, vec3 normal, vec3 view_dir, vec3 frag_pos, vec3 albedo, float roughness, float metallic) {
+vec3 calculate_spot_light_luminance(spot_light spot_light, vec3 normal, vec3 view_dir, vec3 frag_pos, vec3 albedo, vec3 F0, float roughness, float metallic) {
     // Lambertian diffuse reflection
     vec3 light_dir = normalize(spot_light.position.xyz - frag_pos);
     float distance = length(spot_light.position.xyz - frag_pos);
@@ -107,8 +105,6 @@ vec3 calculate_spot_light_luminance(spot_light spot_light, vec3 normal, vec3 vie
     vec3 diffuse = albedo / PI;
 
     // Cook-Torrance specular reflection
-    vec3 F0 = vec3(0.04); // Default value for non-metallic surfaces
-    F0 = mix(F0, albedo, metallic).rgb;
     vec3 specular = cook_torrance_brdf(normalize(normal), view_dir, light_dir, roughness, F0);
 
     // Final lighting equation with attenuation and spotlight factor
@@ -118,10 +114,7 @@ vec3 calculate_spot_light_luminance(spot_light spot_light, vec3 normal, vec3 vie
     return luminance;
 }
 
-vec3 calculate_ambient_ibl(vec3 albedo, vec3 normal, vec3 view_dir, vec3 irradiance, vec3 prefilter, vec2 brdf_lut, float roughness, float metallic, float ambient_occlusion) {
-    vec3 F0 = vec3(0.04);
-    F0 = mix(F0, albedo, metallic);
-
+vec3 calculate_ambient_ibl(vec3 albedo, vec3 normal, vec3 view_dir, vec3 irradiance, vec3 prefilter, vec2 brdf_lut, vec3 F0, float roughness, float metallic, float ambient_occlusion) {
     vec3 F = fresnel_schlick_roughness(clamp(dot(normal, view_dir), 0.0, 1.0), F0, roughness);
 
     vec3 kS = F;

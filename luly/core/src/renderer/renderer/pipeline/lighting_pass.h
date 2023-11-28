@@ -31,8 +31,8 @@ namespace luly::renderer
 
     struct lights_data
     {
-        point_light_data point_lights[4];
-        spot_light_data spot_lights[4];
+        point_light_data point_lights[16];
+        spot_light_data spot_lights[16];
         directional_light_data directional_light;
     };
 
