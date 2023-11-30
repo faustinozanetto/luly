@@ -58,6 +58,8 @@ void basic_application::on_update()
 
     luly::ui::engine_ui::begin_frame();
 
+    current_scene->get_camera_manager()->get_perspective_camera_controller()->on_update(luly::app_time::get_delta_time());
+    
     const std::shared_ptr<luly::renderer::perspective_camera>& camera = current_scene->get_camera_manager()->
         get_perspective_camera();
 
@@ -70,56 +72,6 @@ void basic_application::on_update()
 
 void basic_application::on_handle_event(luly::events::base_event& event)
 {
-    luly::events::event_dispatcher dispatcher(event);
-    dispatcher.dispatch<luly::events::key_pressed_event>(BIND_EVENT_FN(basic_application::on_key_pressed_event));
-}
-
-bool basic_application::on_key_pressed_event(const luly::events::key_pressed_event& key_pressed_event)
-{
-    const std::shared_ptr<luly::scene::scene>& current_scene = luly::scene::scene_manager::get().get_current_scene();
-    if (!current_scene) return false;
-
-    const std::shared_ptr<luly::renderer::perspective_camera_controller>& camera_controller = current_scene->
-        get_camera_manager()->get_perspective_camera_controller();
-
-    if (key_pressed_event.get_key_code() == luly::input::key::w)
-    {
-        camera_controller->process_keyboard_input(
-            luly::renderer::camera_keyboard_direction::forward, luly::app_time::get_delta_time());
-        return true;
-    }
-    if (key_pressed_event.get_key_code() == luly::input::key::s)
-    {
-        camera_controller->process_keyboard_input(
-            luly::renderer::camera_keyboard_direction::backward, luly::app_time::get_delta_time());
-        return true;
-    }
-    if (key_pressed_event.get_key_code() == luly::input::key::a)
-    {
-        camera_controller->process_keyboard_input(
-            luly::renderer::camera_keyboard_direction::left, luly::app_time::get_delta_time());
-        return true;
-    }
-    if (key_pressed_event.get_key_code() == luly::input::key::d)
-    {
-        camera_controller->process_keyboard_input(
-            luly::renderer::camera_keyboard_direction::right, luly::app_time::get_delta_time());
-        return true;
-    }
-    if (key_pressed_event.get_key_code() == luly::input::key::e)
-    {
-        camera_controller->process_keyboard_input(
-            luly::renderer::camera_keyboard_direction::down, luly::app_time::get_delta_time());
-        return true;
-    }
-    if (key_pressed_event.get_key_code() == luly::input::key::q)
-    {
-        camera_controller->process_keyboard_input(
-            luly::renderer::camera_keyboard_direction::up, luly::app_time::get_delta_time());
-        return true;
-    }
-
-    return false;
 }
 
 void basic_application::setup_scene()
@@ -129,17 +81,30 @@ void basic_application::setup_scene()
     luly::scene::scene_manager::get().add_scene(scene);
     luly::scene::scene_manager::get().switch_scene(scene);
 
-    /*
+    // Create background actor
+    const std::shared_ptr<luly::scene::scene_actor>& background_actor = scene->create_actor("Background Actor");
+    const std::shared_ptr<luly::renderer::model> background_model =
+        luly::renderer::model_factory::create_model_from_file(
+            "assets/models/floor.obj");
+    const std::shared_ptr<luly::assets::asset>& background_model_asset = luly::assets::asset_factory::create_asset<
+        luly::renderer::model>(
+        "background-model", luly::assets::asset_type::model, background_model);
+    luly::scene::model_renderer_component& background_model_renderer_component = background_actor->add_component<
+        luly::scene::model_renderer_component>(
+        background_model_asset->get_data<luly::renderer::model>());
+    background_model_renderer_component.set_casts_shadows(false);
+    background_actor->get_component<luly::scene::transform_component>().get_transform()->set_scale({5, 1, 5});
+
     const auto& dir_light_actor = scene->create_actor("Light Emitter");
     dir_light_actor->add_component<luly::scene::directional_light_component>(
         std::make_shared<luly::renderer::directional_light>(glm::vec3(0.85f), glm::vec3(0.8f, 0.3f, -5.0f))); /*
-    */
-
+    
+    /*
     const std::shared_ptr<luly::renderer::mesh>& sphere_mesh = luly::renderer::mesh_factory::create_sphere_mesh(
         10, 10, 0.05f);
-    float grid_gap = 0.15f;
-    int rows = 4;
-    int cols = 4;
+    float grid_gap = 0.2f;
+    int rows = 1;
+    int cols = 1;
 
     float startX = -(rows - 1) * grid_gap * 0.5f;
     float startY = -(cols - 1) * grid_gap * 0.5f;
@@ -181,7 +146,7 @@ void basic_application::setup_scene()
             });
         }
     }
-
+*/
     const std::shared_ptr<luly::scene::scene_actor>& skybox_actor = scene->create_actor("Skybox Actor");
     skybox_actor->add_component<luly::scene::skybox_component>(
         luly::renderer::texture_factory::create_environment_texture_from_file(
@@ -194,6 +159,7 @@ void basic_application::setup_scene()
                                                      25.0f));
     spot_light_actor->get_component<luly::scene::transform_component>().get_transform()->set_location({0, 0, 2});
 */
+
     m_actor = scene->create_actor("Test Model");
     m_actor->get_component<luly::scene::transform_component>().get_transform()->set_scale({2.0f, 2.0f, 2.0f});
 

@@ -3,13 +3,10 @@
 
 namespace luly::scene
 {
-    model_renderer_component::model_renderer_component()
-    {
-    }
-
     model_renderer_component::model_renderer_component(const std::shared_ptr<renderer::model>& model)
     {
         m_model = model;
+        m_casts_shadows = true;
     }
 
     model_renderer_component::~model_renderer_component()

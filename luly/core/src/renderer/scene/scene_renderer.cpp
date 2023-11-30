@@ -32,6 +32,8 @@ namespace luly::renderer
         update_camera_data();
         update_camera_buffer();
 
+        s_data.shadows_pass->execute();
+
         perform_geometry_pass();
 
         s_data.ambient_occlusion_pass->execute();
@@ -62,6 +64,8 @@ namespace luly::renderer
         LY_TRACE("Started creating pipeling passes...");
         s_data.geometry_pass = std::make_shared<geometry_pass>();
 
+        s_data.shadows_pass = std::make_shared<shadows_pass>();
+
         s_data.environment_pass = std::make_shared<environment_pass>();
         s_data.environment_pass->add_input({s_data.geometry_pass, "geometry_pass_input"});
 
@@ -72,6 +76,7 @@ namespace luly::renderer
         s_data.lighting_pass->add_input({s_data.geometry_pass, "geometry_pass_input"});
         s_data.lighting_pass->add_input({s_data.environment_pass, "environment_pass_input"});
         s_data.lighting_pass->add_input({s_data.ambient_occlusion_pass, "ambient_occlusion_pass_input"});
+        s_data.lighting_pass->add_input({s_data.shadows_pass, "shadows_pass_input"});
 
         s_data.skybox_pass = std::make_shared<skybox_pass>();
         s_data.skybox_pass->add_input({s_data.environment_pass, "environment_pass_input"});
@@ -98,6 +103,8 @@ namespace luly::renderer
         s_data.camera_data.view_projection_matrix = s_data.camera_data.
                                                            projection_matrix * s_data.camera_data.view_matrix;
         s_data.camera_data.position = glm::vec4(s_data.camera->get_position(), 1.0);
+        s_data.camera_data.near_clip = s_data.camera->get_near_clip();
+        s_data.camera_data.far_clip = s_data.camera->get_far_clip();
     }
 
     void scene_renderer::update_camera_buffer()

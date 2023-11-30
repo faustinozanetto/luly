@@ -27,7 +27,7 @@ namespace luly::renderer
 
         std::vector<frame_buffer_attachment> attachments = {
             {
-                texture_internal_format::rgba16,
+                texture_internal_format::rgba16f,
                 texture_filtering::linear,
                 texture_wrapping::clamp_to_edge, viewport_size
             },
@@ -85,6 +85,7 @@ namespace luly::renderer
         renderer::blit_frame_buffer({0, 0}, {width, height}, {0, 0}, {width, height}, renderer_bit_mask::depth,
                                     texture_filtering::nearest);
 
+
         // Bind geometry pass outputs.
         renderer::bind_texture(0, geometry_position_output.output);
         renderer::bind_texture(1, geometry_albedo_output.output);
@@ -94,6 +95,14 @@ namespace luly::renderer
         renderer::bind_texture(5, environment_pass_input.render_pass->get_output("prefilter_output").output);
         renderer::bind_texture(6, environment_pass_input.render_pass->get_output("brdf_output").output);
         renderer::bind_texture(7, ambient_occlusion_pass_input.render_pass->get_output("ssao_blur_output").output);
+        renderer::bind_texture(8, m_directional_light->get_shadow_maps());
+
+        // Bind directional light data.
+        m_lighting_shader->set_int("u_cascades_count", m_directional_light->get_shadow_cascade_levels().size());
+        for (int i = 0; i < m_directional_light->get_shadow_cascade_levels().size(); i++)
+        {
+            m_lighting_shader->set_float("u_cascade_plane_distances[" + std::to_string(i) + "]", m_directional_light->get_shadow_cascade_levels().at(i));
+        }
 
         // Render screen quad mesh.
         renderer::submit_mesh(m_screen_mesh);
@@ -123,6 +132,7 @@ namespace luly::renderer
         {
             point_light.color = glm::vec4(0);
             point_light.position = glm::vec4(0);
+            point_light.shadow_map = glm::vec4(0);
         }
 
         for (spot_light_data spot_light : m_lights_data.spot_lights)
@@ -152,6 +162,7 @@ namespace luly::renderer
             point_light_data point_light_data;
             point_light_data.position = glm::vec4(point_light->get_position(), 1.0);
             point_light_data.color = glm::vec4(point_light->get_color(), point_light->get_intensity());
+            point_light_data.shadow_map = glm::vec4(point_light->get_shadow_map_far_plane());
 
             m_lights_data.point_lights[point_lights_count++] = point_light_data;
         }
@@ -185,6 +196,7 @@ namespace luly::renderer
             directional_light_data.color =
                 glm::vec4(directional_light->get_color(), directional_light->get_intensity());
 
+            m_directional_light = directional_light;
             m_lights_data.directional_light = directional_light_data;
         }
     }

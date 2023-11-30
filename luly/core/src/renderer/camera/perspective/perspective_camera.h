@@ -16,6 +16,7 @@ namespace luly::renderer
 
         /* Getters*/
         float get_fov() const { return m_fov; }
+        std::vector<glm::vec4> get_frustum_corners_world_space(const glm::mat4& projection_matrix, const glm::mat4& view_matrix);
 
         /* Setters */
         void set_fov(float fov);

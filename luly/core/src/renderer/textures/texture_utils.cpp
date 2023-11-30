@@ -346,7 +346,7 @@ namespace luly::renderer
         case texture_internal_format::r11g11b10:
             return GL_R11F_G11F_B10F;
         case texture_internal_format::depth_component16:
-            return GL_DEPTH_COMPONENT16;
+            return GL_DEPTH_COMPONENT;
         case texture_internal_format::depth_component24:
             return GL_DEPTH_COMPONENT24;
         case texture_internal_format::depth_component32:

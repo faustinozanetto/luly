@@ -41,6 +41,12 @@ namespace luly::ui
             {
                 point_light->set_intensity(intensity);
             }
+
+            float shadow_map_far_plane = point_light->get_shadow_map_far_plane();
+            if (ui_utils::draw_property("Shadow Map Far Plane", shadow_map_far_plane, 0.01f, 350.0f, 0.01f))
+            {
+                point_light->set_shadow_map_far_plane(shadow_map_far_plane);
+            }
         }
         else
         {

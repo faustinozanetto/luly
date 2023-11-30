@@ -7,12 +7,15 @@
 
 #include <glm/glm.hpp>
 
+#include "renderer/lights/directional_light.h"
+
 namespace luly::renderer
 {
     struct point_light_data
     {
         glm::vec4 color;
         glm::vec4 position;
+        glm::vec4 shadow_map;
     };
 
     struct spot_light_data
@@ -57,6 +60,7 @@ namespace luly::renderer
         lights_data m_lights_data;
 
         std::shared_ptr<uniform_buffer_object> m_lights_ubo;
+        std::shared_ptr<directional_light> m_directional_light;
         std::shared_ptr<shader> m_lighting_shader;
         std::shared_ptr<mesh> m_screen_mesh;
     };

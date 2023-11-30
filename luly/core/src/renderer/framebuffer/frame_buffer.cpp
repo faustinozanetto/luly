@@ -63,7 +63,29 @@ namespace luly::renderer
         m_depth_attachment_data = depth_attachment;
         m_attachments = {};
         m_depth_attachment = {};
-        
+
+        LY_TRACE("  - Width: {0} px", m_width);
+        LY_TRACE("  - Height: {0} px", m_height);
+        LY_TRACE("  - Attachments Count: {0}", m_attachments_data.size());
+        LY_TRACE("  - Has Depth Attachment: '{0}'", m_has_depth_attachment ? "true" : "false");
+
+        pre_initialize();
+
+        LY_TRACE("Frame buffer created successfully.");
+    }
+
+    frame_buffer::frame_buffer(int width, int height, const frame_buffer_attachment& depth_attachment)
+    {
+        LY_TRACE("Started creating frame buffer...");
+        m_width = width;
+        m_height = height;
+        m_has_depth_attachment = true;
+
+        m_attachments_data = {};
+        m_depth_attachment_data = depth_attachment;
+        m_attachments = {};
+        m_depth_attachment = {};
+
         LY_TRACE("  - Width: {0} px", m_width);
         LY_TRACE("  - Height: {0} px", m_height);
         LY_TRACE("  - Attachments Count: {0}", m_attachments_data.size());

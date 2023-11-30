@@ -24,20 +24,6 @@ namespace luly::renderer
 
     void environment_pass::initialize()
     {
-        // Create pass frame buffer.
-        const glm::ivec2& viewport_size = renderer::get_viewport_size();
-        std::vector<frame_buffer_attachment> attachments = {
-            {
-                texture_internal_format::r16,
-                texture_filtering::nearest,
-                texture_wrapping::none, viewport_size
-            },
-        };
-
-        m_fbo = std::make_shared<frame_buffer>(
-            viewport_size.x, viewport_size.y, attachments);
-        m_fbo->initialize();
-
         // Setup environment
         setup_environment();
     }

@@ -55,7 +55,7 @@ namespace luly::renderer
 
     void material::bind_default(const std::shared_ptr<shader>& shader)
     {
-        shader->set_vec_float3("u_material.albedo", {0.1f, 0.1f, 0.1f});
+        shader->set_vec_float3("u_material.albedo", {0.85f, 0.85f, 0.85f});
         shader->set_float("u_material.roughness", 0.0f);
         shader->set_float("u_material.metallic", 0.0f);
         shader->set_float("u_material.ambient_occlusion", 1.0f);

@@ -30,6 +30,15 @@ layout (binding = 4) uniform samplerCube u_irradiance_map;
 layout (binding = 5) uniform samplerCube u_prefilter_map;
 layout (binding = 6) uniform sampler2D u_brdf_map;
 layout (binding = 7) uniform sampler2D u_ambient_occlusion_map;
+layout (binding = 8) uniform sampler2DArray u_cascades_shadow_map;
+        
+uniform int u_cascades_count;
+uniform float u_cascade_plane_distances[16];
+
+layout (std140, binding = 2) uniform LightSpaceMatrices
+{
+    mat4 u_light_space_matrices[16];
+};
 
 vec3 sample_irradiance_map(vec3 normal) {
     return texture(u_irradiance_map, normalize(normal)).rgb;
@@ -46,12 +55,143 @@ vec2 sample_brdf_lut_map(vec3 view_dir, vec3 normal, float roughness) {
     return texture(u_brdf_map, vec2(NdotV, roughness)).rg;
 }
 
+float calculate_directional_light_shadow(vec3 frag_pos, vec3 normal, vec3 light_dir) {
+    vec4 frag_pos_view_space = camera.view_matrix * vec4(frag_pos,1.0);
+    float depth_value = abs(frag_pos_view_space.z);
+    
+    int layer = -1;
+    for (int i = 0; i < u_cascades_count; ++i)
+    {
+        if (depth_value < u_cascade_plane_distances[i])
+        {
+            layer = i;
+            break;
+        }
+    }
+    if (layer == -1)
+    {
+        layer = u_cascades_count;
+    }
+    
+    vec4 frag_pos_light_space = u_light_space_matrices[layer] * vec4(frag_pos, 1.0);
+    vec3 projection_coords = frag_pos_light_space.xyz / frag_pos_light_space.w;
+    // transform to [0,1] range
+    projection_coords = projection_coords * 0.5 + 0.5;
+    
+    float current_depth = projection_coords.z;
+    if (current_depth  > 1.0)
+    {
+        return 0.0;
+    }
+    
+    float inverse_cascade_factor = 0.003f;
+    float bias = max(0.005 * (1.0 - clamp(dot(normal, light_dir), 0.0, 1.0)), 0.005f);
+    if (layer == u_cascades_count)
+    {
+        bias *= 1 / max(camera.far_clip * inverse_cascade_factor, 1.0f);
+    }
+    else
+    {
+        bias *= 1 / max(u_cascade_plane_distances[layer] * inverse_cascade_factor, 1.0f);
+    }
+    
+    float shadow = 0.0;
+    vec2 texel_size = 1.0 / vec2(textureSize(u_cascades_shadow_map, 0));
+    for(int x = -1; x <= 1; ++x)
+    {
+        for(int y = -1; y <= 1; ++y)
+        {
+            float pcfDepth = texture(u_cascades_shadow_map, vec3(projection_coords.xy + vec2(x, y) * texel_size, layer)).r;
+            shadow += (current_depth - bias) > pcfDepth ? 1.0 : 0.0;
+        }
+    }
+    shadow /= 9.0;
+    
+    if(projection_coords.z > 1.0)
+    {
+        shadow = 0.0;
+    }
+    return shadow;
+}
+
+vec3 calculate_directional_light_luminance(directional_light dir_light, vec3 normal, vec3 view_dir, vec3 frag_pos, vec3 albedo, vec3 F0, float roughness, float metallic) {
+    vec3 L = normalize(-dir_light.direction.xyz);
+    vec3 H = normalize(view_dir + L);
+    
+    vec3 radiance = dir_light.color.rgb;
+
+    // cook-torrance brdf
+    float NDF = distribution_ggx(normal, H, roughness);
+    float G = geometry_smith(normal, view_dir, L, roughness);
+    vec3 F = fresnel_schlick(max(dot(H, view_dir), 0.0), F0);
+    vec3 kS = F;
+    vec3 kD = vec3(1.0) - kS;
+    kD *= 1.0 - metallic;
+    vec3 numerator = NDF * G * F;
+    float denominator = 4.0 * max(dot(normal, view_dir), 0.0) * max(dot(normal, L), 0.0);
+    vec3 specular = numerator / max(denominator, 0.001);
+    float NdotL = max(dot(normal, L), 0.0);
+    float shadow = calculate_directional_light_shadow(frag_pos, normal, L);
+    vec3 final = (1 - shadow) * (kD * albedo / PI + specular) * radiance * NdotL;
+    
+    return final;
+}
+
+vec3 calculate_point_light_luminance(point_light point_light, vec3 normal, vec3 view_dir, vec3 reflect_dir, vec3 frag_pos, vec3 albedo, vec3 F0, float roughness, float metallic) {
+/*    
+// Lambertian diffuse reflection
+    vec3 light_dir = normalize(point_light.position.xyz - frag_pos);
+    
+    float distance = length(point_light.position.xyz - frag_pos);
+    float attenuation = 1.0 / (point_light_constant + point_light_linear * distance + point_light_quadratic * (distance * distance));
+    float NdotL = max(dot(normalize(normal), light_dir), 0.0);
+    
+    vec3 diffuse = albedo / PI;
+    
+    // Cook-Torrance specular reflection
+    vec3 specular = cook_torrance_brdf(normalize(normal), view_dir, light_dir, roughness, F0);
+    
+    // Final lighting equation with attenuation
+    float intensity = point_light.color.a;
+    vec3 luminance = attenuation * NdotL * max(diffuse + specular, vec3(0.0)) * point_light.color.rgb * intensity;
+    
+        
+    float shadow = calculate_point_shadow(point_light, frag_pos);
+        
+    return (1-shadow) * luminance;
+*/
+    vec3 L = normalize(point_light.position.xyz - frag_pos);
+    vec3 H = normalize(view_dir + L);
+    
+    float distance = length(point_light.position.xyz - frag_pos);
+    float attenuation = 1.0 / (point_light_constant + point_light_linear * distance + point_light_quadratic * (distance * distance));
+    vec3 radiance = point_light.color.rgb * attenuation;
+    
+    // cook-torrance brdf
+    float NDF = distribution_ggx(normal, H, roughness);
+    float G = geometry_smith(normal, view_dir, L, roughness);
+    vec3 F = fresnel_schlick(max(dot(H, view_dir), 0.0), F0);
+    vec3 kS = F;
+    vec3 kD = vec3(1.0) - kS;
+    kD *= 1.0 - metallic;
+    vec3 numerator = NDF * G * F;
+    float denominator = 4.0 * max(dot(normal, view_dir), 0.0) * max(dot(normal, L), 0.0);
+    vec3 specular = numerator / max(denominator, 0.001);
+    // add to outgoing radiance Lo
+    float NdotL = max(dot(normal, L), 0.0);
+    
+    //float shadow = 0;
+    vec3 final = (kD * albedo / PI + specular) * radiance * NdotL;
+  
+    return final;
+}
+        
 void main()
 {
     vec3 frag_pos = texture(u_position_map, o_tex_coord).rgb;
     vec4 full_albedo = texture(u_albedo_map, o_tex_coord);
     vec3 albedo = pow(full_albedo.rgb, vec3(2.2));
-    vec3 normal = texture(u_normal_map, o_tex_coord).rgb;
+    vec3 normal = normalize(texture(u_normal_map, o_tex_coord).rgb);
     vec3 rough_metal_ao = texture(u_rough_metal_ao_map, o_tex_coord).rgb;
         
     float opacity = full_albedo.a;
@@ -60,7 +200,8 @@ void main()
     float ambient_occlusion = rough_metal_ao.b;
         
     float world_ambient_occlusion = texture(u_ambient_occlusion_map, o_tex_coord).r;
-    ambient_occlusion *= world_ambient_occlusion;        
+  //  ambient_occlusion *= world_ambient_occlusion;
+    //ambient_occlusion /= 2;
             
     vec3 view_dir = normalize(camera.position.xyz - frag_pos);
     vec3 reflect_dir = reflect(-view_dir, normal);
@@ -68,28 +209,30 @@ void main()
     vec3 F0 = vec3(0.04);
     F0 = mix(F0, albedo, metallic);
 
-    vec3 luminance = calculate_directional_light_luminance(lights.directional_light, normal, view_dir, albedo, F0, roughness, metallic);
- 
-    for (int i = 0; i < 16; i++) {
-        luminance += calculate_point_light_luminance(lights.point_lights[i], normal, view_dir, frag_pos, albedo, F0, roughness, metallic);   
-    }
+    vec3 luminance = calculate_directional_light_luminance(lights.directional_light, normal, view_dir, frag_pos, albedo, F0, roughness, metallic);
+ /*
         
+    for (int i = 0; i < 1; i++) {
+        luminance += calculate_point_light_luminance(lights.point_lights[i], normal, view_dir, reflect_dir, frag_pos, albedo, F0, roughness, metallic);   
+    }
+      /*
     for (int i = 0; i < 16; i++) {
         luminance += calculate_spot_light_luminance(lights.spot_lights[i], normal, view_dir, frag_pos, albedo, F0, roughness, metallic);
     }
-        
+        */
     vec3 irradiance = sample_irradiance_map(normal);
     vec3 prefilter = sample_prefilter_map(reflect_dir, roughness);
     vec2 brdf_lut = sample_brdf_lut_map(view_dir, normal, roughness);
 
     luminance += calculate_ambient_ibl(albedo, normal, view_dir, irradiance,
          prefilter, brdf_lut, F0, roughness, metallic, ambient_occlusion);
-        
-    vec3 ambient = vec3(0.03) * albedo * ambient_occlusion;
-    vec3 color   = ambient + luminance;
+   
+    vec3 ambient = vec3(0.3) * albedo * ambient_occlusion;
+
+    vec3 color = ambient + luminance;
 
     color = color / (color + vec3(1.0));
     color = pow(color, vec3(1.0/2.2));
 
-    frag_color = vec4(color, opacity);
+    frag_color = vec4(color, 1.0);
 }

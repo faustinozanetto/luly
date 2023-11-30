@@ -168,8 +168,6 @@ namespace luly::renderer
         LY_TRACE(" - OpenGL version supported: {0}", version);
         LY_TRACE(" - Vendor: {0}", vendor);
         LY_TRACE(" - GLSL Version: {0}", glsl_version);
-
-        glEnable(GL_DEPTH_TEST);
     }
 
     void renderer::initialize_debug()
@@ -260,6 +258,8 @@ namespace luly::renderer
     void renderer::initialize_data()
     {
         s_data.clear_color = glm::vec4(0.85f);
+        set_state(renderer_state::depth, true);
+        glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     }
 
     void renderer::open_gl_message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,

@@ -54,6 +54,7 @@ vec3 cook_torrance_brdf(vec3 normal, vec3 view_dir, vec3 light_dir, float roughn
     return D * F * G / (4.0 * max(dot(normal, view_dir), 0.001) * max(dot(normal, light_dir), 0.001));
 }
 
+/*
 vec3 calculate_directional_light_luminance(directional_light dir_light, vec3 normal, vec3 view_dir, vec3 albedo, vec3 F0, float roughness, float metallic) {
     // Lambertian diffuse reflection
     float NdotL = max(dot(normalize(normal), normalize(-dir_light.direction.xyz)), 0.0);
@@ -69,6 +70,7 @@ vec3 calculate_directional_light_luminance(directional_light dir_light, vec3 nor
     return luminance;
 }
 
+/*
 vec3 calculate_point_light_luminance(point_light point_light, vec3 normal, vec3 view_dir, vec3 frag_pos, vec3 albedo, vec3 F0, float roughness, float metallic) {
     // Lambertian diffuse reflection
     vec3 light_dir = normalize(point_light.position.xyz - frag_pos);
@@ -88,6 +90,7 @@ vec3 calculate_point_light_luminance(point_light point_light, vec3 normal, vec3 
 
     return luminance;
 }
+*/
 
 vec3 calculate_spot_light_luminance(spot_light spot_light, vec3 normal, vec3 view_dir, vec3 frag_pos, vec3 albedo, vec3 F0, float roughness, float metallic) {
     // Lambertian diffuse reflection

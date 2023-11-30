@@ -11,6 +11,7 @@
 #include "renderer/renderer/pipeline/ambient_occlusion_pass.h"
 #include "renderer/renderer/pipeline/environment_pass.h"
 #include "renderer/renderer/pipeline/lighting_pass.h"
+#include "renderer/renderer/pipeline/shadows_pass.h"
 #include "renderer/renderer/pipeline/skybox_pass.h"
 
 namespace luly::renderer
@@ -21,11 +22,14 @@ namespace luly::renderer
         glm::mat4 projection_matrix;
         glm::mat4 view_projection_matrix;
         glm::vec4 position;
+        float near_clip;
+        float far_clip;
     };
 
     struct scene_renderer_data
     {
         /* Passes */
+        std::shared_ptr<shadows_pass> shadows_pass;
         std::shared_ptr<geometry_pass> geometry_pass;
         std::shared_ptr<environment_pass> environment_pass;
         std::shared_ptr<lighting_pass> lighting_pass;

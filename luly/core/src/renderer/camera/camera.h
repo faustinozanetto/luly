@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <glm/glm.hpp>
+#include <vector>
 
 namespace luly::renderer
 {
@@ -29,6 +30,8 @@ namespace luly::renderer
 
         /* Setters */
         void set_position(const glm::vec3& position);
+        void set_pitch(float pitch) { m_pitch = pitch; }
+        void set_yaw(float yaw) { m_yaw = yaw; }
         void set_near_clip(float near_clip);
         void set_far_clip(float far_clip);
 

@@ -27,6 +27,7 @@ namespace luly::renderer
         frame_buffer(int width, int height, const std::vector<frame_buffer_attachment>& attachments);
         frame_buffer(int width, int height, const std::vector<frame_buffer_attachment>& attachments,
                      const frame_buffer_attachment& depth_attachment);
+        frame_buffer(int width, int height, const frame_buffer_attachment& depth_attachment);
         ~frame_buffer() override;
 
         /* Getters */

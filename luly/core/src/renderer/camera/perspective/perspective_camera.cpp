@@ -30,6 +30,34 @@ namespace luly::renderer
         m_projection_matrix = glm::perspective(glm::radians(m_fov), aspect_ratio, m_near_clip, m_far_clip);
     }
 
+    std::vector<glm::vec4> perspective_camera::get_frustum_corners_world_space(
+        const glm::mat4& projection_matrix, const glm::mat4& view_matrix)
+    {
+        glm::mat4 inverse = glm::inverse(projection_matrix * view_matrix);
+
+        std::vector<glm::vec4> frustum_corners;
+        frustum_corners.reserve(8);
+
+        for (unsigned int x = 0; x < 2; ++x)
+        {
+            for (unsigned int y = 0; y < 2; ++y)
+            {
+                for (unsigned int z = 0; z < 2; ++z)
+                {
+                    const glm::vec4 pt =
+                        inverse * glm::vec4(
+                            2.0f * x - 1.0f,
+                            2.0f * y - 1.0f,
+                            2.0f * z - 1.0f,
+                            1.0f);
+                    frustum_corners.push_back(pt / pt.w);
+                }
+            }
+        }
+
+        return frustum_corners;
+    }
+
     void perspective_camera::set_fov(float fov)
     {
         LY_ASSERT_MSG(fov > 0.0f && fov < 179.0f, "FOV must be in the range (0,180)!")

@@ -49,6 +49,12 @@ namespace luly::ui
             {
                 directional_light->set_intensity(intensity);
             }
+
+            float distance = directional_light->get_distance();
+            if (ui_utils::draw_property("Distance", distance, 0.0f, 150.0f, 0.01f))
+            {
+                directional_light->set_distance(distance);
+            }
         }
         else
         {

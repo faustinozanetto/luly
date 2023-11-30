@@ -27,25 +27,25 @@ namespace luly::renderer
         std::vector<frame_buffer_attachment> attachments = {
             // Position
             {
-                texture_internal_format::rgb16,
+                texture_internal_format::rgb16f,
                 texture_filtering::linear,
                 texture_wrapping::clamp_to_edge, viewport_size
             },
             // Albedo
             {
-                texture_internal_format::rgba16,
+                texture_internal_format::rgba16f,
                 texture_filtering::linear,
                 texture_wrapping::clamp_to_edge, viewport_size
             },
             // Normal
             {
-                texture_internal_format::rgb16,
+                texture_internal_format::rgb16f,
                 texture_filtering::linear,
                 texture_wrapping::clamp_to_edge, viewport_size
             },
             // Roughness-Metallic-AO
             {
-                texture_internal_format::rgb16,
+                texture_internal_format::rgb16f,
                 texture_filtering::linear,
                 texture_wrapping::clamp_to_edge, viewport_size
             },
@@ -71,6 +71,7 @@ namespace luly::renderer
     {
         renderer::set_state(renderer_state::depth, true);
         m_fbo->bind();
+        renderer::set_clear_color({0.0f, 0.0f, 0.0f, 1.0f});
         renderer::clear_screen();
         m_geometry_shader->bind();
 

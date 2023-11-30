@@ -1,0 +1,40 @@
+﻿#shader vertex
+#version 450
+
+layout (location = 0) in vec3 a_pos;
+        
+layout (location = 0) uniform mat4 u_transform;
+
+void main()
+{
+    gl_Position = u_transform * vec4(a_pos, 1.0);
+}
+  
+#shader geometry
+#version 450
+
+layout(triangles, invocations = 5) in;
+layout(triangle_strip, max_vertices = 3) out;
+
+layout (std140, binding = 2) uniform LightSpaceMatrices
+{
+    mat4 u_light_space_matrices[16];
+};
+
+void main()
+{
+    for (int i = 0; i < 3; ++i)
+    {
+        gl_Position = u_light_space_matrices[gl_InvocationID] * gl_in[i].gl_Position;
+        gl_Layer = gl_InvocationID;
+        EmitVertex();
+    }
+    EndPrimitive();
+}
+
+#shader fragment
+#version 450
+
+void main()
+{
+}
