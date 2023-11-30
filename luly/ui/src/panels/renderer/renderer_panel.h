@@ -22,6 +22,7 @@ namespace luly::ui
         bool draw_render_pass_details(const std::shared_ptr<renderer::render_pass>& render_pass);
         void draw_render_pass_outputs(
             const std::unordered_map<std::string, renderer::render_pass_output>& pass_outputs);
+
         static bool s_show;
     };
 }

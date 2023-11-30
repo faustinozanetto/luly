@@ -3,6 +3,8 @@
 #include "renderer/camera/camera_manager.h"
 #include <entt/entt.hpp>
 
+#include "renderer/lights/directional_light.h"
+
 namespace luly::scene
 {
     class scene_actor;
@@ -22,6 +24,8 @@ namespace luly::scene
         /* Methods */
         std::shared_ptr<scene_actor> create_actor(const std::string& name);
         void on_update(float delta_time);
+
+        const std::shared_ptr<renderer::directional_light>& get_directional_light() const;
 
     private:
         void update_lights();

@@ -30,34 +30,32 @@ namespace luly::renderer
     {
         const std::shared_ptr<scene::scene>& current_scene = scene::scene_manager::get().get_current_scene();
 
-        // 1. Render depth of scene from lights perspective.
-        const auto& registry = current_scene->get_registry();
-        const auto& view = registry->view<scene::directional_light_component>();
+        // 1. Perform directional light cascaded shadow mapping
+        const std::shared_ptr<directional_light>& directional_light = current_scene->get_directional_light();
+        if (!directional_light) return;
 
-        for (const auto& [actor, directional_light_component] : view.each())
-        {
-            const std::shared_ptr<directional_light>& directional_light = directional_light_component.
-                get_directional_light();
+        // Calculate cascades levels and update cascades.
+        directional_light->calculate_shadow_map_levels(
+             current_scene->get_camera_manager()->get_perspective_camera()->get_far_clip());
+        directional_light->update_shadow_cascades(current_scene->get_camera_manager()->get_perspective_camera());
 
-            directional_light->calculate_shadow_map_levels(
-                current_scene->get_camera_manager()->get_perspective_camera()->get_far_clip());
-            directional_light->update_shadow_cascades(current_scene->get_camera_manager()->get_perspective_camera());
+        // Setup fbo and shader.
+        glBindFramebuffer(GL_FRAMEBUFFER, directional_light->get_shadow_map_fbo());
+        m_directional_light_shadows_shader->bind();
+        glClear(GL_DEPTH_BUFFER_BIT);
 
-            glBindFramebuffer(GL_FRAMEBUFFER, directional_light->get_shadow_map_fbo());
-            m_directional_light_shadows_shader->bind();
-            glClear(GL_DEPTH_BUFFER_BIT);
+        // Render geometry.
+        glCullFace(GL_FRONT);
+        renderer::set_viewport_size({
+            directional_light->get_shadow_map_width(), directional_light->get_shadow_map_height()
+        });
+        render_geometry();
 
-            glCullFace(GL_FRONT);
-            renderer::set_viewport_size({
-                directional_light->get_shadow_map_width(), directional_light->get_shadow_map_height()
-            });
-            render_geometry();
-
-            glCullFace(GL_BACK);
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
-            m_directional_light_shadows_shader->un_bind();
-        }
-
+        // Reset state.
+        glCullFace(GL_BACK);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        m_directional_light_shadows_shader->un_bind();
+        
         renderer::set_viewport_size(renderer::get_viewport_size());
         renderer::clear_screen();
         /*

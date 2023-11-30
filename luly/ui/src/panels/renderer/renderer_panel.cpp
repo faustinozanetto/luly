@@ -3,6 +3,7 @@
 #include "engine_ui.h"
 #include "renderer/renderer/renderer.h"
 #include "renderer/scene/scene_renderer.h"
+#include "scene/scene_manager.h"
 #include "utils/ui_utils.h"
 
 namespace luly::ui
@@ -32,6 +33,18 @@ namespace luly::ui
             }
             ImGui::Separator();
             ui_utils::draw_property("Render Passes");
+
+            // Skybox Pass.
+            ImGui::Separator();
+            if (draw_render_pass_details(renderer::scene_renderer::get_data().shadows_pass))
+            {
+                const std::shared_ptr<renderer::directional_light>& directional_light = scene::scene_manager::get().
+                    get_current_scene()->get_directional_light();
+                if (directional_light)
+                {
+                }
+                ImGui::TreePop();
+            }
 
             // Geometry Pass.
             ImGui::Separator();

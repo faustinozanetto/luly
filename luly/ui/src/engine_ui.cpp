@@ -52,7 +52,6 @@ namespace luly::ui
     {
         ImVec4* colors = ImGui::GetStyle().Colors;
 
-
         colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
         colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
         colors[ImGuiCol_WindowBg] = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
@@ -110,6 +109,7 @@ namespace luly::ui
         colors[ImGuiCol_ModalWindowDimBg] = ImVec4(1.00f, 0.00f, 0.00f, 0.35f);
 
         ImGuiStyle& style = ImGui::GetStyle();
+        
         style.WindowPadding = ImVec2(6.00f, 6.00f);
         style.FramePadding = ImVec2(5.00f, 2.00f);
         style.CellPadding = ImVec2(6.00f, 6.00f);
@@ -152,7 +152,6 @@ namespace luly::ui
         const spdlog::sink_ptr& imgui_sink = std::make_shared<engine_ui_sink<std::mutex>>();
         shared::log::add_sink(imgui_sink);
     }
-
 
     void engine_ui::set_render_target(uint32_t render_target)
     {

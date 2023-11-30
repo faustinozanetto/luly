@@ -3,6 +3,7 @@
 
 #include "actor/components/name_component.h"
 #include "actor/components/transform_component.h"
+#include "actor/components/lights/directional_light_component.h"
 
 #include "actor/components/lights/point_light_component.h"
 #include "actor/components/lights/spot_light_component.h"
@@ -51,6 +52,20 @@ namespace luly::scene
     void scene::on_update(float delta_time)
     {
         update_lights();
+    }
+
+    const std::shared_ptr<renderer::directional_light>& scene::get_directional_light() const
+    {
+        const auto& view = m_actors_registry->view<directional_light_component>();
+        for (auto [actor, directional_light_component] : view.each())
+        {
+            const std::shared_ptr<renderer::directional_light>& directional_light = directional_light_component.
+                get_directional_light();
+
+            return directional_light;
+        }
+        LY_ASSERT_MSG(false, "Could not find directional light for scene!")
+        return {};
     }
 
     void scene::update_lights()

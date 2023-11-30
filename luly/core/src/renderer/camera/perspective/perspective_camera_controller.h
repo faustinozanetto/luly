@@ -6,20 +6,19 @@
 
 namespace luly::renderer
 {
-    enum class camera_keyboard_direction
-    {
-        forward,
-        backward,
-        left,
-        right,
-        up,
-        down,
-    };
-
     class perspective_camera_controller
     {
     public:
         perspective_camera_controller(const std::shared_ptr<perspective_camera>& perspective_camera);
+
+        /* Getters */
+        const glm::vec2& get_last_mouse_pos() const { return m_last_mouse_pos; }
+        float get_movement_speed() const { return m_movement_speed; }
+        float get_mouse_speed() const { return m_mouse_speed; }
+
+        /* Setters */
+        void set_movement_speed(float movement_speed) { m_movement_speed = movement_speed; }
+        void set_mouse_speed(float mouse_speed) { m_mouse_speed = mouse_speed; }
 
         /* Methods */
         void on_update(float delta_time);

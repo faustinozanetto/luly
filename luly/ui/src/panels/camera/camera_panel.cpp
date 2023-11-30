@@ -25,29 +25,49 @@ namespace luly::ui
             const std::shared_ptr<scene::scene>& current_scene = scene::scene_manager::get().get_current_scene();
             if (current_scene)
             {
-                auto& camera_manager = current_scene->get_camera_manager();
-                auto& camera = camera_manager->get_perspective_camera();
+                const std::shared_ptr<renderer::camera_manager>& camera_manager = current_scene->get_camera_manager();
+                const std::shared_ptr<renderer::perspective_camera>& perspective_camera = camera_manager->
+                    get_perspective_camera();
 
-                glm::vec3 camera_position = camera->get_position();
+                ui_utils::draw_property("Camera Parameters");
+                ImGui::Separator();
+                glm::vec3 camera_position = perspective_camera->get_position();
                 if (ui_utils::draw_property("Position", camera_position, -50.0f, 50.0f, 0.01f))
                 {
-                    camera->set_position(camera_position);
+                    perspective_camera->set_position(camera_position);
                 }
-                float camera_fov = camera->get_fov();
+                float camera_fov = perspective_camera->get_fov();
                 if (ui_utils::draw_property("FOV", camera_fov, 0.5f, 179.0f))
                 {
-                    camera->set_fov(camera_fov);
+                    perspective_camera->set_fov(camera_fov);
                 }
-                float camera_near_plane = camera->get_near_clip();
+                float camera_near_plane = perspective_camera->get_near_clip();
                 if (ui_utils::draw_property("Near Plane", camera_near_plane, 0.01f, 100.0f, 0.1f))
                 {
-                    camera->set_near_clip(camera_near_plane);
+                    perspective_camera->set_near_clip(camera_near_plane);
                 }
 
-                float camera_far_plane = camera->get_far_clip();
+                float camera_far_plane = perspective_camera->get_far_clip();
                 if (ui_utils::draw_property("Far Plane", camera_far_plane, 1.0f, 5000.0f, 1.0f))
                 {
-                    camera->set_far_clip(camera_far_plane);
+                    perspective_camera->set_far_clip(camera_far_plane);
+                }
+
+                const std::shared_ptr<renderer::perspective_camera_controller>& perspective_camera_controller =
+                    camera_manager->get_perspective_camera_controller();
+
+                ui_utils::draw_property("Camera Controller Parameters");
+                ImGui::Separator();
+                float movement_speed = perspective_camera_controller->get_movement_speed();
+                if (ui_utils::draw_property("Movement Speed", movement_speed, 0.1f, 15.0f, 0.01f))
+                {
+                    perspective_camera_controller->set_movement_speed(movement_speed);
+                }
+
+                float mouse_speed = perspective_camera_controller->get_mouse_speed();
+                if (ui_utils::draw_property("Mouse Speed", mouse_speed, 0.1f, 15.0f, 0.01f))
+                {
+                    perspective_camera_controller->set_mouse_speed(mouse_speed);
                 }
             }
             else
