@@ -1,0 +1,23 @@
+﻿#shader vertex
+#version 450
+
+#include "common/camera.lsh"
+
+layout (location = 0) in vec3 a_pos;
+        
+void main()
+{
+    gl_Position = camera.view_projection_matrix * vec4(a_pos, 1.0);
+}
+
+#shader fragment
+#version 450
+
+out vec4 frag_color;
+
+uniform vec4 u_color;
+
+void main()
+{
+    frag_color = u_color;
+}

@@ -36,7 +36,6 @@ namespace luly::renderer
         glm::mat4 inverse = glm::inverse(projection_matrix * view_matrix);
 
         std::vector<glm::vec4> frustum_corners;
-        frustum_corners.reserve(8);
 
         for (unsigned int x = 0; x < 2; ++x)
         {
@@ -44,12 +43,7 @@ namespace luly::renderer
             {
                 for (unsigned int z = 0; z < 2; ++z)
                 {
-                    const glm::vec4 pt =
-                        inverse * glm::vec4(
-                            2.0f * x - 1.0f,
-                            2.0f * y - 1.0f,
-                            2.0f * z - 1.0f,
-                            1.0f);
+                    const glm::vec4 pt = inverse * glm::vec4(2.0f * x - 1.0f, 2.0f * y - 1.0f, 2.0f * z - 1.0f, 1.0f);
                     frustum_corners.push_back(pt / pt.w);
                 }
             }

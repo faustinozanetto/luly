@@ -13,7 +13,7 @@ namespace luly::renderer
 
         m_view_matrix = glm::mat4(1.0f);
         m_projection_matrix = glm::mat4(1.0f);
-        m_near_clip = 0.01f;
+        m_near_clip = 0.1f;
         m_far_clip = 150.0f;
         m_yaw = -90.0f;
         m_pitch = 0.0f;

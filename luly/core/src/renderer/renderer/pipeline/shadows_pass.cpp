@@ -75,25 +75,36 @@ namespace luly::renderer
 
     void shadows_pass::calculate_directional_light_shadows()
     {
+        renderer::set_state(renderer_state::depth, true);
+
         const std::shared_ptr<scene::scene>& current_scene = scene::scene_manager::get().get_current_scene();
 
         // 1. Perform directional light cascaded shadow mapping
         const std::shared_ptr<directional_light>& directional_light = current_scene->get_directional_light();
         if (!directional_light) return;
 
+        directional_light->update_shadow_map_views();
+        
         // Calculate cascades levels and update cascades.
         directional_light->calculate_shadow_map_levels(
             current_scene->get_camera_manager()->get_perspective_camera()->get_far_clip());
-        directional_light->update_shadow_cascades(current_scene->get_camera_manager()->get_perspective_camera());
+        // directional_light->update_shadow_cascades(current_scene->get_camera_manager()->get_perspective_camera());
+        std::vector<glm::mat4> lightSpaceMatrices = directional_light->get_light_space_matrices(
+            current_scene->get_camera_manager()->get_perspective_camera());
+        for (size_t i = 0; i < lightSpaceMatrices.size(); ++i)
+        {
+            directional_light->get_light_matrices_ubo()->set_data(&lightSpaceMatrices[i], sizeof(glm::mat4x4),
+                                                                  i * sizeof(glm::mat4x4));
+        }
 
         // Setup fbo and shader.
-        glBindFramebuffer(GL_FRAMEBUFFER, directional_light->get_shadow_map_fbo());
         m_directional_light_shadows_shader->bind();
+        glBindFramebuffer(GL_FRAMEBUFFER, directional_light->get_shadow_map_fbo());
+        renderer::set_viewport_size(directional_light->get_shadow_map_dimensions());
         glClear(GL_DEPTH_BUFFER_BIT);
+        glCullFace(GL_FRONT);
 
         // Render geometry.
-        glCullFace(GL_FRONT);
-        renderer::set_viewport_size(directional_light->get_shadow_map_dimensions());
         render_geometry();
 
         // Reset state.
@@ -101,8 +112,10 @@ namespace luly::renderer
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         m_directional_light_shadows_shader->un_bind();
 
+        // Reset
         renderer::set_viewport_size(renderer::get_viewport_size());
         renderer::clear_screen();
+        renderer::set_state(renderer_state::depth, false);
     }
 
     void shadows_pass::render_geometry()

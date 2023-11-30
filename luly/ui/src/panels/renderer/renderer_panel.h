@@ -24,5 +24,7 @@ namespace luly::ui
             const std::unordered_map<std::string, renderer::render_pass_output>& pass_outputs);
 
         static bool s_show;
+
+        int m_cascade_index;
     };
 }
