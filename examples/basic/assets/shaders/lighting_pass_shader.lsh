@@ -31,10 +31,17 @@ layout (binding = 5) uniform samplerCube u_prefilter_map;
 layout (binding = 6) uniform sampler2D u_brdf_map;
 layout (binding = 7) uniform sampler2D u_ambient_occlusion_map;
 layout (binding = 8) uniform sampler2DArray u_cascades_shadow_map;
-        
-uniform int u_cascades_count;
-uniform float u_cascade_plane_distances[16];
 
+struct cascade_shadows_data {
+    int cascades_count;
+    float inverse_cascade_factor;
+    float shadow_bias;
+    float cascade_plane_distances[16];
+    int soft_shadows;
+};
+
+uniform cascade_shadows_data u_cascade_shadows_data;
+        
 layout (std140, binding = 2) uniform LightSpaceMatrices
 {
     mat4 u_light_space_matrices[16];
@@ -60,9 +67,9 @@ float calculate_directional_light_shadow(vec3 frag_pos, vec3 normal, vec3 light_
     float depth_value = abs(frag_pos_view_space.z);
     
     int layer = -1;
-    for (int i = 0; i < u_cascades_count; ++i)
+    for (int i = 0; i < u_cascade_shadows_data.cascades_count; ++i)
     {
-        if (depth_value < u_cascade_plane_distances[i])
+        if (depth_value < u_cascade_shadows_data.cascade_plane_distances[i])
         {
             layer = i;
             break;
@@ -70,7 +77,7 @@ float calculate_directional_light_shadow(vec3 frag_pos, vec3 normal, vec3 light_
     }
     if (layer == -1)
     {
-        layer = u_cascades_count;
+        layer = u_cascade_shadows_data.cascades_count;
     }
     
     vec4 frag_pos_light_space = u_light_space_matrices[layer] * vec4(frag_pos, 1.0);
@@ -84,28 +91,32 @@ float calculate_directional_light_shadow(vec3 frag_pos, vec3 normal, vec3 light_
         return 0.0;
     }
     
-    float inverse_cascade_factor = 0.003f;
-    float bias = max(0.005 * (1.0 - clamp(dot(normal, light_dir), 0.0, 1.0)), 0.005f);
-    if (layer == u_cascades_count)
+    float bias = max(0.005 * (1.0 - clamp(dot(normal, light_dir), 0.0, 1.0)), u_cascade_shadows_data.shadow_bias);
+    if (layer == u_cascade_shadows_data.cascades_count)
     {
-        bias *= 1 / max(camera.far_clip * inverse_cascade_factor, 1.0f);
+        bias *= 1 / max(camera.far_clip * u_cascade_shadows_data.inverse_cascade_factor, 1.0f);
     }
     else
     {
-        bias *= 1 / max(u_cascade_plane_distances[layer] * inverse_cascade_factor, 1.0f);
+        bias *= 1 / max(u_cascade_shadows_data.cascade_plane_distances[layer] * u_cascade_shadows_data.inverse_cascade_factor, 1.0f);
     }
     
     float shadow = 0.0;
-    vec2 texel_size = 1.0 / vec2(textureSize(u_cascades_shadow_map, 0));
-    for(int x = -1; x <= 1; ++x)
-    {
-        for(int y = -1; y <= 1; ++y)
+    if (u_cascade_shadows_data.soft_shadows == 1) {
+        vec2 texel_size = 1.0 / vec2(textureSize(u_cascades_shadow_map, 0));
+        for (int x = - 1; x <= 1; ++x)
         {
-            float pcfDepth = texture(u_cascades_shadow_map, vec3(projection_coords.xy + vec2(x, y) * texel_size, layer)).r;
-            shadow += (current_depth - bias) > pcfDepth ? 1.0 : 0.0;
+            for (int y = - 1; y <= 1; ++y)
+            {
+                float pcfDepth = texture(u_cascades_shadow_map, vec3(projection_coords.xy + vec2(x, y) * texel_size, layer)).r;
+                shadow += (current_depth - bias) > pcfDepth ? 1.0: 0.0;
+            }
         }
+        shadow /= 9.0;
+    } else {
+        float depth = texture(u_cascades_shadow_map, vec3(projection_coords.xy,layer)).r;
+        shadow += (current_depth - bias) > depth ? 1.0: 0.0;
     }
-    shadow /= 9.0;
     
     if(projection_coords.z > 1.0)
     {
@@ -220,14 +231,32 @@ void main()
         luminance += calculate_spot_light_luminance(lights.spot_lights[i], normal, view_dir, frag_pos, albedo, F0, roughness, metallic);
     }
         */
+        /*
     vec3 irradiance = sample_irradiance_map(normal);
     vec3 prefilter = sample_prefilter_map(reflect_dir, roughness);
     vec2 brdf_lut = sample_brdf_lut_map(view_dir, normal, roughness);
 
     luminance += calculate_ambient_ibl(albedo, normal, view_dir, irradiance,
          prefilter, brdf_lut, F0, roughness, metallic, ambient_occlusion);
-   
-    vec3 ambient = vec3(0.3) * albedo * ambient_occlusion;
+   */
+
+    // ambient lighting (we now use IBL as the ambient term)
+    vec3 F = fresnel_schlick_roughness(max(dot(normal, view_dir), 0.0), F0, roughness);
+
+    vec3 kS = F;
+    vec3 kD = 1.0 - kS;
+    kD *= 1.0 - metallic;
+
+    vec3 irradiance = texture(u_irradiance_map, normal).rgb;
+    vec3 diffuse      = irradiance * albedo;
+
+    // sample both the pre-filter map and the BRDF lut and combine them together as per the Split-Sum approximation to get the IBL specular part.
+    const float MAX_REFLECTION_LOD = 4.0;
+    vec3 prefilteredColor = textureLod(u_prefilter_map, reflect_dir,  roughness * MAX_REFLECTION_LOD).rgb;
+    vec2 brdf  = texture(u_brdf_map, vec2(max(dot(normal, view_dir), 0.0), roughness)).rg;
+    vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
+
+    vec3 ambient = (kD * diffuse + specular) * ambient_occlusion;
 
     vec3 color = ambient + luminance;
 

@@ -47,8 +47,6 @@ namespace luly::renderer
         // Load meshes.
         m_cube_mesh = mesh_factory::create_cube_mesh();
         m_screen_mesh = mesh_factory::create_screen_quad_mesh();
-
-        set_outputs();
     }
 
     void skybox_pass::execute()

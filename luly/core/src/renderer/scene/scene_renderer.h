@@ -51,6 +51,8 @@ namespace luly::renderer
         static void begin_render(const std::shared_ptr<camera>& camera);
         static void end_render();
 
+        static void set_outputs();
+
         static void set_environment_map(const std::shared_ptr<texture_2d>& environment_map);
 
         /* Getters */

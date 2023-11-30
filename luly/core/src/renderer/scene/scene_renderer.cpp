@@ -49,6 +49,16 @@ namespace luly::renderer
     {
     }
 
+    void scene_renderer::set_outputs()
+    {
+        s_data.geometry_pass->set_outputs();
+        s_data.ambient_occlusion_pass->set_outputs();
+        s_data.final_pass->set_outputs();
+        s_data.lighting_pass->set_outputs();
+        s_data.skybox_pass->set_outputs();
+        s_data.shadows_pass->set_outputs();
+    }
+
     void scene_renderer::set_environment_map(const std::shared_ptr<texture_2d>& environment_map)
     {
         s_data.environment_pass->set_environment_map(environment_map);

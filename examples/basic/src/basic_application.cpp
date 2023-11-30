@@ -58,8 +58,9 @@ void basic_application::on_update()
 
     luly::ui::engine_ui::begin_frame();
 
-    current_scene->get_camera_manager()->get_perspective_camera_controller()->on_update(luly::app_time::get_delta_time());
-    
+    current_scene->get_camera_manager()->get_perspective_camera_controller()->on_update(
+        luly::app_time::get_delta_time());
+
     const std::shared_ptr<luly::renderer::perspective_camera>& camera = current_scene->get_camera_manager()->
         get_perspective_camera();
 
@@ -79,7 +80,6 @@ void basic_application::setup_scene()
     const std::shared_ptr<luly::scene::scene>& scene = std::make_shared<luly::scene::scene>("Test Scene");
 
     luly::scene::scene_manager::get().add_scene(scene);
-    luly::scene::scene_manager::get().switch_scene(scene);
 
     // Create background actor
     const std::shared_ptr<luly::scene::scene_actor>& background_actor = scene->create_actor("Background Actor");
@@ -150,7 +150,7 @@ void basic_application::setup_scene()
     const std::shared_ptr<luly::scene::scene_actor>& skybox_actor = scene->create_actor("Skybox Actor");
     skybox_actor->add_component<luly::scene::skybox_component>(
         luly::renderer::texture_factory::create_environment_texture_from_file(
-            "assets/hdris/kart_club_4k.hdr"));
+            "assets/hdris/kloofendal_43d_clear_puresky_4k.hdr"));
 
     /*
     const auto& spot_light_actor = scene->create_actor("Spot Light Emitter");
@@ -236,6 +236,7 @@ void basic_application::setup_scene()
         "tv-material", luly::assets::asset_type::material, tv_material);
 
     m_actor->add_component<luly::scene::material_component>(tv_material_asset->get_data<luly::renderer::material>());
+    luly::scene::scene_manager::get().switch_scene(scene);
 }
 
 luly::core::application* luly::core::create_application()

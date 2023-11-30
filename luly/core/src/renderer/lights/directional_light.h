@@ -1,4 +1,5 @@
 ﻿#pragma once
+
 #include "light.h"
 #include "renderer/buffers/uniform/uniform_buffer_object.h"
 #include "renderer/camera/perspective/perspective_camera.h"
@@ -27,10 +28,12 @@ namespace luly::renderer
         const glm::vec3& get_direction() const { return m_direction; }
         uint32_t get_shadow_map_fbo() const { return m_shadow_map_fbo; }
         uint32_t get_shadow_maps() const { return m_shadow_maps; }
-        int get_shadow_map_width() const { return m_shadow_map_width; }
-        int get_shadow_map_height() const { return m_shadow_map_height; }
+        const glm::ivec2& get_shadow_map_dimensions() const { return m_shadow_map_dimensions; }
         float get_distance() const { return m_distance; }
         const std::vector<float>& get_shadow_cascade_levels() const { return m_shadow_cascade_levels; }
+        float get_inverse_cascade_factor() const { return m_inverse_cascade_factor; }
+        float get_shadow_bias() const { return m_shadow_bias; }
+        bool get_soft_shadows() const { return m_soft_shadows; }
 
         /* Setters */
         void set_direction(const glm::vec3& direction) { m_direction = direction; }
@@ -50,14 +53,16 @@ namespace luly::renderer
         glm::vec3 m_direction;
         float m_distance;
 
-        int m_shadow_map_width;
-        int m_shadow_map_height;
+        // Cascaded shadow maps.
+        glm::ivec2 m_shadow_map_dimensions;
         std::vector<float> m_shadow_cascade_levels;
         uint32_t m_shadow_map_fbo;
         uint32_t m_shadow_maps;
-
         std::vector<glm::vec3> m_cascade_bound_centers;
-        directional_light_shadow m_shadow_data;
         std::shared_ptr<uniform_buffer_object> m_light_matrices_ubo;
+        directional_light_shadow m_shadow_data;
+        float m_inverse_cascade_factor;
+        float m_shadow_bias;
+        bool m_soft_shadows;
     };
 }

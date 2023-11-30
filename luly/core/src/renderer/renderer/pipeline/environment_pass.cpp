@@ -80,9 +80,9 @@ namespace luly::renderer
 
     void environment_pass::setup_environment()
     {
-        m_irradiance_map_size = 256;
-        m_prefilter_map_size = 2048;
-        m_brdf_map_size = 256;
+        m_irradiance_map_size = 128;
+        m_prefilter_map_size = 256;
+        m_brdf_map_size = 512;
         m_environment_map_size = 2048;
 
         m_cube_mesh = mesh_factory::create_cube_mesh();

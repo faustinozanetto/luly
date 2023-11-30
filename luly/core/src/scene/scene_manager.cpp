@@ -1,6 +1,8 @@
 ﻿#include "lypch.h"
 #include "scene_manager.h"
 
+#include "renderer/scene/scene_renderer.h"
+
 namespace luly::scene
 {
     scene_manager* scene_manager::s_instance = nullptr;
@@ -31,6 +33,8 @@ namespace luly::scene
     void scene_manager::switch_scene(const std::shared_ptr<scene>& scene)
     {
         m_current_scene = scene;
+
+        renderer::scene_renderer::set_outputs();
     }
 
     void scene_manager::on_update(float delta_time)

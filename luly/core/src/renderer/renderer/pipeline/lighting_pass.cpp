@@ -1,6 +1,7 @@
 ﻿#include "lypch.h"
 #include "lighting_pass.h"
 
+#include "shadows_pass.h"
 #include "application/application.h"
 #include "renderer/meshes/mesh_factory.h"
 #include "renderer/renderer/renderer.h"
@@ -52,8 +53,6 @@ namespace luly::renderer
         m_lighting_shader = shader_factory::create_shader_from_file("assets/shaders/lighting_pass_shader.lsh");
 
         m_screen_mesh = mesh_factory::create_screen_quad_mesh();
-
-        set_outputs();
     }
 
     void lighting_pass::execute()
@@ -77,14 +76,13 @@ namespace luly::renderer
         const render_pass_output& geometry_rough_metal_ao_output = geometry_pass_input.render_pass->get_output(
             "rough_metal_ao_output");
 
+        // Blit depth from geometry pass to this fbo.
         int width = m_fbo->get_width();
         int height = m_fbo->get_height();
-
         glBindFramebuffer(GL_READ_FRAMEBUFFER, geometry_pass_input.render_pass->get_fbo()->get_handle_id());
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo->get_handle_id());
         renderer::blit_frame_buffer({0, 0}, {width, height}, {0, 0}, {width, height}, renderer_bit_mask::depth,
                                     texture_filtering::nearest);
-
 
         // Bind geometry pass outputs.
         renderer::bind_texture(0, geometry_position_output.output);
@@ -95,14 +93,25 @@ namespace luly::renderer
         renderer::bind_texture(5, environment_pass_input.render_pass->get_output("prefilter_output").output);
         renderer::bind_texture(6, environment_pass_input.render_pass->get_output("brdf_output").output);
         renderer::bind_texture(7, ambient_occlusion_pass_input.render_pass->get_output("ssao_blur_output").output);
-        renderer::bind_texture(8, m_directional_light->get_shadow_maps());
 
-        // Bind directional light data.
-        m_lighting_shader->set_int("u_cascades_count", m_directional_light->get_shadow_cascade_levels().size());
-        for (int i = 0; i < m_directional_light->get_shadow_cascade_levels().size(); i++)
+        const std::shared_ptr<scene::scene>& current_scene = scene::scene_manager::get().get_current_scene();
+        const std::shared_ptr<directional_light>& directional_light = current_scene->get_directional_light();
+        renderer::bind_texture(8, directional_light->get_shadow_maps());
+
+        // Upload directional light shadow cascades data
+        size_t cascades_count = directional_light->get_shadow_cascade_levels().size();
+        m_lighting_shader->set_int("u_cascade_shadows_data.cascades_count", cascades_count);
+        for (unsigned int i = 0; i < cascades_count; i++)
         {
-            m_lighting_shader->set_float("u_cascade_plane_distances[" + std::to_string(i) + "]", m_directional_light->get_shadow_cascade_levels().at(i));
+            m_lighting_shader->set_float("u_cascade_shadows_data.cascade_plane_distances[" + std::to_string(i) + "]",
+                                         directional_light->get_shadow_cascade_levels().at(i));
         }
+        m_lighting_shader->set_float("u_cascade_shadows_data.inverse_cascade_factor",
+                                     directional_light->get_inverse_cascade_factor());
+        m_lighting_shader->set_float("u_cascade_shadows_data.shadow_bias",
+                                     directional_light->get_shadow_bias());
+        m_lighting_shader->set_int("u_cascade_shadows_data.soft_shadows",
+                                   directional_light->get_soft_shadows());
 
         // Render screen quad mesh.
         renderer::submit_mesh(m_screen_mesh);
@@ -196,7 +205,6 @@ namespace luly::renderer
             directional_light_data.color =
                 glm::vec4(directional_light->get_color(), directional_light->get_intensity());
 
-            m_directional_light = directional_light;
             m_lights_data.directional_light = directional_light_data;
         }
     }

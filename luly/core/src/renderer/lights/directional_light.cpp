@@ -13,10 +13,12 @@ namespace luly::renderer
     {
         m_direction = direction;
         m_distance = 10.0f;
-        m_shadow_map_width = 4096;
-        m_shadow_map_height = 4096;
+        m_shadow_map_dimensions = glm::ivec2(2048, 2048);
+        m_soft_shadows = true;
+        m_shadow_bias = 0.005f;
+        m_inverse_cascade_factor = 0.003f;
 
-        calculate_shadow_map_levels(150.0f);
+        calculate_shadow_map_levels(70.0f);
 
         // Create shadow map fbo
         glGenFramebuffers(1, &m_shadow_map_fbo);
@@ -26,8 +28,8 @@ namespace luly::renderer
             GL_TEXTURE_2D_ARRAY,
             0,
             GL_DEPTH_COMPONENT32F,
-            m_shadow_map_width,
-            m_shadow_map_height,
+            m_shadow_map_dimensions.x,
+            m_shadow_map_dimensions.y,
             int(m_shadow_cascade_levels.size()) + 1,
             0,
             GL_DEPTH_COMPONENT,
@@ -183,7 +185,7 @@ namespace luly::renderer
         const glm::vec3 new_center_view_space = glm::vec3(shadow_view_matrix * glm::vec4(new_center, 1.0f));
         const glm::vec3 center_diff = new_center_view_space - old_center_view_space;
 
-        float pixel_size = (float)m_shadow_map_width / (2.0f * radius);
+        float pixel_size = (float)m_shadow_map_dimensions.x / (2.0f * radius);
 
         float pixelOffsetX = center_diff.x * pixel_size;
         float pixelOffsetY = center_diff.y * pixel_size;

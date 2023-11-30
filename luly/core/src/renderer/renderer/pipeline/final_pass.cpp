@@ -44,8 +44,6 @@ namespace luly::renderer
 
         // Create screen quad
         m_screen_mesh = mesh_factory::create_screen_quad_mesh();
-
-        set_outputs();
     }
 
     void final_pass::execute()

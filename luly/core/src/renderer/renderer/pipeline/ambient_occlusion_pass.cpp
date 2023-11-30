@@ -101,8 +101,6 @@ namespace luly::renderer
                                            texture_wrapping::repeat);
         m_ssao_noise_texture->set_wrapping(texture_wrapping_type::wrap_t,
                                            texture_wrapping::repeat);
-
-        set_outputs();
     }
 
     void ambient_occlusion_pass::execute()

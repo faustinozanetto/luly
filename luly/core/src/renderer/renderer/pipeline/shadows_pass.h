@@ -17,6 +17,8 @@ namespace luly::renderer
         void set_outputs() override;
 
     private:
+        void calculate_directional_light_shadows();
+
         void render_geometry();
         std::shared_ptr<shader> m_directional_light_shadows_shader;
     };

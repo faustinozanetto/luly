@@ -63,8 +63,6 @@ namespace luly::renderer
 
         // Load shader.
         m_geometry_shader = shader_factory::create_shader_from_file("assets/shaders/geometry_pass_shader.lsh");
-
-        set_outputs();
     }
 
     void geometry_pass::execute()
