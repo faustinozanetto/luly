@@ -4,6 +4,9 @@
 #include <assimp/postprocess.h>
 #include <assimp/Importer.hpp>
 
+#include "renderer/materials/material.h"
+#include "renderer/textures/texture_factory.h"
+
 namespace luly::renderer
 {
     std::shared_ptr<model> model_factory::create_model_from_file(const std::string& file_path)
@@ -40,33 +43,38 @@ namespace luly::renderer
             LY_ASSERT_MSG(false, "An error occurred while loading model from file.")
         }
 
+        const std::string directory = file_path.substr(0, file_path.find_last_of('/'));
+
         std::vector<std::shared_ptr<mesh>> model_meshes;
-        parse_assimp_node(assimp_scene, assimp_scene->mRootNode, model_meshes);
+        parse_assimp_node(assimp_scene, assimp_scene->mRootNode, model_meshes, directory);
 
         return std::make_shared<model>(model_meshes);
     }
 
     void model_factory::parse_assimp_node(const aiScene* assimp_scene, const aiNode* assimp_node,
-                                          std::vector<std::shared_ptr<mesh>>& model_meshes)
+                                          std::vector<std::shared_ptr<mesh>>& model_meshes,
+                                          const std::string& directory)
     {
         // Process all the node's meshes (if any)
         for (unsigned int i = 0; i < assimp_node->mNumMeshes; i++)
         {
             aiMesh* mesh = assimp_scene->mMeshes[assimp_node->mMeshes[i]];
-            model_meshes.push_back(parse_assimp_mesh(mesh));
+            model_meshes.push_back(parse_assimp_mesh(assimp_scene, mesh, directory));
         }
         // Then do the same for each of its children
         for (unsigned int i = 0; i < assimp_node->mNumChildren; i++)
         {
-            parse_assimp_node(assimp_scene, assimp_node->mChildren[i], model_meshes);
+            parse_assimp_node(assimp_scene, assimp_node->mChildren[i], model_meshes, directory);
         }
     }
 
-    std::shared_ptr<mesh> model_factory::parse_assimp_mesh(aiMesh* assimp_mesh)
+    std::shared_ptr<mesh> model_factory::parse_assimp_mesh(const aiScene* assimp_scene, aiMesh* assimp_mesh,
+                                                           const std::string& directory)
     {
         std::vector<mesh_vertex> vertices;
         std::vector<mesh_index> indices;
 
+        // Process vertices.
         for (unsigned int i = 0; i < assimp_mesh->mNumVertices; i++)
         {
             mesh_vertex vertex;
@@ -106,6 +114,7 @@ namespace luly::renderer
             vertices.push_back(vertex);
         }
 
+        // Process indices.
         for (unsigned int i = 0; i < assimp_mesh->mNumFaces; i++)
         {
             aiFace face = assimp_mesh->mFaces[i];
@@ -116,6 +125,65 @@ namespace luly::renderer
             }
         }
 
+        // Process materials.
+        if (assimp_scene->HasMaterials())
+        {
+            aiMaterial* assimp_material = assimp_scene->mMaterials[assimp_mesh->mMaterialIndex];
+
+            std::vector<model_texture> loaded_textures;
+
+            std::vector<model_texture> albedo_maps = parse_assimp_material_textures(
+                assimp_material, aiTextureType_DIFFUSE, "texture_diffuse", directory, loaded_textures);
+
+            std::vector<model_texture> normal_maps = parse_assimp_material_textures(
+                assimp_material, aiTextureType_NORMALS, "texture_normal", directory, loaded_textures);
+
+            std::vector<model_texture> roughness_maps = parse_assimp_material_textures(
+                assimp_material, aiTextureType_DIFFUSE_ROUGHNESS, "texture_roughness", directory, loaded_textures);
+
+            std::vector<model_texture> ao_maps = parse_assimp_material_textures(
+                assimp_material, aiTextureType_AMBIENT_OCCLUSION, "texture_ao", directory, loaded_textures);
+        }
+
         return std::make_shared<mesh>(assimp_mesh->mName.C_Str(), vertices, indices);
+    }
+
+    std::vector<model_texture> model_factory::parse_assimp_material_textures(aiMaterial* assimp_material,
+                                                                             aiTextureType assimp_texture_type,
+                                                                             const std::string& type_name,
+                                                                             const std::string& directory,
+                                                                             std::vector<model_texture>&
+                                                                             loaded_textures)
+    {
+        std::vector<model_texture> textures;
+        for (unsigned int i = 0; i < assimp_material->GetTextureCount(assimp_texture_type); i++)
+        {
+            aiString str;
+            assimp_material->GetTexture(assimp_texture_type, i, &str);
+
+            bool skip = false;
+            for (unsigned int j = 0; j < loaded_textures.size(); j++)
+            {
+                if (std::strcmp(loaded_textures[j].path.data(), str.C_Str()) == 0)
+                {
+                    textures.push_back(loaded_textures[j]);
+                    skip = true;
+                    break;
+                }
+            }
+            if (!skip)
+            {
+                std::string filename = str.C_Str();
+                filename = directory + '\\' + filename;
+
+                model_texture model_texture;
+                model_texture.type = type_name;
+                model_texture.path = filename;
+                model_texture.texture = texture_factory::create_texture_from_file(filename);
+                textures.push_back(model_texture);
+                loaded_textures.push_back(model_texture);
+            }
+        }
+        return textures;
     }
 }

@@ -9,6 +9,7 @@
 #include "scene/actor/components/lights/directional_light_component.h"
 #include "scene/actor/components/lights/point_light_component.h"
 #include "scene/actor/components/lights/spot_light_component.h"
+#include "scene/actor/components/rendering/skybox_component.h"
 
 namespace luly::renderer
 {
@@ -57,12 +58,15 @@ namespace luly::renderer
 
     void lighting_pass::execute()
     {
-        update_lights();
+        const std::shared_ptr<scene::scene>& current_scene = scene::scene_manager::get().get_current_scene();
 
+        // Set state
         renderer::set_state(renderer_state::depth, false);
         m_fbo->bind();
         renderer::clear_screen();
         m_lighting_shader->bind();
+
+        update_lights();
 
         const render_pass_input& geometry_pass_input = m_inputs.at("geometry_pass_input");
         const render_pass_input& environment_pass_input = m_inputs.at("environment_pass_input");
@@ -94,7 +98,7 @@ namespace luly::renderer
         renderer::bind_texture(6, environment_pass_input.render_pass->get_output("brdf_output").output);
         renderer::bind_texture(7, ambient_occlusion_pass_input.render_pass->get_output("ssao_blur_output").output);
 
-        const std::shared_ptr<scene::scene>& current_scene = scene::scene_manager::get().get_current_scene();
+        // Directional light cascaded shadow map.
         const std::shared_ptr<directional_light>& directional_light = current_scene->get_directional_light();
         renderer::bind_texture(8, directional_light->get_shadow_maps());
 
@@ -112,6 +116,9 @@ namespace luly::renderer
                                      directional_light->get_shadow_bias());
         m_lighting_shader->set_int("u_cascade_shadows_data.soft_shadows",
                                    directional_light->get_soft_shadows());
+
+        // Update rest of uniforms
+        upload_skybox_uniforms();
 
         // Render screen quad mesh.
         renderer::submit_mesh(m_screen_mesh);
@@ -212,5 +219,16 @@ namespace luly::renderer
     void lighting_pass::update_lights_buffer()
     {
         m_lights_ubo->set_data(&m_lights_data, sizeof(m_lights_data));
+    }
+
+    void lighting_pass::upload_skybox_uniforms()
+    {
+        const std::shared_ptr<scene::scene>& current_scene = scene::scene_manager::get().get_current_scene();
+
+        const auto& view = current_scene->get_registry()->view<scene::skybox_component>();
+        for (const auto& [actor, skybox_component] : view.each())
+        {
+            m_lighting_shader->set_float("u_skybox_intensity", skybox_component.get_intensity());
+        }
     }
 }

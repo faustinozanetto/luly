@@ -16,6 +16,7 @@ namespace luly::scene
 
         /* Getters */
         const std::shared_ptr<renderer::texture_2d>& get_environment_texture() const { return m_environment_texture; }
+        float get_intensity() const { return m_intensity; }
 
         /* Setters */
         void set_environment_texture(const std::shared_ptr<renderer::texture_2d>& environment_texture)
@@ -24,7 +25,10 @@ namespace luly::scene
             renderer::scene_renderer::set_environment_map(m_environment_texture);
         }
 
+        void set_intensity(float intensity) { m_intensity = intensity; }
+
     private:
-        std::shared_ptr<renderer::texture_2d> m_environment_texture;;
+        std::shared_ptr<renderer::texture_2d> m_environment_texture;
+        float m_intensity;
     };
 }

@@ -41,6 +41,7 @@ struct cascade_shadows_data {
 };
 
 uniform cascade_shadows_data u_cascade_shadows_data;
+uniform float u_skybox_intensity;
         
 layout (std140, binding = 2) uniform LightSpaceMatrices
 {
@@ -138,12 +139,17 @@ vec3 calculate_directional_light_luminance(directional_light dir_light, vec3 nor
     vec3 kS = F;
     vec3 kD = vec3(1.0) - kS;
     kD *= 1.0 - metallic;
+    
     vec3 numerator = NDF * G * F;
     float denominator = 4.0 * max(dot(normal, view_dir), 0.0) * max(dot(normal, L), 0.0);
     vec3 specular = numerator / max(denominator, 0.001);
     float NdotL = max(dot(normal, L), 0.0);
+    
     float shadow = calculate_directional_light_shadow(frag_pos, normal, L);
     vec3 final = (1 - shadow) * (kD * albedo / PI + specular) * radiance * NdotL;
+    
+    float intensity = dir_light.color.a;
+    final *= intensity;
     
     return final;
 }
@@ -256,7 +262,7 @@ void main()
     vec2 brdf  = texture(u_brdf_map, vec2(max(dot(normal, view_dir), 0.0), roughness)).rg;
     vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
 
-    vec3 ambient = (kD * diffuse + specular) * ambient_occlusion;
+    vec3 ambient = (kD * diffuse + specular) * ambient_occlusion * u_skybox_intensity;
 
     vec3 color = ambient + luminance;
 

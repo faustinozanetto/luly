@@ -58,6 +58,7 @@ namespace luly::renderer
         void initialize_lights_data();
         void collect_lights();
         void update_lights_buffer();
+        void upload_skybox_uniforms();
 
         lights_data m_lights_data;
 

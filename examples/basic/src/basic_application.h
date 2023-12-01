@@ -20,5 +20,4 @@ public:
 
 private:
     void setup_scene();
-    std::shared_ptr<luly::scene::scene_actor> m_actor;
 };

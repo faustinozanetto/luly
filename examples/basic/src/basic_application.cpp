@@ -33,9 +33,6 @@ basic_application::basic_application(const luly::renderer::window_specification&
 
     setup_scene();
 
-    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-    glEnable(GL_DEPTH_TEST);
-
     luly::ui::engine_ui::set_render_target(
         luly::renderer::scene_renderer::get_data().final_pass->get_output("final_output").output);
 }
@@ -81,10 +78,15 @@ void basic_application::setup_scene()
 
     luly::scene::scene_manager::get().add_scene(scene);
 
-
-    const auto& dir_light_actor = scene->create_actor("Light Emitter");
-    dir_light_actor->add_component<luly::scene::directional_light_component>(
-        std::make_shared<luly::renderer::directional_light>(glm::vec3(0.85f), glm::vec3(0.8f, 0.3f, -5.0f))); /*
+    scene->get_camera_manager()->get_perspective_camera()->set_far_clip(750.0f);
+    
+    const std::shared_ptr<luly::scene::scene_actor>& dir_light_actor = scene->create_actor("Light Emitter");
+    const std::shared_ptr<luly::renderer::directional_light>& directional_light = std::make_shared<
+        luly::renderer::directional_light>(glm::vec3(0.85f), glm::vec3(-2.36f, -1.98f, 0.5f));
+    directional_light->set_shadow_bias(0.001f);
+    directional_light->set_z_multiplier(1.5f);
+    dir_light_actor->add_component<luly::scene::directional_light_component>(directional_light);
+    /*
     
     /*
     const std::shared_ptr<luly::renderer::mesh>& sphere_mesh = luly::renderer::mesh_factory::create_sphere_mesh(
@@ -147,17 +149,18 @@ void basic_application::setup_scene()
     spot_light_actor->get_component<luly::scene::transform_component>().get_transform()->set_location({0, 0, 2});
 */
 
-    m_actor = scene->create_actor("Test Model");
-    m_actor->get_component<luly::scene::transform_component>().get_transform()->set_scale({2.0f, 2.0f, 2.0f});
+    const std::shared_ptr<luly::scene::scene_actor>& actor = scene->create_actor("Sponza");
+    actor->get_component<luly::scene::transform_component>().get_transform()->set_scale({0.01f, 0.01f, 0.01f});
 
-    // Loading TV model and creating asset.
-    const std::shared_ptr<luly::renderer::model> tv_model = luly::renderer::model_factory::create_model_from_file(
-        "assets/models/tv/tv.obj");
-    const std::shared_ptr<luly::assets::asset>& model_asset = luly::assets::asset_factory::create_asset<
+    // Loading model and creating asset.
+    const std::shared_ptr<luly::renderer::model> sponza_model = luly::renderer::model_factory::create_model_from_file(
+        "assets/models/sponza/sponza.obj");
+    const std::shared_ptr<luly::assets::asset>& sponza_model_asset = luly::assets::asset_factory::create_asset<
         luly::renderer::model>(
-        "tv-model", luly::assets::asset_type::model, tv_model);
-    m_actor->add_component<luly::scene::model_renderer_component>(model_asset->get_data<luly::renderer::model>());
+        "sponza-model", luly::assets::asset_type::model, sponza_model);
+    actor->add_component<luly::scene::model_renderer_component>(sponza_model_asset->get_data<luly::renderer::model>());
 
+    /*
     const std::shared_ptr<luly::renderer::texture_2d>& albedo_texture =
         luly::renderer::texture_factory::create_texture_from_file(
             "assets/textures/tv/tv-albedo.png");
@@ -225,6 +228,7 @@ void basic_application::setup_scene()
     m_actor->add_component<luly::scene::material_component>(tv_material_asset->get_data<luly::renderer::material>());
 
     // Create background actor
+    /*
     const std::shared_ptr<luly::scene::scene_actor>& background_actor = scene->create_actor("Background Actor");
     const std::shared_ptr<luly::renderer::model> background_model =
         luly::renderer::model_factory::create_model_from_file(
@@ -237,6 +241,8 @@ void basic_application::setup_scene()
         background_model_asset->get_data<luly::renderer::model>());
     background_model_renderer_component.set_casts_shadows(false);
     background_actor->get_component<luly::scene::transform_component>().get_transform()->set_scale({5, 1, 5});
+    background_actor->get_component<luly::scene::transform_component>().get_transform()->set_location({0, -3, 0});
+    */
 
     luly::scene::scene_manager::get().switch_scene(scene);
 }

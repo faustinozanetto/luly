@@ -44,6 +44,12 @@ namespace luly::ui
                     skybox_component.set_environment_texture(new_environment_map);
                 }
             }
+
+            float intensity = skybox_component.get_intensity();
+            if (ui_utils::draw_property("Intesity", intensity, 0.0f, 5.0f, 0.01f))
+            {
+                skybox_component.set_intensity(intensity);
+            }
         }
         else
         {

@@ -207,7 +207,7 @@ namespace luly::renderer
     glm::mat4 directional_light::get_light_space_matrix(const std::shared_ptr<perspective_camera>& perspective_camera,
                                                         float near_clip, float far_clip)
     {
-        const glm::ivec2& viewport_size = renderer::get_viewport_size();
+        const glm::ivec2 viewport_size = renderer::get_viewport_size();
         float aspect_ratio = static_cast<float>(viewport_size.x) / static_cast<float>(viewport_size.y);
 
         glm::mat4 projection_matrix = glm::perspective(

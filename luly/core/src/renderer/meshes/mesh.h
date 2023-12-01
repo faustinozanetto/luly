@@ -6,6 +6,8 @@
 #include <vector>
 #include <memory>
 
+#include "renderer/textures/texture_2d.h"
+
 namespace luly::renderer
 {
     typedef uint32_t mesh_index;
