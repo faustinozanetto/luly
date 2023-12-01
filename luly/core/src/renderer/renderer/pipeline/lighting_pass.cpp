@@ -58,8 +58,6 @@ namespace luly::renderer
 
     void lighting_pass::execute()
     {
-        const std::shared_ptr<scene::scene>& current_scene = scene::scene_manager::get().get_current_scene();
-
         // Set state
         renderer::set_state(renderer_state::depth, false);
         m_fbo->bind();
@@ -68,10 +66,13 @@ namespace luly::renderer
 
         update_lights();
 
+        // Retrieve render pass inputs
         const render_pass_input& geometry_pass_input = m_inputs.at("geometry_pass_input");
         const render_pass_input& environment_pass_input = m_inputs.at("environment_pass_input");
         const render_pass_input& ambient_occlusion_pass_input = m_inputs.at("ambient_occlusion_pass_input");
+        const render_pass_input& shadows_pass_input = m_inputs.at("shadows_pass_input");
 
+        // Retrieve render pass inputs outputs.
         const render_pass_output& geometry_position_output = geometry_pass_input.render_pass->get_output(
             "position_output");
         const render_pass_output& geometry_albedo_output = geometry_pass_input.render_pass->get_output("albedo_output");
@@ -79,6 +80,8 @@ namespace luly::renderer
             "normals_output");
         const render_pass_output& geometry_rough_metal_ao_output = geometry_pass_input.render_pass->get_output(
             "rough_metal_ao_output");
+        const render_pass_output& directional_shadow_map_output = shadows_pass_input.render_pass->get_output(
+            "directional_shadow_map_output");
 
         // Blit depth from geometry pass to this fbo.
         int width = m_fbo->get_width();
@@ -93,29 +96,14 @@ namespace luly::renderer
         renderer::bind_texture(1, geometry_albedo_output.output);
         renderer::bind_texture(2, geometry_normals_output.output);
         renderer::bind_texture(3, geometry_rough_metal_ao_output.output);
+        // Bind environemnt pass outputs.
         renderer::bind_texture(4, environment_pass_input.render_pass->get_output("irradiance_output").output);
         renderer::bind_texture(5, environment_pass_input.render_pass->get_output("prefilter_output").output);
         renderer::bind_texture(6, environment_pass_input.render_pass->get_output("brdf_output").output);
+        // Bind ssao output.
         renderer::bind_texture(7, ambient_occlusion_pass_input.render_pass->get_output("ssao_blur_output").output);
-
-        // Directional light cascaded shadow map.
-        const std::shared_ptr<directional_light>& directional_light = current_scene->get_directional_light();
-        renderer::bind_texture(8, directional_light->get_shadow_maps());
-
-        // Upload directional light shadow cascades data
-        size_t cascades_count = directional_light->get_shadow_cascade_levels().size();
-        m_lighting_shader->set_int("u_cascade_shadows_data.cascades_count", cascades_count);
-        for (unsigned int i = 0; i < cascades_count; i++)
-        {
-            m_lighting_shader->set_float("u_cascade_shadows_data.cascade_plane_distances[" + std::to_string(i) + "]",
-                                         directional_light->get_shadow_cascade_levels().at(i));
-        }
-        m_lighting_shader->set_float("u_cascade_shadows_data.inverse_cascade_factor",
-                                     directional_light->get_inverse_cascade_factor());
-        m_lighting_shader->set_float("u_cascade_shadows_data.shadow_bias",
-                                     directional_light->get_shadow_bias());
-        m_lighting_shader->set_int("u_cascade_shadows_data.soft_shadows",
-                                   directional_light->get_soft_shadows());
+        // Bind shadow pass outputs.
+        renderer::bind_texture(8, directional_shadow_map_output.output);
 
         // Update rest of uniforms
         upload_skybox_uniforms();
@@ -133,6 +121,11 @@ namespace luly::renderer
         lighting_output.name = "lighting_output";
         lighting_output.output = m_fbo->get_attachment_id(0);
         add_output(lighting_output);
+    }
+
+    void lighting_pass::on_resize(const glm::ivec2& dimensions)
+    {
+        m_fbo->resize(dimensions);
     }
 
     void lighting_pass::update_lights()

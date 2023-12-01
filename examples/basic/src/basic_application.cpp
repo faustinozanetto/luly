@@ -79,12 +79,11 @@ void basic_application::setup_scene()
     luly::scene::scene_manager::get().add_scene(scene);
 
     scene->get_camera_manager()->get_perspective_camera()->set_far_clip(750.0f);
-    
+
     const std::shared_ptr<luly::scene::scene_actor>& dir_light_actor = scene->create_actor("Light Emitter");
     const std::shared_ptr<luly::renderer::directional_light>& directional_light = std::make_shared<
-        luly::renderer::directional_light>(glm::vec3(0.85f), glm::vec3(-2.36f, -1.98f, 0.5f));
-    directional_light->set_shadow_bias(0.001f);
-    directional_light->set_z_multiplier(1.5f);
+        luly::renderer::directional_light>(glm::vec3(0.85f), glm::vec3(-2.36f, -3.24f, 0.5f));
+    directional_light->set_z_multiplier(10.0f);
     dir_light_actor->add_component<luly::scene::directional_light_component>(directional_light);
     /*
     
@@ -137,9 +136,13 @@ void basic_application::setup_scene()
     }
 */
     const std::shared_ptr<luly::scene::scene_actor>& skybox_actor = scene->create_actor("Skybox Actor");
-    skybox_actor->add_component<luly::scene::skybox_component>(
+    const std::shared_ptr<luly::renderer::texture_2d>& environment_texture =
         luly::renderer::texture_factory::create_environment_texture_from_file(
-            "assets/hdris/kloofendal_43d_clear_puresky_4k.hdr"));
+            "assets/hdris/kloofendal_43d_clear_puresky_4k.hdr");
+    luly::scene::skybox_component& skybox_component = skybox_actor->add_component<luly::scene::skybox_component>(
+        environment_texture
+    );
+    skybox_component.set_intensity(0.01f);
 
     /*
     const auto& spot_light_actor = scene->create_actor("Spot Light Emitter");

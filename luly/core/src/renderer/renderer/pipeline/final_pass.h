@@ -16,6 +16,7 @@ namespace luly::renderer
         void initialize() override;
         void execute() override;
         void set_outputs() override;
+        void on_resize(const glm::ivec2& dimensions) override;
 
     private:
         std::shared_ptr<shader> m_screen_shader;

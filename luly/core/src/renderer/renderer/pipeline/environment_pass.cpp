@@ -55,6 +55,10 @@ namespace luly::renderer
         add_output(environment_cubemap_texture);
     }
 
+    void environment_pass::on_resize(const glm::ivec2& dimensions)
+    {
+    }
+
     void environment_pass::set_environment_map(const std::shared_ptr<texture_2d>& environment_map)
     {
         m_environment_cubemap_texture.reset();

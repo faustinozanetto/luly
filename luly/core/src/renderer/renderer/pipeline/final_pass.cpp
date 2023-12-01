@@ -69,4 +69,9 @@ namespace luly::renderer
         final_output.output = m_fbo->get_attachment_id(0);
         add_output(final_output);
     }
+
+    void final_pass::on_resize(const glm::ivec2& dimensions)
+    {
+        m_fbo->resize(dimensions);
+    }
 }

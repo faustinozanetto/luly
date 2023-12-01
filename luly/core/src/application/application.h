@@ -7,6 +7,8 @@
 #include <events/base_event.h>
 #include <memory>
 
+#include "events/window/window_resize_event.h"
+
 // Entry point used in applications.
 int main(int argc, char** argv);
 
@@ -33,6 +35,7 @@ namespace luly::core
     private:
         void run();
         void on_event(events::base_event& event);
+        bool on_window_resized_event(const events::window_resize_event& window_resize_event);
 
         std::shared_ptr<renderer::window> m_window;
         float m_frame_delay;

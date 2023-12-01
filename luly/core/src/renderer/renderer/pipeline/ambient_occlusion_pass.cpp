@@ -17,7 +17,6 @@ namespace luly::renderer
 
     ambient_occlusion_pass::~ambient_occlusion_pass()
     {
-        m_ssao_kernel.clear();
     }
 
     void ambient_occlusion_pass::initialize()
@@ -66,8 +65,6 @@ namespace luly::renderer
         std::uniform_real_distribution<float> random_floats(0.0, 1.0);
         std::default_random_engine generator;
 
-        m_ssao_kernel.reserve(m_ssao_kernel_size);
-
         for (int i = 0; i < m_ssao_kernel_size; i++)
         {
             glm::vec3 sample(random_floats(generator) * 2.0 - 1.0, random_floats(generator) * 2.0 - 1.0,
@@ -84,8 +81,6 @@ namespace luly::renderer
         }
 
         // Setup ssao noise texture.
-        m_ssao_noise.reserve(m_ssao_noise_sample_size);
-
         for (int i = 0; i < m_ssao_noise_sample_size; i++)
         {
             glm::vec3 noise(random_floats(generator) * 2.0 - 1.0, random_floats(generator) * 2.0 - 1.0, 0.0);
@@ -111,8 +106,8 @@ namespace luly::renderer
         m_ssao_shader->set_float("u_ssao_bias", m_ssao_bias);
         m_ssao_shader->set_float("u_ssao_radius", m_ssao_radius);
 
-        glm::vec2 noise_scale = glm::vec2(renderer::get_viewport_size().x / m_ssao_noise_size,
-                                          renderer::get_viewport_size().y / m_ssao_noise_size);
+        const glm::vec2 noise_scale = glm::vec2(renderer::get_viewport_size().x / m_ssao_noise_size,
+                                                renderer::get_viewport_size().y / m_ssao_noise_size);
         m_ssao_shader->set_vec_float2("u_ssao_noise_size", noise_scale);
 
         m_ssao_shader->set_int("u_ssao_kernel_size", m_ssao_kernel_size);
@@ -164,5 +159,11 @@ namespace luly::renderer
         ssao_noise_output.name = "ssao_noise_output";
         ssao_noise_output.output = m_ssao_noise_texture->get_handle_id();
         add_output(ssao_noise_output);
+    }
+
+    void ambient_occlusion_pass::on_resize(const glm::ivec2& dimensions)
+    {
+        m_fbo->resize(dimensions);
+        m_blur_fbo->resize(dimensions);
     }
 }

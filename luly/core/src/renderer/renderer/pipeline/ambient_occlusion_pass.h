@@ -18,6 +18,7 @@ namespace luly::renderer
         void initialize() override;
         void execute() override;
         void set_outputs() override;
+        void on_resize(const glm::ivec2& dimensions) override;
 
         /* Getters */
         float get_ssao_radius() const { return m_ssao_radius; }

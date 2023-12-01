@@ -45,6 +45,14 @@ namespace luly::scene
         }
     }
 
+    void scene_manager::on_resize(const glm::ivec2& dimensions)
+    {
+        if (m_current_scene)
+        {
+            m_current_scene->get_camera_manager()->get_perspective_camera()->update_projection_matrix(dimensions);
+        }
+    }
+
     void scene_manager::initialize()
     {
         s_instance = new scene_manager();

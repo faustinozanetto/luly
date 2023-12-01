@@ -20,7 +20,9 @@ namespace luly::scene
         static void initialize();
         void add_scene(const std::shared_ptr<scene>& scene);
         void switch_scene(const std::shared_ptr<scene>& scene);
+        
         void on_update(float delta_time);
+        void on_resize(const glm::ivec2& dimensions);
 
     private:
         std::set<std::shared_ptr<scene>> m_scenes_pool;

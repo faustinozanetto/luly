@@ -4,6 +4,8 @@
 
 #include <application/application.h>
 
+#include "events/window/window_resize_event.h"
+
 class basic_application : public luly::core::application
 {
 public:

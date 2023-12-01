@@ -14,7 +14,7 @@ namespace luly::renderer
         LY_TRACE("Started loading model from file...");
         LY_TRACE("  - File Path: '{0}'", file_path);
 
-        const auto& created_model = create_model_using_assimp(file_path);
+        const std::shared_ptr<model>& created_model = create_model_using_assimp(file_path);
 
         LY_TRACE("Model loaded from file successfully!");
         return created_model;
@@ -24,7 +24,7 @@ namespace luly::renderer
     {
         LY_TRACE("Started loading model from meshes...");
 
-        const auto& created_model = std::make_shared<model>(meshes);
+        const std::shared_ptr<model>& created_model = std::make_shared<model>(meshes);
 
         LY_TRACE("Model loaded from meshes successfully!");
         return created_model;
@@ -129,21 +129,26 @@ namespace luly::renderer
         if (assimp_scene->HasMaterials())
         {
             aiMaterial* assimp_material = assimp_scene->mMaterials[assimp_mesh->mMaterialIndex];
-
-            std::vector<model_texture> loaded_textures;
-
-            std::vector<model_texture> albedo_maps = parse_assimp_material_textures(
-                assimp_material, aiTextureType_DIFFUSE, "texture_diffuse", directory, loaded_textures);
-
-            std::vector<model_texture> normal_maps = parse_assimp_material_textures(
-                assimp_material, aiTextureType_NORMALS, "texture_normal", directory, loaded_textures);
-
-            std::vector<model_texture> roughness_maps = parse_assimp_material_textures(
-                assimp_material, aiTextureType_DIFFUSE_ROUGHNESS, "texture_roughness", directory, loaded_textures);
-
-            std::vector<model_texture> ao_maps = parse_assimp_material_textures(
-                assimp_material, aiTextureType_AMBIENT_OCCLUSION, "texture_ao", directory, loaded_textures);
+            /*
+                        std::vector<model_texture> loaded_textures;
+            
+                        std::vector<model_texture> albedo_maps = parse_assimp_material_textures(
+                            assimp_material, aiTextureType_DIFFUSE, "texture_diffuse", directory, loaded_textures);
+            
+                        std::vector<model_texture> normal_maps = parse_assimp_material_textures(
+                            assimp_material, aiTextureType_NORMALS, "texture_normal", directory, loaded_textures);
+            
+                        std::vector<model_texture> roughness_maps = parse_assimp_material_textures(
+                            assimp_material, aiTextureType_DIFFUSE_ROUGHNESS, "texture_roughness", directory, loaded_textures);
+            
+                        std::vector<model_texture> ao_maps = parse_assimp_material_textures(
+                            assimp_material, aiTextureType_AMBIENT_OCCLUSION, "texture_ao", directory, loaded_textures);*/
         }
+
+        LY_TRACE("Parsed model mesh: ");
+        LY_TRACE("   - Name: {}", assimp_mesh->mName.C_Str());
+        LY_TRACE("   - Vertices: {}", vertices.size());
+        LY_TRACE("   - Indices: {}", indices.size());
 
         return std::make_shared<mesh>(assimp_mesh->mName.C_Str(), vertices, indices);
     }

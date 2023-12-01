@@ -24,11 +24,21 @@ namespace luly::renderer
         // Load shader.
         m_directional_light_shadows_shader = shader_factory::create_shader_from_file(
             "assets/shaders/shadows/directional_light_shadows.lsh");
+
+        // Create cascaded shadows ubo.
+        m_cascaded_shadows_ubo = std::make_shared<uniform_buffer_object>(sizeof(cascaded_shadows_parameters), 3);
     }
 
     void shadows_pass::execute()
     {
-        calculate_directional_light_shadows();
+        const std::shared_ptr<scene::scene>& current_scene = scene::scene_manager::get().get_current_scene();
+
+        // 1. Perform directional light cascaded shadow mapping
+        const std::shared_ptr<directional_light>& directional_light = current_scene->get_directional_light();
+        if (!directional_light) return;
+
+        update_cascaded_shadows_ubo(directional_light);
+        calculate_directional_light_shadows(current_scene, directional_light);
         /*
         glCullFace(GL_FRONT);
         glClearColor(FLT_MAX, FLT_MAX, FLT_MAX, FLT_MAX);
@@ -71,21 +81,58 @@ namespace luly::renderer
 
     void shadows_pass::set_outputs()
     {
+        clear_outputs();
+
+        const std::shared_ptr<scene::scene>& current_scene = scene::scene_manager::get().get_current_scene();
+        const std::shared_ptr<directional_light>& directional_light = current_scene->get_directional_light();
+
+        render_pass_output directional_shadow_map_output;
+        directional_shadow_map_output.name = "directional_shadow_map_output";
+        directional_shadow_map_output.output = directional_light->get_shadow_maps();
+        add_output(directional_shadow_map_output);
     }
 
-    void shadows_pass::calculate_directional_light_shadows()
+    void shadows_pass::on_resize(const glm::ivec2& dimensions)
+    {
+    }
+
+    void shadows_pass::initialize_cascaded_shadows_parameters()
+    {
+        m_cascaded_shadows_parameters.cascades_count = 0;
+        m_cascaded_shadows_parameters.inverse_cascade_factor = 0.003f;
+        m_cascaded_shadows_parameters.shadow_bias = 0.005f;
+        m_cascaded_shadows_parameters.soft_shadows = 1;
+        m_cascaded_shadows_parameters.pcf_vertical_samples = 4;
+        m_cascaded_shadows_parameters.pcf_horizontal_samples = 4;
+
+        for (int i = 0; i < 16; i++)
+        {
+            m_cascaded_shadows_parameters.cascade_plane_distances[i] = 0.0f;
+        }
+    }
+
+    void shadows_pass::update_cascaded_shadows_ubo(const std::shared_ptr<directional_light>& directional_light)
+    {
+        m_cascaded_shadows_parameters.cascades_count = directional_light->get_shadow_cascade_levels().size();
+
+        std::vector<float> cascade_planes_distances = directional_light->get_shadow_cascade_levels();
+        for (int i = 0; i < 16; i++)
+        {
+            if (i < cascade_planes_distances.size())
+                m_cascaded_shadows_parameters.cascade_plane_distances[i] = cascade_planes_distances[i];
+            else m_cascaded_shadows_parameters.cascade_plane_distances[i] = 0.0f;
+        }
+
+        m_cascaded_shadows_ubo->set_data(&m_cascaded_shadows_parameters, sizeof(m_cascaded_shadows_parameters));
+    }
+
+    void shadows_pass::calculate_directional_light_shadows(const std::shared_ptr<scene::scene>& current_scene,
+                                                           const std::shared_ptr<directional_light>& directional_light)
     {
         renderer::set_state(renderer_state::depth, true);
 
-        const std::shared_ptr<scene::scene>& current_scene = scene::scene_manager::get().get_current_scene();
-
-        // 1. Perform directional light cascaded shadow mapping
-        const std::shared_ptr<directional_light>& directional_light = current_scene->get_directional_light();
-        if (!directional_light) return;
-
-        directional_light->update_shadow_map_views();
-        
         // Calculate cascades levels and update cascades.
+        directional_light->update_shadow_map_views();
         directional_light->calculate_shadow_map_levels(
             current_scene->get_camera_manager()->get_perspective_camera()->get_far_clip());
         // directional_light->update_shadow_cascades(current_scene->get_camera_manager()->get_perspective_camera());

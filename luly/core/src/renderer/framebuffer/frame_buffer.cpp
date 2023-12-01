@@ -142,6 +142,26 @@ namespace luly::renderer
         un_bind();
     }
 
+    void frame_buffer::resize(const glm::ivec2& dimensions, bool resize_attachments)
+    {
+        m_width = dimensions.x;
+        m_height = dimensions.y;
+
+        // If we mark resize attachments as true, we need
+        // to set the new dimension to the attachments data array.
+        if (resize_attachments)
+        {
+            for (frame_buffer_attachment& attachment : m_attachments_data)
+            {
+                attachment.size = dimensions;
+            }
+            m_depth_attachment_data.size = dimensions;
+        }
+
+        pre_initialize();
+        initialize();
+    }
+
     void frame_buffer::attach_texture(const std::shared_ptr<texture>& texture, uint32_t target,
                                       render_buffer_attachment_type attachment, uint32_t texture_target,
                                       bool register_attachment, int mipmaps_level)

@@ -56,30 +56,10 @@ namespace luly::ui
                 directional_light->set_distance(distance);
             }
 
-            ui_utils::draw_property("Cascaded Shadows");
-            ImGui::Separator();
-            float shadow_bias = directional_light->get_shadow_bias();
-            if (ui_utils::draw_property("Shadow Bias", shadow_bias, 0.0f, 5.0f, 0.00001f))
-            {
-                directional_light->set_shadow_bias(shadow_bias);
-            }
-
-            float inverse_cascade_factor = directional_light->get_inverse_cascade_factor();
-            if (ui_utils::draw_property("Inverse Cascade Factor", inverse_cascade_factor, 0.0f, 5.0f, 0.00001f))
-            {
-                directional_light->set_inverse_cascade_factor(inverse_cascade_factor);
-            }
-
             float z_multiplier = directional_light->get_z_multiplier();
             if (ui_utils::draw_property("Z Multiplier", z_multiplier, 0.0f, 50.0f, 0.01f))
             {
                 directional_light->set_z_multiplier(z_multiplier);
-            }
-
-            bool soft_shadows = directional_light->get_soft_shadows();
-            if (ui_utils::draw_property("Soft Shadows", soft_shadows))
-            {
-                directional_light->set_soft_shados(soft_shadows);
             }
         }
         else

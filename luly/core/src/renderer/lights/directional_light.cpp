@@ -13,10 +13,7 @@ namespace luly::renderer
     {
         m_direction = direction;
         m_distance = 20.0f;
-        m_soft_shadows = true;
         m_z_multiplier = 20.0f;
-        m_shadow_bias = 0.005f;
-        m_inverse_cascade_factor = 0.003f;
         m_shadow_map_dimensions = glm::ivec2(8192, 8192);
 
         calculate_shadow_map_levels(70.0f);
@@ -41,7 +38,7 @@ namespace luly::renderer
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-        
+
         glGenTextures(m_shadow_cascade_levels.size(), m_shadow_map_views);
 
         constexpr float bordercolor[] = {1.0f, 1.0f, 1.0f, 1.0f};

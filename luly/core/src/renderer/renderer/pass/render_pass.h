@@ -43,6 +43,7 @@ namespace luly::renderer
         virtual void initialize() = 0;
         virtual void execute() = 0;
         virtual void set_outputs() = 0;
+        virtual void on_resize(const glm::ivec2& dimensions) = 0;
 
         /* Methods */
         void add_input(const render_pass_input& render_pass_input)
@@ -60,6 +61,8 @@ namespace luly::renderer
 
             m_outputs[render_pass_output.name] = render_pass_output;
         }
+
+        void clear_outputs() { m_outputs.clear(); }
 
     protected:
         std::string m_name;

@@ -28,27 +28,17 @@ namespace luly::renderer
         const glm::vec3& get_direction() const { return m_direction; }
         uint32_t get_shadow_map_fbo() const { return m_shadow_map_fbo; }
         uint32_t get_shadow_maps() const { return m_shadow_maps; }
-        uint32_t* get_shadow_map_views()  { return m_shadow_map_views; }
+        uint32_t* get_shadow_map_views() { return m_shadow_map_views; }
         const glm::ivec2& get_shadow_map_dimensions() const { return m_shadow_map_dimensions; }
         float get_distance() const { return m_distance; }
-        const std::vector<float>& get_shadow_cascade_levels() const { return m_shadow_cascade_levels; }
-        float get_inverse_cascade_factor() const { return m_inverse_cascade_factor; }
-        float get_shadow_bias() const { return m_shadow_bias; }
+        std::vector<float>& get_shadow_cascade_levels() { return m_shadow_cascade_levels; }
         float get_z_multiplier() const { return m_z_multiplier; }
-        bool get_soft_shadows() const { return m_soft_shadows; }
         const std::shared_ptr<uniform_buffer_object>& get_light_matrices_ubo() const { return m_light_matrices_ubo; }
 
         /* Setters */
         void set_direction(const glm::vec3& direction) { m_direction = direction; }
         void set_distance(float distance) { m_distance = distance; }
-        void set_soft_shados(bool soft_shadows) { m_soft_shadows = soft_shadows; }
-        void set_shadow_bias(float shadow_bias) { m_shadow_bias = shadow_bias; }
         void set_z_multiplier(float z_multiplier) { m_z_multiplier = z_multiplier; }
-
-        void set_inverse_cascade_factor(float inverse_cascade_factor)
-        {
-            m_inverse_cascade_factor = inverse_cascade_factor;
-        }
 
         /* Methods */
         void update_shadow_map_views();
@@ -78,9 +68,6 @@ namespace luly::renderer
         std::vector<glm::vec3> m_cascade_bound_centers;
         std::shared_ptr<uniform_buffer_object> m_light_matrices_ubo;
         directional_light_shadow m_shadow_data;
-        float m_inverse_cascade_factor;
-        float m_shadow_bias;
-        bool m_soft_shadows;
         float m_z_multiplier;
     };
 }

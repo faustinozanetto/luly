@@ -10,7 +10,7 @@ namespace luly::renderer
     {
         m_perspective_camera = perspective_camera;
         m_movement_speed = 3.0f;
-        m_mouse_speed = 6.0f;
+        m_mouse_speed = 15.0f;
         m_last_mouse_pos = glm::vec2(0, 0);
     }
 

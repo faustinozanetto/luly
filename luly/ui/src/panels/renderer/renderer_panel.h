@@ -2,7 +2,6 @@
 #include <memory>
 
 #include "panels/ui_panel.h"
-#include "renderer/framebuffer/frame_buffer.h"
 #include "renderer/renderer/pass/render_pass.h"
 
 namespace luly::ui

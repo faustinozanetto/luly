@@ -23,6 +23,8 @@
 #include <logging/log.h>
 #include <utils/assert.h>
 
+#include "panels/shadows/shadows_panel.h"
+
 namespace luly::ui
 {
     engine_ui_data engine_ui::s_engine_ui_data = {};
@@ -109,7 +111,7 @@ namespace luly::ui
         colors[ImGuiCol_ModalWindowDimBg] = ImVec4(1.00f, 0.00f, 0.00f, 0.35f);
 
         ImGuiStyle& style = ImGui::GetStyle();
-        
+
         style.WindowPadding = ImVec2(6.00f, 6.00f);
         style.FramePadding = ImVec2(5.00f, 2.00f);
         style.CellPadding = ImVec2(6.00f, 6.00f);
@@ -145,6 +147,7 @@ namespace luly::ui
         s_engine_ui_data.panels.push_back(std::make_shared<camera_panel>());
         s_engine_ui_data.panels.push_back(std::make_shared<renderer_panel>());
         s_engine_ui_data.panels.push_back(std::make_shared<assets_panel>());
+        s_engine_ui_data.panels.push_back(std::make_shared<shadows_panel>());
     }
 
     void engine_ui::initialize_log_sink()

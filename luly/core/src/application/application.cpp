@@ -77,6 +77,18 @@ namespace luly::core
 
     void application::on_event(events::base_event& event)
     {
+        events::event_dispatcher dispatcher(event);
+        dispatcher.dispatch<events::window_resize_event>(BIND_EVENT_FN(on_window_resized_event));
+
+        // Call the on_handle_event for the child classes.
         on_handle_event(event);
+    }
+
+    bool application::on_window_resized_event(const events::window_resize_event& window_resize_event)
+    {
+        renderer::renderer::set_viewport_size(window_resize_event.get_size());
+        renderer::scene_renderer::on_resize(window_resize_event.get_size());
+        scene::scene_manager::get().on_resize(window_resize_event.get_size());
+        return true;
     }
 }

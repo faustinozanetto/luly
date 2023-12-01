@@ -127,6 +127,17 @@ namespace luly::ui
     {
         if (ImGui::TreeNode(render_pass->get_name().c_str()))
         {
+            if (render_pass->get_fbo())
+            {
+                ui_utils::draw_property("Frame Buffer");
+                ImGui::Separator();
+                ui_utils::draw_property("Dimensions",
+                                        std::format("{}x{}", render_pass->get_fbo()->get_width(),
+                                                    render_pass->get_fbo()->get_height()));
+            }
+
+            ui_utils::draw_property("Outputs");
+            ImGui::Separator();
             draw_render_pass_outputs(render_pass->get_outputs());
             return true;
         }

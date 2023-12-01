@@ -4,15 +4,13 @@
 #include "renderer/renderer/pipeline/geometry_pass.h"
 #include "renderer/buffers/uniform/uniform_buffer_object.h"
 #include "renderer/camera/camera.h"
-#include "renderer/shaders/shader.h"
-
-#include <memory>
-
 #include "renderer/renderer/pipeline/ambient_occlusion_pass.h"
 #include "renderer/renderer/pipeline/environment_pass.h"
 #include "renderer/renderer/pipeline/lighting_pass.h"
 #include "renderer/renderer/pipeline/shadows_pass.h"
 #include "renderer/renderer/pipeline/skybox_pass.h"
+
+#include <memory>
 
 namespace luly::renderer
 {
@@ -54,6 +52,7 @@ namespace luly::renderer
         static void set_outputs();
 
         static void set_environment_map(const std::shared_ptr<texture_2d>& environment_map);
+        static void on_resize(const glm::ivec2& viewport_size);
 
         /* Getters */
         static scene_renderer_data& get_data();

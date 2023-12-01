@@ -64,6 +64,14 @@ namespace luly::renderer
         s_data.environment_pass->set_environment_map(environment_map);
     }
 
+    void scene_renderer::on_resize(const glm::ivec2& viewport_size)
+    {
+        s_data.geometry_pass->on_resize(viewport_size);
+        s_data.lighting_pass->on_resize(viewport_size);
+        s_data.skybox_pass->on_resize(viewport_size);
+        s_data.final_pass->on_resize(viewport_size);
+    }
+
     scene_renderer_data& scene_renderer::get_data()
     {
         return s_data;

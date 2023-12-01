@@ -29,32 +29,37 @@ namespace luly::renderer
             {
                 texture_internal_format::rgb16f,
                 texture_filtering::linear,
-                texture_wrapping::clamp_to_edge, viewport_size
+                texture_wrapping::clamp_to_edge,
+                viewport_size
             },
             // Albedo
             {
                 texture_internal_format::rgba16f,
                 texture_filtering::linear,
-                texture_wrapping::clamp_to_edge, viewport_size
+                texture_wrapping::clamp_to_edge,
+                viewport_size
             },
             // Normal
             {
                 texture_internal_format::rgb16f,
                 texture_filtering::linear,
-                texture_wrapping::clamp_to_edge, viewport_size
+                texture_wrapping::clamp_to_edge,
+                viewport_size
             },
             // Roughness-Metallic-AO
             {
                 texture_internal_format::rgb16f,
                 texture_filtering::linear,
-                texture_wrapping::clamp_to_edge, viewport_size
+                texture_wrapping::clamp_to_edge,
+                viewport_size
             },
         };
 
         frame_buffer_attachment depth_attachment = {
             texture_internal_format::depth_component32,
             texture_filtering::linear,
-            texture_wrapping::clamp_to_edge, viewport_size
+            texture_wrapping::clamp_to_edge,
+            viewport_size
         };
 
         m_fbo = std::make_shared<frame_buffer>(
@@ -135,5 +140,10 @@ namespace luly::renderer
         depth_output.name = "depth_output";
         depth_output.output = m_fbo->get_depth_attachment();
         add_output(depth_output);
+    }
+
+    void geometry_pass::on_resize(const glm::ivec2& dimensions)
+    {
+        m_fbo->resize(dimensions);
     }
 }
