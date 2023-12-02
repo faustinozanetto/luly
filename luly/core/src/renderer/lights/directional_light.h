@@ -13,12 +13,13 @@ namespace luly::renderer
 
         /* Getters */
         const glm::vec3& get_direction() const { return m_direction; }
+        std::vector<float>& get_shadow_cascade_levels() { return m_shadow_cascade_levels; }
         uint32_t get_shadow_map_fbo() const { return m_shadow_map_fbo; }
         uint32_t get_shadow_maps() const { return m_shadow_maps; }
         uint32_t* get_shadow_map_views() { return m_shadow_map_views; }
         const glm::ivec2& get_shadow_map_dimensions() const { return m_shadow_map_dimensions; }
+        int get_cascades_count() const { return m_cascades_count; }
         float get_distance() const { return m_distance; }
-        std::vector<float>& get_shadow_cascade_levels() { return m_shadow_cascade_levels; }
         float get_z_multiplier() const { return m_z_multiplier; }
         const std::shared_ptr<uniform_buffer_object>& get_light_matrices_ubo() const { return m_light_matrices_ubo; }
 
@@ -26,10 +27,11 @@ namespace luly::renderer
         void set_direction(const glm::vec3& direction) { m_direction = direction; }
         void set_distance(float distance) { m_distance = distance; }
         void set_z_multiplier(float z_multiplier) { m_z_multiplier = z_multiplier; }
+        void set_cascades_count(int cascades_count);
 
         /* Methods */
-        void update_shadow_map_views();
-        void calculate_shadow_map_levels(float far_clip);
+        void update_shadow_map_views() const;
+        void calculate_cascade_levels(float far_clip);
         void update_shadow_cascades(const std::shared_ptr<perspective_camera>& perspective_camera);
 
     private:
@@ -41,6 +43,7 @@ namespace luly::renderer
         float m_distance;
 
         // Cascaded shadow maps.
+        int m_cascades_count;
         glm::ivec2 m_shadow_map_dimensions;
         std::vector<float> m_shadow_cascade_levels;
         uint32_t m_shadow_map_fbo;

@@ -30,9 +30,9 @@ void main() {
     vec3 env_color = textureLod(u_environment_map, o_world_pos, 0.1).rgb;
     
     // HDR tonemap and gamma correct
-    vec3 mapped = vec3(1.0) - exp(-env_color * 0.7);
+    //vec3 mapped = vec3(1.0) - exp(-env_color * 0.7);
     // gamma correction 
-    mapped = pow(mapped, vec3(1.0 / 1.9));
+  //  mapped = pow(mapped, vec3(1.0 / 1.9));
     
-    frag_color = vec4(mapped, 1.0);
+    frag_color = vec4(env_color, 1.0);
 }

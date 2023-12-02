@@ -136,8 +136,7 @@ namespace luly::renderer
             get_perspective_camera();
 
         // Calculate cascades levels and update cascades.
-        // directional_light->update_shadow_map_views();
-        directional_light->calculate_shadow_map_levels(perspective_camera->get_far_clip());
+        directional_light->calculate_cascade_levels(perspective_camera->get_far_clip());
         directional_light->update_shadow_cascades(perspective_camera);
         
         // Setup fbo and shader.

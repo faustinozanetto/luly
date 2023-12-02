@@ -14,10 +14,11 @@ namespace luly::renderer
         m_direction = direction;
         m_distance = 20.0f;
         m_z_multiplier = 20.0f;
+        m_cascades_count = 4;
         m_shadow_map_dimensions = glm::ivec2(8196, 8196);
 
-        calculate_shadow_map_levels(70.0f);
-
+        calculate_cascade_levels(500.0f);
+        
         // Create shadow map fbo
         glGenFramebuffers(1, &m_shadow_map_fbo);
         glGenTextures(1, &m_shadow_maps);
@@ -50,6 +51,7 @@ namespace luly::renderer
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+        
         m_light_matrices_ubo = std::make_shared<uniform_buffer_object>(sizeof(glm::mat4) * 16, 2);
 
         m_cascade_bound_centers.reserve(m_shadow_cascade_levels.size() + 1);
@@ -58,18 +60,18 @@ namespace luly::renderer
             m_cascade_bound_centers.push_back(glm::vec3(0.0f));
         }
     }
-    
+
     glm::mat4 directional_light::get_light_space_matrix(const std::shared_ptr<perspective_camera>& perspective_camera,
                                                         float near_clip, float far_clip)
     {
         const glm::ivec2 viewport_size = renderer::get_viewport_size();
-        float aspect_ratio = static_cast<float>(viewport_size.x) / static_cast<float>(viewport_size.y);
+        const float aspect_ratio = static_cast<float>(viewport_size.x) / static_cast<float>(viewport_size.y);
 
-        glm::mat4 projection_matrix = glm::perspective(
+        const glm::mat4 projection_matrix = glm::perspective(
             glm::radians(perspective_camera->get_fov()), aspect_ratio, near_clip,
             far_clip);
 
-        std::vector<glm::vec4> corners = perspective_camera->get_frustum_corners_world_space(
+        const std::vector<glm::vec4> corners = perspective_camera->get_frustum_corners_world_space(
             projection_matrix, perspective_camera->get_view_matrix());
 
         glm::vec3 center = glm::vec3(0, 0, 0);
@@ -79,52 +81,51 @@ namespace luly::renderer
         }
         center /= corners.size();
 
-        glm::mat4 light_view_matrix = glm::lookAt(
+        const glm::mat4 light_view_matrix = glm::lookAt(
             center - m_direction,
             center,
             glm::vec3(0.0f, 1.0f, 0.0f)
         );
 
-        float minX = std::numeric_limits<float>::max();
-        float maxX = std::numeric_limits<float>::min();
-        float minY = std::numeric_limits<float>::max();
-        float maxY = std::numeric_limits<float>::min();
-        float minZ = std::numeric_limits<float>::max();
-        float maxZ = std::numeric_limits<float>::min();
+        float min_x = std::numeric_limits<float>::max();
+        float max_x = std::numeric_limits<float>::min();
+        float min_y = std::numeric_limits<float>::max();
+        float max_y = std::numeric_limits<float>::min();
+        float min_z = std::numeric_limits<float>::max();
+        float max_z = std::numeric_limits<float>::min();
         for (const auto& v : corners)
         {
             const auto trf = light_view_matrix * v;
-            minX = std::min(minX, trf.x);
-            maxX = std::max(maxX, trf.x);
-            minY = std::min(minY, trf.y);
-            maxY = std::max(maxY, trf.y);
-            minZ = std::min(minZ, trf.z);
-            maxZ = std::max(maxZ, trf.z);
+            min_x = std::min(min_x, trf.x);
+            max_x = std::max(max_x, trf.x);
+            min_y = std::min(min_y, trf.y);
+            max_y = std::max(max_y, trf.y);
+            min_z = std::min(min_z, trf.z);
+            max_z = std::max(max_z, trf.z);
         }
 
-        if (minZ < 0)
+        if (min_z < 0)
         {
-            minZ *= m_z_multiplier;
+            min_z *= m_z_multiplier;
         }
         else
         {
-            minZ /= m_z_multiplier;
+            min_z /= m_z_multiplier;
         }
-        if (maxZ < 0)
+        if (max_z < 0)
         {
-            maxZ /= m_z_multiplier;
+            max_z /= m_z_multiplier;
         }
         else
         {
-            /*
-            if (maxZ < 0.5f)
+            if (max_z < 0.5f)
             {
-                maxZ = 0.5f;
-            }*/
-            maxZ *= m_z_multiplier;
+                max_z = 0.5f;
+            }
+            max_z *= m_z_multiplier;
         }
 
-        glm::mat4 light_projection = glm::ortho(minX, maxX, minY, maxY, minZ, maxZ);
+        const glm::mat4 light_projection = glm::ortho(min_x, max_x, min_y, max_y, min_z, max_z);
         return light_projection * light_view_matrix;
     }
 
@@ -154,7 +155,12 @@ namespace luly::renderer
         return matrices;
     }
 
-    void directional_light::update_shadow_map_views()
+    void directional_light::set_cascades_count(int cascades_count)
+    {
+        m_cascades_count = cascades_count;
+    }
+
+    void directional_light::update_shadow_map_views() const
     {
         for (uint32_t i = 0; i < m_shadow_cascade_levels.size(); ++i)
         {
@@ -163,18 +169,20 @@ namespace luly::renderer
         }
     }
 
-    void directional_light::calculate_shadow_map_levels(float far_clip)
+    void directional_light::calculate_cascade_levels(float far_clip)
     {
         m_shadow_cascade_levels.clear();
-        m_shadow_cascade_levels.push_back(far_clip / 50.0f);
-        m_shadow_cascade_levels.push_back(far_clip / 25.0f);
-        m_shadow_cascade_levels.push_back(far_clip / 10.0f);
-        m_shadow_cascade_levels.push_back(far_clip / 2.0f);
+        for (int i = 0; i < m_cascades_count; ++i)
+        {
+            float split_factor = static_cast<float>(i + 1) / static_cast<float>(m_cascades_count + 1);
+            float cascade_far_clip = std::pow(far_clip, split_factor);
+            m_shadow_cascade_levels.push_back(cascade_far_clip);
+        }
     }
 
     void directional_light::update_shadow_cascades(const std::shared_ptr<perspective_camera>& perspective_camera)
     {
-        std::vector<glm::mat4> light_space_matrices = get_light_space_matrices(perspective_camera);
+        const std::vector<glm::mat4> light_space_matrices = get_light_space_matrices(perspective_camera);
         for (size_t i = 0; i < light_space_matrices.size(); ++i)
         {
             m_light_matrices_ubo->set_data(&light_space_matrices[i], sizeof(glm::mat4x4),
