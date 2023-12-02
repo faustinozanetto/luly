@@ -222,6 +222,7 @@ namespace luly::renderer
         for (const auto& [actor, skybox_component] : view.each())
         {
             m_lighting_shader->set_float("u_skybox_intensity", skybox_component.get_intensity());
+            m_lighting_shader->set_vec_float4("u_skybox_tint", glm::vec4(skybox_component.get_tint(), 1.0));
         }
     }
 }

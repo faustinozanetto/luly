@@ -6,19 +6,6 @@
 
 namespace luly::renderer
 {
-    struct directional_light_shadow
-    {
-        glm::mat4 world_to_shadow_matrix;
-        glm::mat4 shadow_view;
-        float radius;
-    };
-
-    struct bounding_sphere
-    {
-        glm::vec3 frustum_center;
-        float radius;
-    };
-
     class directional_light : public light
     {
     public:
@@ -44,18 +31,12 @@ namespace luly::renderer
         void update_shadow_map_views();
         void calculate_shadow_map_levels(float far_clip);
         void update_shadow_cascades(const std::shared_ptr<perspective_camera>& perspective_camera);
-        directional_light_shadow calculate_shadow_matrix(const std::shared_ptr<perspective_camera>& perspective_camera);
-        bounding_sphere calculate_frustum_bounding_sphere(const std::shared_ptr<perspective_camera>& perspective_camera,
-                                                          float near_clip, float far_clip);
-        bool cascade_needs_update(const glm::mat4& shadow_view_matrix, const glm::vec3& new_center,
-                                  const glm::vec3& old_center, float radius,
-                                  glm::vec3& offset);
 
+    private:
         glm::mat4 get_light_space_matrix(const std::shared_ptr<perspective_camera>& perspective_camera,
                                          float near_clip, float far_clip);
         std::vector<glm::mat4> get_light_space_matrices(const std::shared_ptr<perspective_camera>& perspective_camera);
 
-    private:
         glm::vec3 m_direction;
         float m_distance;
 
@@ -67,7 +48,6 @@ namespace luly::renderer
         uint32_t m_shadow_map_views[4];
         std::vector<glm::vec3> m_cascade_bound_centers;
         std::shared_ptr<uniform_buffer_object> m_light_matrices_ubo;
-        directional_light_shadow m_shadow_data;
         float m_z_multiplier;
     };
 }

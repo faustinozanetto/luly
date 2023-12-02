@@ -30,9 +30,9 @@ namespace luly::ui
             ui_utils::draw_property("Parameters");
             ImGui::Separator();
 
-            if (ui_utils::draw_property("Environemt Map", skybox_component.get_environment_texture()))
+            if (ui_utils::draw_property("Environment Map", skybox_component.get_environment_texture()))
             {
-                std::string file_path = utils::file_utils::open_file_dialog("Environment Map", {"*.hdr"});
+                const std::string file_path = utils::file_utils::open_file_dialog("Environment Map", {"*.hdr"});
                 if (file_path.empty())
                 {
                     LY_WARN("Failed to load environment map from file dialog!");
@@ -49,6 +49,12 @@ namespace luly::ui
             if (ui_utils::draw_property("Intesity", intensity, 0.0f, 5.0f, 0.01f))
             {
                 skybox_component.set_intensity(intensity);
+            }
+
+            glm::vec3 tint = skybox_component.get_tint();
+            if (ui_utils::draw_property("Tint", tint))
+            {
+                skybox_component.set_tint(tint);
             }
         }
         else

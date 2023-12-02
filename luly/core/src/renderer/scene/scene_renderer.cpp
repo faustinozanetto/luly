@@ -70,6 +70,7 @@ namespace luly::renderer
         s_data.lighting_pass->on_resize(viewport_size);
         s_data.skybox_pass->on_resize(viewport_size);
         s_data.final_pass->on_resize(viewport_size);
+        s_data.ambient_occlusion_pass->on_resize(viewport_size);
     }
 
     scene_renderer_data& scene_renderer::get_data()

@@ -34,9 +34,10 @@ layout (binding = 7) uniform sampler2D u_ambient_occlusion_map;
 layout (binding = 8) uniform sampler2DArray u_cascades_shadow_map;
 
 uniform float u_skybox_intensity;
+uniform vec4 u_skybox_tint;
 
 vec3 sample_irradiance_map(vec3 normal) {
-    return texture(u_irradiance_map, normalize(normal)).rgb;
+    return texture(u_irradiance_map, normal).rgb;
 }
 
 vec3 sample_prefilter_map(vec3 reflection_dir, float roughness) {
@@ -46,8 +47,7 @@ vec3 sample_prefilter_map(vec3 reflection_dir, float roughness) {
 }
 
 vec2 sample_brdf_lut_map(vec3 view_dir, vec3 normal, float roughness) {
-    float NdotV = clamp(dot(normal, view_dir), 0.0, 1.0);
-    return texture(u_brdf_map, vec2(NdotV, roughness)).rg;
+    return texture(u_brdf_map, vec2(max(dot(normal, view_dir), 0.0), roughness)).rg;
 }
 
 float calculate_directional_light_shadow(vec3 frag_pos, vec3 normal, vec3 light_dir) {
@@ -59,7 +59,7 @@ float calculate_directional_light_shadow(vec3 frag_pos, vec3 normal, vec3 light_
     for (int i = 0; i < cascaded_shadows_parameters.cascades_count; ++i)
     {
         float cascadeDistance = cascaded_shadows_parameters.cascade_plane_distances[i];
-        
+
         if (depth_value < cascadeDistance)
         {
             layer = i;
@@ -208,8 +208,8 @@ void main()
     float ambient_occlusion = rough_metal_ao.b;
 
     float world_ambient_occlusion = texture(u_ambient_occlusion_map, o_tex_coord).r;
-    //  ambient_occlusion *= world_ambient_occlusion;
-    //ambient_occlusion /= 2;
+    ambient_occlusion *= world_ambient_occlusion;
+    ambient_occlusion /= 2;
 
     vec3 view_dir = normalize(camera.position.xyz - frag_pos);
     vec3 reflect_dir = reflect(-view_dir, normal);
@@ -228,32 +228,22 @@ void main()
            luminance += calculate_spot_light_luminance(lights.spot_lights[i], normal, view_dir, frag_pos, albedo, F0, roughness, metallic);
        }
            */
-    /*
-vec3 irradiance = sample_irradiance_map(normal);
-vec3 prefilter = sample_prefilter_map(reflect_dir, roughness);
-vec2 brdf_lut = sample_brdf_lut_map(view_dir, normal, roughness);
 
-luminance += calculate_ambient_ibl(albedo, normal, view_dir, irradiance,
-     prefilter, brdf_lut, F0, roughness, metallic, ambient_occlusion);
-*/
 
-    // ambient lighting (we now use IBL as the ambient term)
     vec3 F = fresnel_schlick_roughness(max(dot(normal, view_dir), 0.0), F0, roughness);
 
     vec3 kS = F;
     vec3 kD = 1.0 - kS;
     kD *= 1.0 - metallic;
 
-    vec3 irradiance = texture(u_irradiance_map, normal).rgb;
+    vec3 irradiance = sample_irradiance_map(normal);
     vec3 diffuse      = irradiance * albedo;
 
-    // sample both the pre-filter map and the BRDF lut and combine them together as per the Split-Sum approximation to get the IBL specular part.
-    const float MAX_REFLECTION_LOD = 4.0;
-    vec3 prefilteredColor = textureLod(u_prefilter_map, reflect_dir, roughness * MAX_REFLECTION_LOD).rgb;
-    vec2 brdf  = texture(u_brdf_map, vec2(max(dot(normal, view_dir), 0.0), roughness)).rg;
-    vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
+    vec3 prefilter = sample_prefilter_map(reflect_dir, roughness);
+    vec2 brdf_lut = sample_brdf_lut_map(view_dir, normal, roughness);
+    vec3 specular = prefilter * (F * brdf_lut.x + brdf_lut.y);
 
-    vec3 ambient = (kD * diffuse + specular) * ambient_occlusion * u_skybox_intensity;
+    vec3 ambient = (kD * diffuse + specular)  * u_skybox_intensity * u_skybox_tint.rgb;
 
     vec3 color = ambient + luminance;
 

@@ -17,6 +17,7 @@ namespace luly::scene
         /* Getters */
         const std::shared_ptr<renderer::texture_2d>& get_environment_texture() const { return m_environment_texture; }
         float get_intensity() const { return m_intensity; }
+        const glm::vec3& get_tint() const { return m_tint; }
 
         /* Setters */
         void set_environment_texture(const std::shared_ptr<renderer::texture_2d>& environment_texture)
@@ -26,9 +27,11 @@ namespace luly::scene
         }
 
         void set_intensity(float intensity) { m_intensity = intensity; }
+        void set_tint(const glm::vec3& tint) { m_tint = tint; }
 
     private:
         std::shared_ptr<renderer::texture_2d> m_environment_texture;
         float m_intensity;
+        glm::vec3 m_tint;
     };
 }

@@ -132,31 +132,26 @@ namespace luly::renderer
     {
         renderer::set_state(renderer_state::depth, true);
 
-        // Calculate cascades levels and update cascades.
-        directional_light->update_shadow_map_views();
-        directional_light->calculate_shadow_map_levels(
-            current_scene->get_camera_manager()->get_perspective_camera()->get_far_clip());
-        // directional_light->update_shadow_cascades(current_scene->get_camera_manager()->get_perspective_camera());
-        std::vector<glm::mat4> lightSpaceMatrices = directional_light->get_light_space_matrices(
-            current_scene->get_camera_manager()->get_perspective_camera());
-        for (size_t i = 0; i < lightSpaceMatrices.size(); ++i)
-        {
-            directional_light->get_light_matrices_ubo()->set_data(&lightSpaceMatrices[i], sizeof(glm::mat4x4),
-                                                                  i * sizeof(glm::mat4x4));
-        }
+        const std::shared_ptr<perspective_camera>& perspective_camera = current_scene->get_camera_manager()->
+            get_perspective_camera();
 
+        // Calculate cascades levels and update cascades.
+        // directional_light->update_shadow_map_views();
+        directional_light->calculate_shadow_map_levels(perspective_camera->get_far_clip());
+        directional_light->update_shadow_cascades(perspective_camera);
+        
         // Setup fbo and shader.
         m_directional_light_shadows_shader->bind();
         glBindFramebuffer(GL_FRAMEBUFFER, directional_light->get_shadow_map_fbo());
         renderer::set_viewport_size(directional_light->get_shadow_map_dimensions());
         glClear(GL_DEPTH_BUFFER_BIT);
-        glCullFace(GL_FRONT);
+        // glCullFace(GL_FRONT);
 
         // Render geometry.
         render_geometry();
 
         // Reset state.
-        glCullFace(GL_BACK);
+        //glCullFace(GL_BACK);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         m_directional_light_shadows_shader->un_bind();
 

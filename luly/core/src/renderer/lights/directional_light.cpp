@@ -14,7 +14,7 @@ namespace luly::renderer
         m_direction = direction;
         m_distance = 20.0f;
         m_z_multiplier = 20.0f;
-        m_shadow_map_dimensions = glm::ivec2(8192, 8192);
+        m_shadow_map_dimensions = glm::ivec2(8196, 8196);
 
         calculate_shadow_map_levels(70.0f);
 
@@ -22,17 +22,9 @@ namespace luly::renderer
         glGenFramebuffers(1, &m_shadow_map_fbo);
         glGenTextures(1, &m_shadow_maps);
         glBindTexture(GL_TEXTURE_2D_ARRAY, m_shadow_maps);
-        glTexImage3D(
-            GL_TEXTURE_2D_ARRAY,
-            0,
-            GL_DEPTH_COMPONENT32F,
-            m_shadow_map_dimensions.x,
-            m_shadow_map_dimensions.y,
-            int(m_shadow_cascade_levels.size()) + 1,
-            0,
-            GL_DEPTH_COMPONENT,
-            GL_FLOAT,
-            nullptr);
+        glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT32F, m_shadow_map_dimensions.x,
+                     m_shadow_map_dimensions.y, int(m_shadow_cascade_levels.size()) + 1,
+                     0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
 
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -66,141 +58,7 @@ namespace luly::renderer
             m_cascade_bound_centers.push_back(glm::vec3(0.0f));
         }
     }
-
-    void directional_light::update_shadow_cascades(const std::shared_ptr<perspective_camera>& perspective_camera)
-    {
-        float min_distance = 0.0f;
-        float near_clip = perspective_camera->get_near_clip();
-        float far_clip = perspective_camera->get_far_clip();
-        m_shadow_data = calculate_shadow_matrix(perspective_camera);
-
-        const glm::mat3 shadow_offset_matrix = glm::mat3(glm::transpose(m_shadow_data.shadow_view));
-        for (uint32_t cascade = 0; cascade <= m_shadow_cascade_levels.size(); cascade++)
-        {
-            const float near_split_distance = near_clip + (cascade == 0
-                                                               ? min_distance
-                                                               : m_shadow_cascade_levels[cascade - 1]);
-            const float far_split_distance = near_clip + (cascade == m_shadow_cascade_levels.size()
-                                                              ? far_clip
-                                                              : m_shadow_cascade_levels[cascade]);
-
-            const bounding_sphere bounding_sphere = calculate_frustum_bounding_sphere(
-                perspective_camera, near_split_distance, far_split_distance);
-
-            glm::vec3 offset;
-
-            if (cascade_needs_update(m_shadow_data.shadow_view, bounding_sphere.frustum_center,
-                                     m_cascade_bound_centers[cascade], bounding_sphere.radius, offset))
-            {
-                glm::vec3 world_space_offset = shadow_offset_matrix * offset;
-                m_cascade_bound_centers[cascade] += world_space_offset;
-            }
-
-            glm::vec3 cascade_center_shadow_space = glm::vec3(
-                m_shadow_data.world_to_shadow_matrix * glm::vec4(m_cascade_bound_centers[cascade], 1.0f));
-            float scale = m_shadow_data.radius / bounding_sphere.radius;
-
-            glm::mat4 cascade_translate_inverse = glm::translate(glm::mat4(1.0f),
-                                                                 glm::vec3(-cascade_center_shadow_space.x,
-                                                                           -cascade_center_shadow_space.y, 0.0f));
-            glm::mat4 cascade_scale = glm::scale(glm::mat4(1.0), glm::vec3(scale, scale, 1.0f));
-
-            glm::mat4 light_view_projection_matrix = cascade_scale * cascade_translate_inverse * m_shadow_data.
-                world_to_shadow_matrix;
-
-            m_light_matrices_ubo->set_data(&light_view_projection_matrix, sizeof(glm::mat4x4),
-                                           cascade * sizeof(glm::mat4x4));
-        }
-    }
-
-    directional_light_shadow directional_light::calculate_shadow_matrix(
-        const std::shared_ptr<perspective_camera>& perspective_camera)
-    {
-        bounding_sphere shadow_bounds = calculate_frustum_bounding_sphere(
-            perspective_camera, perspective_camera->get_near_clip(), perspective_camera->get_far_clip());
-
-        const glm::vec3 camera_frustum_center_world_space = shadow_bounds.frustum_center;
-        const glm::vec3 light_position = camera_frustum_center_world_space + glm::normalize(m_direction) * m_distance;
-
-        glm::vec3 up_vector = glm::normalize(glm::cross(m_direction, glm::vec3(0.0f, 1.0f, 0.0f)));
-
-        const float direction_bias = 0.0001f;
-
-        if (glm::abs(glm::dot(up_vector, m_direction)) < direction_bias)
-        {
-            up_vector = glm::normalize(glm::cross(m_direction, glm::vec3(0.0f, 0.0f, -1.0f)));
-        }
-
-        const glm::mat4 shadow_view = glm::lookAt(camera_frustum_center_world_space, light_position, up_vector);
-        const glm::mat4 shadow_projection = glm::ortho(-shadow_bounds.radius, shadow_bounds.radius,
-                                                       -shadow_bounds.radius,
-                                                       shadow_bounds.radius, -shadow_bounds.radius,
-                                                       shadow_bounds.radius);
-
-        directional_light_shadow result;
-        result.world_to_shadow_matrix = shadow_projection * shadow_view;
-        result.shadow_view = shadow_view;
-        result.radius = shadow_bounds.radius;
-        return result;
-    }
-
-    bounding_sphere directional_light::calculate_frustum_bounding_sphere(
-        const std::shared_ptr<perspective_camera>& perspective_camera, float near_clip, float far_clip)
-    {
-        const glm::ivec2& viewport_size = renderer::get_viewport_size();
-        const float aspect_ratio = static_cast<float>(viewport_size.x) / static_cast<float>(viewport_size.y);
-
-        std::vector<glm::vec4> corners = perspective_camera->get_frustum_corners_world_space(
-            glm::perspective(glm::radians(glm::radians(perspective_camera->get_fov())), aspect_ratio,
-                             near_clip, far_clip),
-            perspective_camera->get_view_matrix());
-
-        glm::vec3 center = glm::vec3(0.0f);
-        for (const glm::vec4& corner : corners)
-        {
-            center += glm::vec3(corner);
-        }
-        center /= corners.size();
-
-        float radius = 0.0f;
-        for (uint32_t i = 0; i < 8; i++)
-        {
-            float distance = glm::length(glm::vec3(corners[i].x, corners[i].y, corners[i].z) - center);
-            radius = glm::max(radius, distance);
-        }
-        radius = std::round(radius * 16.0f) / 16.0f;
-
-        bounding_sphere result;
-        result.frustum_center = center;
-        result.radius = radius;
-
-        return result;
-    }
-
-    bool directional_light::cascade_needs_update(const glm::mat4& shadow_view_matrix, const glm::vec3& new_center,
-                                                 const glm::vec3& old_center, float radius,
-                                                 glm::vec3& offset)
-    {
-        const glm::vec3 old_center_view_space = glm::vec3(shadow_view_matrix * glm::vec4(old_center, 1.0f));
-        const glm::vec3 new_center_view_space = glm::vec3(shadow_view_matrix * glm::vec4(new_center, 1.0f));
-        const glm::vec3 center_diff = new_center_view_space - old_center_view_space;
-
-        float pixel_size = (float)m_shadow_map_dimensions.x / (2.0f * radius);
-
-        float pixelOffsetX = center_diff.x * pixel_size;
-        float pixelOffsetY = center_diff.y * pixel_size;
-
-        const bool needs_update = glm::abs(pixelOffsetX) > 0.5f || glm::abs(pixelOffsetY) > 0.5f;
-        if (needs_update)
-        {
-            offset.x = glm::floor(0.5f + pixelOffsetX) / pixel_size;
-            offset.y = glm::floor(0.5f + pixelOffsetY) / pixel_size;
-            offset.z = center_diff.z;
-        }
-
-        return needs_update;
-    }
-
+    
     glm::mat4 directional_light::get_light_space_matrix(const std::shared_ptr<perspective_camera>& perspective_camera,
                                                         float near_clip, float far_clip)
     {
@@ -258,10 +116,11 @@ namespace luly::renderer
         }
         else
         {
+            /*
             if (maxZ < 0.5f)
             {
                 maxZ = 0.5f;
-            }
+            }*/
             maxZ *= m_z_multiplier;
         }
 
@@ -311,5 +170,15 @@ namespace luly::renderer
         m_shadow_cascade_levels.push_back(far_clip / 25.0f);
         m_shadow_cascade_levels.push_back(far_clip / 10.0f);
         m_shadow_cascade_levels.push_back(far_clip / 2.0f);
+    }
+
+    void directional_light::update_shadow_cascades(const std::shared_ptr<perspective_camera>& perspective_camera)
+    {
+        std::vector<glm::mat4> light_space_matrices = get_light_space_matrices(perspective_camera);
+        for (size_t i = 0; i < light_space_matrices.size(); ++i)
+        {
+            m_light_matrices_ubo->set_data(&light_space_matrices[i], sizeof(glm::mat4x4),
+                                           i * sizeof(glm::mat4x4));
+        }
     }
 }

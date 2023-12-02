@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "light.h"
-#include "renderer/framebuffer/frame_buffer.h"
+#include "renderer/renderer/renderer.h"
 
 namespace luly::renderer
 {
