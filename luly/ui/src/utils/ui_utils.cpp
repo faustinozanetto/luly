@@ -108,7 +108,7 @@ namespace luly::ui
 
         // Content
         const std::string id = "##" + name;
-        if (ImGui::DragFloat(id.c_str(), &value, step, min, max))
+        if (ImGui::DragFloat(id.c_str(), &value, step, min, max, "%.4f"))
         {
             modified = true;
         }

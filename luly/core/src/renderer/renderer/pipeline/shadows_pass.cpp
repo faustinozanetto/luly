@@ -26,6 +26,7 @@ namespace luly::renderer
             "assets/shaders/shadows/directional_light_shadows.lsh");
 
         // Create cascaded shadows ubo.
+        initialize_cascaded_shadows_parameters();
         m_cascaded_shadows_ubo = std::make_shared<uniform_buffer_object>(sizeof(cascaded_shadows_parameters), 3);
     }
 

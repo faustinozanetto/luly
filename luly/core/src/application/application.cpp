@@ -42,6 +42,12 @@ namespace luly::core
 
     void application::on_update()
     {
+        const std::shared_ptr<scene::scene>& current_scene = scene::scene_manager::get().get_current_scene();
+        if (!current_scene) return;
+
+        current_scene->get_camera_manager()->get_perspective_camera_controller()->on_update(
+            app_time::get_delta_time());
+
         scene::scene_manager::get().on_update(app_time::get_delta_time());
     }
 

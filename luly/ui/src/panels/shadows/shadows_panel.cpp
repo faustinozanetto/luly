@@ -44,6 +44,18 @@ namespace luly::ui
                 cascaded_shadows_parameters.inverse_cascade_factor = inverse_cascade_factor;
             }
 
+            int pcf_horizontal_samples = cascaded_shadows_parameters.pcf_horizontal_samples;
+            if (ui_utils::draw_property("PCF Horizontal Samples", pcf_horizontal_samples, 1, 12))
+            {
+                cascaded_shadows_parameters.pcf_horizontal_samples = pcf_horizontal_samples;
+            }
+
+            int pcf_vertical_samples = cascaded_shadows_parameters.pcf_vertical_samples;
+            if (ui_utils::draw_property("PCF Vertical Samples", pcf_vertical_samples, 1, 12))
+            {
+                cascaded_shadows_parameters.pcf_vertical_samples = pcf_vertical_samples;
+            }
+
             bool soft_shadows = cascaded_shadows_parameters.soft_shadows;
             if (ui_utils::draw_property("Soft Shadows", soft_shadows))
             {

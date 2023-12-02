@@ -55,8 +55,12 @@ void basic_application::on_update()
 
     luly::ui::engine_ui::begin_frame();
 
-    current_scene->get_camera_manager()->get_perspective_camera_controller()->on_update(
-        luly::app_time::get_delta_time());
+    const std::shared_ptr<luly::renderer::directional_light>& directional_light = current_scene->
+        get_directional_light();
+    
+    glm::vec3 direction = directional_light->get_direction();
+    direction.z = sin(2 * glm::pi<float>() * 0.05f * luly::app_time::get_time());
+    directional_light->set_direction(direction);
 
     const std::shared_ptr<luly::renderer::perspective_camera>& camera = current_scene->get_camera_manager()->
         get_perspective_camera();
@@ -82,8 +86,8 @@ void basic_application::setup_scene()
 
     const std::shared_ptr<luly::scene::scene_actor>& dir_light_actor = scene->create_actor("Light Emitter");
     const std::shared_ptr<luly::renderer::directional_light>& directional_light = std::make_shared<
-        luly::renderer::directional_light>(glm::vec3(0.85f), glm::vec3(-2.36f, -3.24f, 0.5f));
-    directional_light->set_z_multiplier(10.0f);
+        luly::renderer::directional_light>(glm::vec3(0.85f), glm::vec3(-0.45f, -4.24f, 0.5f));
+    directional_light->set_z_multiplier(20.0f);
     dir_light_actor->add_component<luly::scene::directional_light_component>(directional_light);
     /*
     
