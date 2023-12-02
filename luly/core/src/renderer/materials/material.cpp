@@ -6,14 +6,13 @@
 
 namespace luly::renderer
 {
-    material_specification::material_specification(const glm::vec3& albedo,
-                                                   float roughness,
-                                                   float metallic,
-                                                   float ambient_occlusion,
-                                                   float tilling,
+    material_specification::material_specification(const glm::vec3& albedo, const glm::vec3& emissive, float roughness,
+                                                   float metallic, float ambient_occlusion, float tilling,
+                                                   float emissive_strength,
                                                    const std::map<material_texture_type, material_texture>& textures)
-        : albedo(albedo), roughness(roughness), metallic(metallic),
-          ambient_occlusion(ambient_occlusion), tilling(tilling), textures(textures)
+        : albedo(albedo), emissive(emissive), roughness(roughness), metallic(metallic),
+          ambient_occlusion(ambient_occlusion), tilling(tilling), emissive_strength(emissive_strength),
+          textures(textures)
     {
     }
 
@@ -36,10 +35,12 @@ namespace luly::renderer
     void material::bind(const std::shared_ptr<shader>& shader)
     {
         shader->set_vec_float3("u_material.albedo", m_material_specification.albedo);
+        shader->set_vec_float3("u_material.emissive", m_material_specification.emissive);
         shader->set_float("u_material.roughness", m_material_specification.roughness);
         shader->set_float("u_material.metallic", m_material_specification.metallic);
         shader->set_float("u_material.ambient_occlusion", m_material_specification.ambient_occlusion);
         shader->set_float("u_material.tilling", m_material_specification.tilling);
+        shader->set_float("u_material.emissive_strength", m_material_specification.emissive_strength);
 
         for (auto& [texture_type, texture] : m_material_specification.textures)
         {
@@ -56,10 +57,12 @@ namespace luly::renderer
     void material::bind_default(const std::shared_ptr<shader>& shader)
     {
         shader->set_vec_float3("u_material.albedo", {0.85f, 0.85f, 0.85f});
+        shader->set_vec_float3("u_material.emissive", {0.0f, 0.0f, 0.0f});
         shader->set_float("u_material.roughness", 1.0f);
         shader->set_float("u_material.metallic", 0.0f);
         shader->set_float("u_material.ambient_occlusion", 1.0f);
         shader->set_float("u_material.tilling", 1.0f);
+        shader->set_float("u_material.emissive_strength", 0.0f);
 
         for (material_texture_type texture_type : MATERIAL_TEXTURE_TYPES)
         {

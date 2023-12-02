@@ -69,7 +69,7 @@ namespace luly::renderer
         // Retrieve render pass inputs
         const render_pass_input& geometry_pass_input = m_inputs.at("geometry_pass_input");
         const render_pass_input& environment_pass_input = m_inputs.at("environment_pass_input");
-        const render_pass_input& ambient_occlusion_pass_input = m_inputs.at("ambient_occlusion_pass_input");
+      //  const render_pass_input& ambient_occlusion_pass_input = m_inputs.at("ambient_occlusion_pass_input");
         const render_pass_input& shadows_pass_input = m_inputs.at("shadows_pass_input");
 
         // Retrieve render pass inputs outputs.
@@ -80,6 +80,8 @@ namespace luly::renderer
             "normals_output");
         const render_pass_output& geometry_rough_metal_ao_output = geometry_pass_input.render_pass->get_output(
             "rough_metal_ao_output");
+        const render_pass_output& geometry_emissive_output = geometry_pass_input.render_pass->get_output(
+            "emissive_output");
         const render_pass_output& directional_shadow_map_output = shadows_pass_input.render_pass->get_output(
             "directional_shadow_map_output");
 
@@ -96,14 +98,15 @@ namespace luly::renderer
         renderer::bind_texture(1, geometry_albedo_output.output);
         renderer::bind_texture(2, geometry_normals_output.output);
         renderer::bind_texture(3, geometry_rough_metal_ao_output.output);
+        renderer::bind_texture(4, geometry_emissive_output.output);
         // Bind environemnt pass outputs.
-        renderer::bind_texture(4, environment_pass_input.render_pass->get_output("irradiance_output").output);
-        renderer::bind_texture(5, environment_pass_input.render_pass->get_output("prefilter_output").output);
-        renderer::bind_texture(6, environment_pass_input.render_pass->get_output("brdf_output").output);
+        renderer::bind_texture(5, environment_pass_input.render_pass->get_output("irradiance_output").output);
+        renderer::bind_texture(6, environment_pass_input.render_pass->get_output("prefilter_output").output);
+        renderer::bind_texture(7, environment_pass_input.render_pass->get_output("brdf_output").output);
         // Bind ssao output.
-        renderer::bind_texture(7, ambient_occlusion_pass_input.render_pass->get_output("ssao_blur_output").output);
+      //  renderer::bind_texture(8, ambient_occlusion_pass_input.render_pass->get_output("ssao_blur_output").output);
         // Bind shadow pass outputs.
-        renderer::bind_texture(8, directional_shadow_map_output.output);
+        renderer::bind_texture(9, directional_shadow_map_output.output);
 
         // Update rest of uniforms
         upload_skybox_uniforms();

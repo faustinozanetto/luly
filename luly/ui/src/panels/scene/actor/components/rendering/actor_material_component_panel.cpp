@@ -39,6 +39,12 @@ namespace luly::ui
                 material->set_albedo(albedo);
             }
 
+            glm::vec3 emissive = material->get_emissive();
+            if (ui_utils::draw_property("Emissive", emissive, true))
+            {
+                material->set_emissive(emissive);
+            }
+
             float roughness = material->get_roughness();
             if (ui_utils::draw_property("Roughness", roughness, 0.0f, 1.0f, 0.01f))
             {
@@ -61,6 +67,12 @@ namespace luly::ui
             if (ui_utils::draw_property("Tilling", tilling, 0.0f, 10.0f, 0.01f))
             {
                 material->set_tilling(tilling);
+            }
+
+            float emissive_strength = material->get_emissive_strength();
+            if (ui_utils::draw_property("Emissive Strength", emissive_strength, 0.0f, 10.0f, 0.01f))
+            {
+                material->set_emissive_strength(emissive_strength);
             }
 
             ui_utils::draw_property("Textures");

@@ -36,9 +36,10 @@ namespace luly::renderer
 
         perform_geometry_pass();
 
-        s_data.ambient_occlusion_pass->execute();
+       // s_data.ambient_occlusion_pass->execute();
 
         perform_lighting_pass();
+        s_data.bloom_pass->execute();
 
         s_data.skybox_pass->execute();
 
@@ -52,11 +53,12 @@ namespace luly::renderer
     void scene_renderer::set_outputs()
     {
         s_data.geometry_pass->set_outputs();
-        s_data.ambient_occlusion_pass->set_outputs();
+      //  s_data.ambient_occlusion_pass->set_outputs();
         s_data.final_pass->set_outputs();
         s_data.lighting_pass->set_outputs();
         s_data.skybox_pass->set_outputs();
         s_data.shadows_pass->set_outputs();
+        s_data.bloom_pass->set_outputs();
     }
 
     void scene_renderer::set_environment_map(const std::shared_ptr<texture_2d>& environment_map)
@@ -70,7 +72,8 @@ namespace luly::renderer
         s_data.lighting_pass->on_resize(viewport_size);
         s_data.skybox_pass->on_resize(viewport_size);
         s_data.final_pass->on_resize(viewport_size);
-        s_data.ambient_occlusion_pass->on_resize(viewport_size);
+        //s_data.ambient_occlusion_pass->on_resize(viewport_size);
+        s_data.bloom_pass->on_resize(viewport_size);
     }
 
     scene_renderer_data& scene_renderer::get_data()
@@ -88,21 +91,24 @@ namespace luly::renderer
         s_data.environment_pass = std::make_shared<environment_pass>();
         s_data.environment_pass->add_input({s_data.geometry_pass, "geometry_pass_input"});
 
-        s_data.ambient_occlusion_pass = std::make_shared<ambient_occlusion_pass>();
-        s_data.ambient_occlusion_pass->add_input({s_data.geometry_pass, "geometry_pass_input"});
+       // s_data.ambient_occlusion_pass = std::make_shared<ambient_occlusion_pass>();
+        //s_data.ambient_occlusion_pass->add_input({s_data.geometry_pass, "geometry_pass_input"});
 
         s_data.lighting_pass = std::make_shared<lighting_pass>();
         s_data.lighting_pass->add_input({s_data.geometry_pass, "geometry_pass_input"});
         s_data.lighting_pass->add_input({s_data.environment_pass, "environment_pass_input"});
-        s_data.lighting_pass->add_input({s_data.ambient_occlusion_pass, "ambient_occlusion_pass_input"});
+       // s_data.lighting_pass->add_input({s_data.ambient_occlusion_pass, "ambient_occlusion_pass_input"});
         s_data.lighting_pass->add_input({s_data.shadows_pass, "shadows_pass_input"});
 
         s_data.skybox_pass = std::make_shared<skybox_pass>();
         s_data.skybox_pass->add_input({s_data.environment_pass, "environment_pass_input"});
         s_data.skybox_pass->add_input({s_data.lighting_pass, "lighting_pass_input"});
 
+        s_data.bloom_pass = std::make_shared<bloom_pass>();
+        s_data.bloom_pass->add_input({s_data.skybox_pass, "skybox_pass_input"});
+
         s_data.final_pass = std::make_shared<final_pass>();
-        s_data.final_pass->add_input({s_data.skybox_pass, "skybox_pass_input"});
+        s_data.final_pass->add_input({s_data.bloom_pass, "bloom_pass_input"});
         LY_TRACE("Pipeline passes created successfully!");
     }
 

@@ -1,9 +1,11 @@
 ﻿struct material {
     vec3 albedo;
+    vec3 emissive;
     float roughness;
     float metallic;
     float ambient_occlusion;
     float tilling;
+    float emissive_strength;
 
     int albedo_map_enabled;
     int normal_map_enabled;
@@ -11,4 +13,5 @@
     int metallic_map_enabled;
     int ambient_occlusion_map_enabled;
     int opacity_map_enabled;
+    int emissive_map_enabled;
 };

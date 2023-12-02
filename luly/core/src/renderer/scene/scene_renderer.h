@@ -12,6 +12,8 @@
 
 #include <memory>
 
+#include "renderer/renderer/pipeline/bloom_pass.h"
+
 namespace luly::renderer
 {
     struct camera_data
@@ -31,7 +33,8 @@ namespace luly::renderer
         std::shared_ptr<geometry_pass> geometry_pass;
         std::shared_ptr<environment_pass> environment_pass;
         std::shared_ptr<lighting_pass> lighting_pass;
-        std::shared_ptr<ambient_occlusion_pass> ambient_occlusion_pass;
+        std::shared_ptr<bloom_pass> bloom_pass;
+    //    std::shared_ptr<ambient_occlusion_pass> ambient_occlusion_pass;
         std::shared_ptr<skybox_pass> skybox_pass;
         std::shared_ptr<final_pass> final_pass;
 

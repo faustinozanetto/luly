@@ -27,11 +27,12 @@ layout (binding = 0) uniform sampler2D u_position_map;
 layout (binding = 1) uniform sampler2D u_albedo_map;
 layout (binding = 2) uniform sampler2D u_normal_map;
 layout (binding = 3) uniform sampler2D u_rough_metal_ao_map;
-layout (binding = 4) uniform samplerCube u_irradiance_map;
-layout (binding = 5) uniform samplerCube u_prefilter_map;
-layout (binding = 6) uniform sampler2D u_brdf_map;
-layout (binding = 7) uniform sampler2D u_ambient_occlusion_map;
-layout (binding = 8) uniform sampler2DArray u_cascades_shadow_map;
+layout (binding = 4) uniform sampler2D u_emissive_map;
+layout (binding = 5) uniform samplerCube u_irradiance_map;
+layout (binding = 6) uniform samplerCube u_prefilter_map;
+layout (binding = 7) uniform sampler2D u_brdf_map;
+layout (binding = 8) uniform sampler2D u_ambient_occlusion_map;
+layout (binding = 9) uniform sampler2DArray u_cascades_shadow_map;
 
 uniform float u_skybox_intensity;
 uniform vec4 u_skybox_tint;
@@ -201,7 +202,8 @@ void main()
     vec3 albedo = pow(full_albedo.rgb, vec3(2.2));
     vec3 normal = normalize(texture(u_normal_map, o_tex_coord).rgb);
     vec3 rough_metal_ao = texture(u_rough_metal_ao_map, o_tex_coord).rgb;
-
+    vec3 emissive = texture(u_emissive_map, o_tex_coord).rgb;
+    
     float opacity = full_albedo.a;
     float roughness = rough_metal_ao.r;
     float metallic = rough_metal_ao.g;
@@ -245,7 +247,7 @@ void main()
 
     vec3 ambient = (kD * diffuse + specular)  * u_skybox_intensity * u_skybox_tint.rgb;
 
-    vec3 color = ambient + luminance;
+    vec3 color = ambient + luminance + emissive;
 
     color = color / (color + vec3(1.0));
     color = pow(color, vec3(1.0/2.2));

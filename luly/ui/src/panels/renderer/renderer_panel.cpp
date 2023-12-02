@@ -70,7 +70,43 @@ namespace luly::ui
                 ImGui::TreePop();
             }
 
+            // Bloom Pass.
+            ImGui::Separator();
+            if (draw_render_pass_details(renderer::scene_renderer::get_data().bloom_pass))
+            {
+                ui_utils::draw_property("Mips");
+                ImGui::Separator();
+
+                ImGui::Columns(3);
+                for (const renderer::bloom_pass_mip_data& bloom_mip : renderer::scene_renderer::get_data().bloom_pass->
+                     get_mips_data())
+                {
+                    if (ui_utils::draw_property(bloom_mip.texture->get_handle_id(), {90, 90}))
+                    {
+                        engine_ui::set_render_target(bloom_mip.texture->get_handle_id());
+                    }
+                    ImGui::NextColumn();
+                }
+                ImGui::Columns(1);
+
+                ui_utils::draw_property("Parameters");
+                ImGui::Separator();
+                float strength = renderer::scene_renderer::get_data().bloom_pass->get_strength();
+                if (ui_utils::draw_property("Strength", strength, 0.001f, 5.0f, 0.001f))
+                {
+                    renderer::scene_renderer::get_data().bloom_pass->set_strength(strength);
+                }
+
+                float filter_radius = renderer::scene_renderer::get_data().bloom_pass->get_filter_radius();
+                if (ui_utils::draw_property("Filter Radius", filter_radius, 0.001f, 5.0f, 0.001f))
+                {
+                    renderer::scene_renderer::get_data().bloom_pass->set_filter_radius(filter_radius);
+                }
+                ImGui::TreePop();
+            }
+
             // AO Pass
+            /*
             ImGui::Separator();
             if (draw_render_pass_details(renderer::scene_renderer::get_data().ambient_occlusion_pass))
             {
@@ -94,6 +130,7 @@ namespace luly::ui
 
                 ImGui::TreePop();
             }
+            */
 
             // Skybox Pass.
             ImGui::Separator();

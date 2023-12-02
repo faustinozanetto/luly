@@ -19,6 +19,8 @@ namespace luly::renderer
             return "ambient_occlusion";
         case material_texture_type::opacity:
             return "opacity";
+        case material_texture_type::emissive:
+            return "emissive";
         }
         LY_ASSERT_MSG(false, "Invalid material texture type!");
         return nullptr;
@@ -40,6 +42,8 @@ namespace luly::renderer
             return "u_material.ambient_occlusion_map_enabled";
         case material_texture_type::opacity:
             return "u_material.opacity_map_enabled";
+        case material_texture_type::emissive:
+            return "u_material.emissive_map_enabled";
         }
         LY_ASSERT_MSG(false, "Invalid material texture type!");
         return nullptr;

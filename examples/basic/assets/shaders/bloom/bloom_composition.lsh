@@ -21,21 +21,13 @@ layout (location = 0) in vec2 o_tex_coord;
 layout (binding = 0) uniform sampler2D u_texture;
 layout (binding = 1) uniform sampler2D u_bloom_texture;
 
-float bloomStrength = 0.04;
-float exposure = 0.95;
+uniform float u_strength;
 
 void main()
 {
     vec3 hdr_color = texture(u_texture, o_tex_coord).rgb;
     vec3 bloom_color = texture(u_bloom_texture, o_tex_coord).rgb;
-    vec3 result = mix(hdr_color, bloom_color, bloomStrength);
-
-    // Tone mapping
-    result = vec3(1.0) - exp(-result * exposure);
-    
-    // Gamma correction
-    float gamma = 2.2;
-    result = pow(result, vec3(1.0 / gamma));
+    vec3 result = mix(hdr_color, bloom_color, u_strength);
 
     frag_color = vec4(result, 1.0);
 }

@@ -53,6 +53,13 @@ namespace luly::renderer
                 texture_wrapping::clamp_to_edge,
                 viewport_size
             },
+            //  Emissive
+            {
+                texture_internal_format::rgb16f,
+                texture_filtering::linear,
+                texture_wrapping::clamp_to_edge,
+                viewport_size
+            },
         };
 
         frame_buffer_attachment depth_attachment = {
@@ -85,7 +92,7 @@ namespace luly::renderer
 
         for (auto [actor, transform_component] : view.each())
         {
-            auto& transform = transform_component.get_transform();
+            const std::shared_ptr<math::transform>& transform = transform_component.get_transform();
 
             // Check if has model_renderer_component
             if (!registry->any_of<scene::model_renderer_component>(actor)) continue;
@@ -103,8 +110,9 @@ namespace luly::renderer
                 material::bind_default(m_geometry_shader);
             }
 
-            auto& model_renderer_component = registry->get<scene::model_renderer_component>(actor);
-            auto& model = model_renderer_component.get_model();
+            const scene::model_renderer_component& model_renderer_component = registry->get<
+                scene::model_renderer_component>(actor);
+            const std::shared_ptr<model>& model = model_renderer_component.get_model();
 
             m_geometry_shader->set_mat4("u_transform", transform->get_transform());
             renderer::submit_model(model);
@@ -135,6 +143,11 @@ namespace luly::renderer
         rough_metal_ao_output.name = "rough_metal_ao_output";
         rough_metal_ao_output.output = m_fbo->get_attachment_id(3);
         add_output(rough_metal_ao_output);
+
+        render_pass_output emissive_output;
+        emissive_output.name = "emissive_output";
+        emissive_output.output = m_fbo->get_attachment_id(4);
+        add_output(emissive_output);
 
         render_pass_output depth_output;
         depth_output.name = "depth_output";

@@ -14,6 +14,12 @@ namespace luly::renderer
         return *this;
     }
 
+    material_specification_builder& material_specification_builder::with_emissive(const glm::vec3& value)
+    {
+        m_material_specification.emissive = value;
+        return *this;
+    }
+
     material_specification_builder& material_specification_builder::with_roughness(float value)
     {
         m_material_specification.roughness = value;
@@ -42,6 +48,12 @@ namespace luly::renderer
         const std::map<material_texture_type, material_texture>& value)
     {
         m_material_specification.textures = value;
+        return *this;
+    }
+
+    material_specification_builder& material_specification_builder::with_emissive_strength(float value)
+    {
+        m_material_specification.emissive_strength = value;
         return *this;
     }
 

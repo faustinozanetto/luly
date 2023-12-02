@@ -57,7 +57,7 @@ void basic_application::on_update()
 
     const std::shared_ptr<luly::renderer::directional_light>& directional_light = current_scene->
         get_directional_light();
-    
+
     glm::vec3 direction = directional_light->get_direction();
     direction.z = sin(2 * glm::pi<float>() * 0.05f * luly::app_time::get_time());
     directional_light->set_direction(direction);
@@ -89,6 +89,20 @@ void basic_application::setup_scene()
         luly::renderer::directional_light>(glm::vec3(0.85f), glm::vec3(-0.45f, -4.24f, 0.5f));
     directional_light->set_z_multiplier(20.0f);
     dir_light_actor->add_component<luly::scene::directional_light_component>(directional_light);
+
+    // Create emissive cube
+    const std::shared_ptr<luly::scene::scene_actor>& emissive_cube_actor = scene->create_actor("Emissive Cube");
+    emissive_cube_actor->add_component<luly::scene::model_renderer_component>(
+        luly::renderer::model_factory::create_model_from_meshes({
+            luly::renderer::mesh_factory::create_cube_mesh()
+        }));
+
+    const luly::renderer::material_specification& material_specification =
+        std::make_shared<luly::renderer::material_specification_builder>()->with_emissive({0.25f, 0.35f, 0.65f}).
+                                                                            with_emissive_strength(5.0f).build();
+    const std::shared_ptr<luly::renderer::material>& emissive_material = std::make_shared<luly::renderer::material>(
+        material_specification);
+    emissive_cube_actor->add_component<luly::scene::material_component>(emissive_material);
     /*
     
     /*
@@ -157,11 +171,11 @@ void basic_application::setup_scene()
 */
 
     const std::shared_ptr<luly::scene::scene_actor>& actor = scene->create_actor("Sponza");
-    actor->get_component<luly::scene::transform_component>().get_transform()->set_scale({0.01f, 0.01f, 0.01f});
+   // actor->get_component<luly::scene::transform_component>().get_transform()->set_scale({0.01f, 0.01f, 0.01f});
 
     // Loading model and creating asset.
     const std::shared_ptr<luly::renderer::model> sponza_model = luly::renderer::model_factory::create_model_from_file(
-        "assets/models/sponza/sponza.obj");
+        "assets/models/sponza/sponza.glb");
     const std::shared_ptr<luly::assets::asset>& sponza_model_asset = luly::assets::asset_factory::create_asset<
         luly::renderer::model>(
         "sponza-model", luly::assets::asset_type::model, sponza_model);

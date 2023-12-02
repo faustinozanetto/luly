@@ -52,10 +52,10 @@ namespace luly::renderer
         renderer::clear_screen();
         m_screen_shader->bind();
 
-        const render_pass_input& skybox_pass_input = m_inputs.at("skybox_pass_input");
-        const render_pass_output& skybox_output = skybox_pass_input.render_pass->get_output("skybox_output");
+        const render_pass_input& bloom_pass_input = m_inputs.at("bloom_pass_input");
+        const render_pass_output& bloom_output = bloom_pass_input.render_pass->get_output("bloom_output");
 
-        renderer::bind_texture(0, skybox_output.output);
+        renderer::bind_texture(0, bloom_output.output);
         renderer::submit_mesh(m_screen_mesh);
 
         m_screen_shader->un_bind();

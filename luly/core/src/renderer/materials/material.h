@@ -15,7 +15,8 @@ namespace luly::renderer
         roughness,
         metallic,
         ambient_occlusion,
-        opacity
+        opacity,
+        emissive
     };
 
     struct material_texture
@@ -28,17 +29,20 @@ namespace luly::renderer
     struct material_specification
     {
         glm::vec3 albedo;
+        glm::vec3 emissive;
         float roughness;
         float metallic;
         float ambient_occlusion;
         float tilling;
+        float emissive_strength;
         std::map<material_texture_type, material_texture> textures;
 
-        material_specification(const glm::vec3& albedo = glm::vec3(1.0f),
+        material_specification(const glm::vec3& albedo = glm::vec3(1.0f), const glm::vec3& emissive = glm::vec3(0.0f),
                                float roughness = 1.0f,
                                float metallic = 0.0f,
                                float ambient_occlusion = 1.0f,
                                float tilling = 1.0f,
+                               float emissive_strength = 0.0f,
                                const std::map<material_texture_type, material_texture>& textures = {});
     };
 
@@ -49,6 +53,7 @@ namespace luly::renderer
         material_texture_type::metallic,
         material_texture_type::ambient_occlusion,
         material_texture_type::opacity,
+        material_texture_type::emissive,
     };
 
     const std::map<material_texture_type, int> MATERIAL_TEXTURE_BIND_SLOTS = {
@@ -58,6 +63,7 @@ namespace luly::renderer
         {material_texture_type::metallic, 3},
         {material_texture_type::ambient_occlusion, 4},
         {material_texture_type::opacity, 5},
+        {material_texture_type::emissive, 6},
     };
 
     class material
@@ -68,10 +74,12 @@ namespace luly::renderer
 
         /* Getters */
         const glm::vec3& get_albedo() const { return m_material_specification.albedo; }
+        const glm::vec3& get_emissive() const { return m_material_specification.emissive; }
         float get_ambient_occlusion() const { return m_material_specification.ambient_occlusion; }
         float get_tilling() const { return m_material_specification.tilling; }
         float get_roughness() const { return m_material_specification.roughness; }
         float get_metallic() const { return m_material_specification.metallic; }
+        float get_emissive_strength() const { return m_material_specification.emissive_strength; }
 
         std::map<material_texture_type, material_texture>& get_textures()
         {
@@ -81,6 +89,7 @@ namespace luly::renderer
         /* Setters */
         void set_texture_enabled(material_texture_type texture_type, bool is_enabled);
         void set_albedo(const glm::vec3& albedo) { m_material_specification.albedo = albedo; }
+        void set_emissive(const glm::vec3& emissive) { m_material_specification.emissive = emissive; }
 
         void set_ambient_occlusion(float ambient_occlusion)
         {
@@ -90,6 +99,11 @@ namespace luly::renderer
         void set_tilling(float tilling) { m_material_specification.tilling = tilling; }
         void set_roughness(float roughness) { m_material_specification.roughness = roughness; }
         void set_metallic(float metallic) { m_material_specification.metallic = metallic; }
+
+        void set_emissive_strength(float emissive_strength)
+        {
+            m_material_specification.emissive_strength = emissive_strength;
+        }
 
         /* Methods */
         void bind(const std::shared_ptr<shader>& shader);
