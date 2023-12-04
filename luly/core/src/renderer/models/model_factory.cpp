@@ -170,7 +170,7 @@ namespace luly::renderer
             if (assimp_mesh->mTextureCoords[0])
             {
                 vertex.tex_coords = glm::vec2(assimp_mesh->mTextureCoords[0][i].x,
-                                              assimp_mesh->mTextureCoords[0][i].y);
+                                              1 - assimp_mesh->mTextureCoords[0][i].y);
             }
             else
             {
