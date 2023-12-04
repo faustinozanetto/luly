@@ -15,9 +15,9 @@ namespace luly::renderer
         m_distance = 20.0f;
         m_z_multiplier = 20.0f;
         m_cascades_count = 4;
-        m_shadow_map_dimensions = glm::ivec2(8196, 8196);
+        m_shadow_map_dimensions = glm::ivec2(4096, 4096);
 
-        calculate_cascade_levels(500.0f);
+        calculate_cascade_levels(200.0f);
         
         // Create shadow map fbo
         glGenFramebuffers(1, &m_shadow_map_fbo);

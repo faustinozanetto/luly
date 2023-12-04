@@ -6,6 +6,14 @@
     float ambient_occlusion;
     float tilling;
     float emissive_strength;
+    
+    int albedo_channel;
+    int normal_channel;
+    int roughness_channel;
+    int metallic_channel;
+    int ambient_occlusion_channel;
+    int opacity_channel;
+    int emissive_channel;
 
     int albedo_map_enabled;
     int normal_map_enabled;

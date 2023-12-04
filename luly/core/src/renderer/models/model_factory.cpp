@@ -5,6 +5,7 @@
 #include <assimp/Importer.hpp>
 
 #include "renderer/materials/material.h"
+#include "renderer/materials/material_specification_builder.h"
 #include "renderer/textures/texture_factory.h"
 
 namespace luly::renderer
@@ -34,8 +35,8 @@ namespace luly::renderer
     {
         Assimp::Importer import;
         const aiScene* assimp_scene = import.ReadFile(
-            file_path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_JoinIdenticalVertices |
-            aiProcess_OptimizeMeshes | aiProcess_CalcTangentSpace | aiProcess_PreTransformVertices);
+            file_path,
+            aiProcessPreset_TargetRealtime_Fast | aiProcess_ConvertToLeftHanded);
 
         // Check for loading errors.
         if (!assimp_scene || assimp_scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !assimp_scene->mRootNode)
@@ -47,6 +48,82 @@ namespace luly::renderer
 
         std::vector<std::shared_ptr<mesh>> model_meshes;
         parse_assimp_node(assimp_scene, assimp_scene->mRootNode, model_meshes, directory);
+
+        /*
+        // Process materials.
+        std::vector<std::shared_ptr<material>> model_materials;
+        if (assimp_scene->HasMaterials())
+        {
+            for (unsigned int i = 0; i < assimp_scene->mNumMaterials; ++i)
+            {
+                aiMaterial* assimp_material = assimp_scene->mMaterials[i];
+
+                std::vector<model_texture> loaded_textures;
+
+                std::vector<model_texture> albedo_maps = parse_assimp_material_textures(
+                    assimp_material, aiTextureType_DIFFUSE, "texture_diffuse", directory, loaded_textures);
+
+                std::vector<model_texture> normal_maps = parse_assimp_material_textures(
+                    assimp_material, aiTextureType_NORMALS, "texture_normal", directory, loaded_textures);
+
+                std::vector<model_texture> roughness_maps = parse_assimp_material_textures(
+                    assimp_material, aiTextureType_SPECULAR, "texture_roughness", directory, loaded_textures);
+
+                std::vector<model_texture> metallic_maps = parse_assimp_material_textures(
+                    assimp_material, aiTextureType_METALNESS, "texture_metallic", directory, loaded_textures);
+
+                std::vector<model_texture> ao_maps = parse_assimp_material_textures(
+                    assimp_material, aiTextureType_AMBIENT, "texture_ao", directory, loaded_textures);
+
+                std::map<material_texture_type, material_texture> material_textures;
+                if (!albedo_maps.empty())
+                {
+                    material_texture albedo_material_texture;
+                    albedo_material_texture.texture = albedo_maps[0].texture;
+                    albedo_material_texture.type = material_texture_type::albedo;
+                    albedo_material_texture.is_enabled = true;
+                    material_textures.insert({material_texture_type::albedo, albedo_material_texture});
+                }
+                if (!normal_maps.empty())
+                {
+                    material_texture normal_material_texture;
+                    normal_material_texture.texture = normal_maps[0].texture;
+                    normal_material_texture.type = material_texture_type::normal;
+                    normal_material_texture.is_enabled = true;
+                    material_textures.insert({material_texture_type::normal, normal_material_texture});
+                }
+                if (!roughness_maps.empty())
+                {
+                    material_texture roughness_material_texture;
+                    roughness_material_texture.texture = roughness_maps[0].texture;
+                    roughness_material_texture.type = material_texture_type::roughness;
+                    roughness_material_texture.is_enabled = true;
+                    material_textures.insert({material_texture_type::roughness, roughness_material_texture});
+                }
+                if (!metallic_maps.empty())
+                {
+                    material_texture metallic_material_texture;
+                    metallic_material_texture.texture = metallic_maps[0].texture;
+                    metallic_material_texture.type = material_texture_type::metallic;
+                    metallic_material_texture.is_enabled = true;
+                    material_textures.insert({material_texture_type::metallic, metallic_material_texture});
+                }
+                if (!ao_maps.empty())
+                {
+                    material_texture ao_material_texture;
+                    ao_material_texture.texture = ao_maps[0].texture;
+                    ao_material_texture.type = material_texture_type::ambient_occlusion;
+                    ao_material_texture.is_enabled = true;
+                    material_textures.insert({material_texture_type::ambient_occlusion, ao_material_texture});
+                }
+
+                const material_specification& material_specification =
+                    std::make_shared<material_specification_builder>()->
+                    with_textures(material_textures).build();
+                const std::shared_ptr<material>& model_material = std::make_shared<material>(material_specification);
+                model_materials.push_back(model_material);
+            }
+        }*/
 
         return std::make_shared<model>(model_meshes);
     }
@@ -90,27 +167,25 @@ namespace luly::renderer
             vertex.normals.z = assimp_mesh->mNormals[i].z;
 
             // Tex coords
-            if (assimp_mesh->HasTextureCoords(0)) // does the mesh contain texture coordinates?
+            if (assimp_mesh->mTextureCoords[0])
             {
-                vertex.tex_coords = glm::vec2(assimp_mesh->mTextureCoords[0][i].x, assimp_mesh->mTextureCoords[0][i].y);
+                vertex.tex_coords = glm::vec2(assimp_mesh->mTextureCoords[0][i].x,
+                                              assimp_mesh->mTextureCoords[0][i].y);
+            }
+            else
+            {
+                vertex.tex_coords = glm::vec2(0.0f, 0.0f);
             }
 
             // Tangent
-            if (assimp_mesh->mTangents)
-            {
-                vertex.tangent.x = assimp_mesh->mTangents[i].x;
-                vertex.tangent.y = assimp_mesh->mTangents[i].y;
-                vertex.tangent.z = assimp_mesh->mTangents[i].z;
-            }
+            vertex.tangent.x = assimp_mesh->mTangents[i].x;
+            vertex.tangent.y = assimp_mesh->mTangents[i].y;
+            vertex.tangent.z = assimp_mesh->mTangents[i].z;
 
             // Bi tangent
-            if (assimp_mesh->mBitangents)
-            {
-                vertex.bi_tangent.x = assimp_mesh->mBitangents[i].x;
-                vertex.bi_tangent.y = assimp_mesh->mBitangents[i].y;
-                vertex.bi_tangent.z = assimp_mesh->mBitangents[i].z;
-            }
-
+            vertex.bi_tangent.x = assimp_mesh->mBitangents[i].x;
+            vertex.bi_tangent.y = assimp_mesh->mBitangents[i].y;
+            vertex.bi_tangent.z = assimp_mesh->mBitangents[i].z;
             vertices.push_back(vertex);
         }
 
@@ -125,35 +200,15 @@ namespace luly::renderer
             }
         }
 
-        // Process materials.
-        if (assimp_scene->HasMaterials())
-        {
-            aiMaterial* assimp_material = assimp_scene->mMaterials[assimp_mesh->mMaterialIndex];
-            /*
-                        std::vector<model_texture> loaded_textures;
-            
-                        std::vector<model_texture> albedo_maps = parse_assimp_material_textures(
-                            assimp_material, aiTextureType_DIFFUSE, "texture_diffuse", directory, loaded_textures);
-            
-                        std::vector<model_texture> normal_maps = parse_assimp_material_textures(
-                            assimp_material, aiTextureType_NORMALS, "texture_normal", directory, loaded_textures);
-            
-                        std::vector<model_texture> roughness_maps = parse_assimp_material_textures(
-                            assimp_material, aiTextureType_DIFFUSE_ROUGHNESS, "texture_roughness", directory, loaded_textures);
-            
-                        std::vector<model_texture> ao_maps = parse_assimp_material_textures(
-                            assimp_material, aiTextureType_AMBIENT_OCCLUSION, "texture_ao", directory, loaded_textures);*/
-        }
-
         LY_TRACE("Parsed model mesh: ");
         LY_TRACE("   - Name: {}", assimp_mesh->mName.C_Str());
         LY_TRACE("   - Vertices: {}", vertices.size());
         LY_TRACE("   - Indices: {}", indices.size());
 
-        return std::make_shared<mesh>(assimp_mesh->mName.C_Str(), vertices, indices);
+        return std::make_shared<mesh>(assimp_mesh->mName.C_Str(), vertices, indices, assimp_mesh->mMaterialIndex);
     }
 
-    std::vector<model_texture> model_factory::parse_assimp_material_textures(aiMaterial* assimp_material,
+    std::vector<model_texture> model_factory::parse_assimp_material_textures(const aiMaterial* assimp_material,
                                                                              aiTextureType assimp_texture_type,
                                                                              const std::string& type_name,
                                                                              const std::string& directory,
@@ -167,11 +222,11 @@ namespace luly::renderer
             assimp_material->GetTexture(assimp_texture_type, i, &str);
 
             bool skip = false;
-            for (unsigned int j = 0; j < loaded_textures.size(); j++)
+            for (model_texture& loaded_texture : loaded_textures)
             {
-                if (std::strcmp(loaded_textures[j].path.data(), str.C_Str()) == 0)
+                if (std::strcmp(loaded_texture.path.data(), str.C_Str()) == 0)
                 {
-                    textures.push_back(loaded_textures[j]);
+                    textures.push_back(loaded_texture);
                     skip = true;
                     break;
                 }

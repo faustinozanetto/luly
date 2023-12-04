@@ -132,14 +132,30 @@ namespace luly::ui
             }
             */
 
-            // Skybox Pass.
             ImGui::Separator();
             if (draw_render_pass_details(renderer::scene_renderer::get_data().skybox_pass))
             {
                 ImGui::TreePop();
             }
 
-            // Final Pass.
+            ImGui::Separator();
+            if (draw_render_pass_details(renderer::scene_renderer::get_data().tonemapping_pass))
+            {
+                float exposure = renderer::scene_renderer::get_data().tonemapping_pass->get_exposure();
+                if (ui_utils::draw_property("Exposure", exposure, 0.01f, 5.0f, 0.01f))
+                {
+                    renderer::scene_renderer::get_data().tonemapping_pass->set_exposure(exposure);
+                }
+
+                float gamma = renderer::scene_renderer::get_data().tonemapping_pass->get_gamma();
+                if (ui_utils::draw_property("Gamma", gamma, 0.01f, 5.0f, 0.01f))
+                {
+                    renderer::scene_renderer::get_data().tonemapping_pass->set_gamma(gamma);
+                }
+
+                ImGui::TreePop();
+            }
+
             ImGui::Separator();
             if (draw_render_pass_details(renderer::scene_renderer::get_data().final_pass))
             {

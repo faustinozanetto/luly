@@ -1,6 +1,7 @@
 ﻿#include "actor_material_component_panel.h"
 
 #include "engine_ui.h"
+#include "imgui_internal.h"
 #include "renderer/materials/material_utils.h"
 #include "renderer/textures/texture_2d.h"
 #include "renderer/textures/texture_factory.h"
@@ -29,7 +30,7 @@ namespace luly::ui
 
         if (material_component.get_material())
         {
-            auto& material = material_component.get_material();
+            const std::shared_ptr<renderer::material>& material = material_component.get_material();
             ui_utils::draw_property("Parameters");
             ImGui::Separator();
 
@@ -103,6 +104,64 @@ namespace luly::ui
                     {
                         material->set_texture_enabled(type, texture_enabled);
                     }
+
+                    if (renderer::MATERIAL_TEXTURE_TYPE_SUPPORTS_CHANNEL_MODE.contains(type) &&
+                        renderer::MATERIAL_TEXTURE_TYPE_SUPPORTS_CHANNEL_MODE.at(type))
+                    {
+                        ImGui::PushID("Channel Mode");
+                        // Name
+                        ImGui::AlignTextToFramePadding();
+                        ImGui::Columns(2);
+                        ImGui::PushItemWidth(-1);
+                        ImGui::TextUnformatted("Channel Mode");
+                        ImGui::NextColumn();
+
+                        const float line_height = ImGui::GetTextLineHeightWithSpacing();
+                        ImVec2 buttonSize = {line_height + 3.0f, line_height};
+
+                        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{5, 5});
+
+                        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.8f, 0.1f, 0.15f, 1.0f});
+                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.9f, 0.2f, 0.2f, 1.0f});
+                        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.8f, 0.1f, 0.15f, 1.0f});
+                        if (ImGui::Button("R", buttonSize))
+                        {
+                            material->set_texture_channel_mode(texture.type,
+                                                               renderer::material_texture_channel_mode::red);
+                        }
+                        ImGui::PopStyleColor(3);
+
+                        ImGui::SameLine();
+
+                        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.2f, 0.7f, 0.2f, 1.0f});
+                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.3f, 0.8f, 0.3f, 1.0f});
+                        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.2f, 0.7f, 0.2f, 1.0f});
+                        if (ImGui::Button("G", buttonSize))
+                        {
+                            material->set_texture_channel_mode(texture.type,
+                                                               renderer::material_texture_channel_mode::green);
+                        }
+                        ImGui::PopStyleColor(3);
+
+                        ImGui::SameLine();
+
+                        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.1f, 0.25f, 0.8f, 1.0f});
+                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.2f, 0.35f, 0.9f, 1.0f});
+                        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.1f, 0.25f, 0.8f, 1.0f});
+                        if (ImGui::Button("B", buttonSize))
+                        {
+                            material->set_texture_channel_mode(texture.type,
+                                                               renderer::material_texture_channel_mode::blue);
+                        }
+                        ImGui::PopStyleColor(3);
+
+                        ImGui::PopStyleVar();
+
+                        // Reset
+                        ImGui::Columns(1);
+                        ImGui::PopID();
+                    }
+
                     ImGui::TreePop();
                 }
             }

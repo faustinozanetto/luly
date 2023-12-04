@@ -120,7 +120,7 @@ namespace luly::renderer
 
     void renderer::submit_model(const std::shared_ptr<model>& model, renderer_draw_mode draw_mode)
     {
-        for (const auto& mesh : model->get_meshes())
+        for (const std::shared_ptr<mesh>& mesh : model->get_meshes())
         {
             submit_mesh(mesh, draw_mode);
         }

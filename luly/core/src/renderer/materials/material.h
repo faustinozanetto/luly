@@ -19,11 +19,23 @@ namespace luly::renderer
         emissive
     };
 
+    enum class material_texture_channel_mode
+    {
+        red = 0,
+        green,
+        blue
+    };
+
     struct material_texture
     {
         std::shared_ptr<texture_2d> texture;
         material_texture_type type;
         bool is_enabled;
+
+        material_texture();
+
+        material_texture(const std::shared_ptr<texture_2d>& texture, material_texture_type type,
+                         bool is_enabled = true);
     };
 
     struct material_specification
@@ -66,6 +78,16 @@ namespace luly::renderer
         {material_texture_type::emissive, 6},
     };
 
+    const std::map<material_texture_type, bool> MATERIAL_TEXTURE_TYPE_SUPPORTS_CHANNEL_MODE = {
+        {material_texture_type::albedo, false},
+        {material_texture_type::normal, false},
+        {material_texture_type::roughness, true},
+        {material_texture_type::metallic, true},
+        {material_texture_type::ambient_occlusion, true},
+        {material_texture_type::opacity, false},
+        {material_texture_type::emissive, false},
+    };
+
     class material
     {
     public:
@@ -81,6 +103,11 @@ namespace luly::renderer
         float get_metallic() const { return m_material_specification.metallic; }
         float get_emissive_strength() const { return m_material_specification.emissive_strength; }
 
+        material_texture_channel_mode get_texture_type_channel_mode(material_texture_type texture_type) const
+        {
+            return m_texture_type_channels.at(texture_type);
+        }
+
         std::map<material_texture_type, material_texture>& get_textures()
         {
             return m_material_specification.textures;
@@ -88,6 +115,8 @@ namespace luly::renderer
 
         /* Setters */
         void set_texture_enabled(material_texture_type texture_type, bool is_enabled);
+        void set_texture_channel_mode(material_texture_type texture_type,
+                                      material_texture_channel_mode texture_channel);
         void set_albedo(const glm::vec3& albedo) { m_material_specification.albedo = albedo; }
         void set_emissive(const glm::vec3& emissive) { m_material_specification.emissive = emissive; }
 
@@ -111,7 +140,9 @@ namespace luly::renderer
 
     private:
         void initialize_textures_map();
+        void initialize_textures_channels_map();
 
         material_specification m_material_specification;
+        std::map<material_texture_type, material_texture_channel_mode> m_texture_type_channels;
     };
 }

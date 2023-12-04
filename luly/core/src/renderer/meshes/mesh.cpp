@@ -4,11 +4,12 @@
 namespace luly::renderer
 {
     mesh::mesh(const std::string& name, const std::vector<mesh_vertex>& vertices,
-               const std::vector<mesh_index>& indices)
+               const std::vector<mesh_index>& indices, int material_index)
     {
         m_name = name;
         m_vertices = vertices;
         m_indices = indices;
+        m_material_index = material_index;
         initialize_buffers();
     }
 

@@ -97,29 +97,50 @@ namespace luly::renderer
             // Check if has model_renderer_component
             if (!registry->any_of<scene::model_renderer_component>(actor)) continue;
 
-            // Check if has material_component
-            if (registry->any_of<scene::material_component>(actor))
-            {
-                auto& material_component = registry->get<scene::material_component>(actor);
-                auto& material = material_component.get_material();
-
-                material->bind(m_geometry_shader);
-            }
-            else
-            {
-                material::bind_default(m_geometry_shader);
-            }
-
             const scene::model_renderer_component& model_renderer_component = registry->get<
                 scene::model_renderer_component>(actor);
             const std::shared_ptr<model>& model = model_renderer_component.get_model();
 
+            // Check if has material_component
+            bool has_material_component = registry->any_of<scene::material_component>(actor);
+            if (has_material_component)
+            {
+                scene::material_component& material_component = registry->get<scene::material_component>(actor);
+                const std::shared_ptr<material>& material = material_component.get_material();
+
+                material->bind(m_geometry_shader);
+            }
+            else if (model->get_materials().empty())
+            {
+                material::bind_default(m_geometry_shader);
+            }
+
             m_geometry_shader->set_mat4("u_transform", transform->get_transform());
+
             renderer::submit_model(model);
+            /*
+            // If model has no embedded materials render as usual.
+            if (model->get_materials().empty() && has_material_component)
+            {
+                continue;
+            }
+            
+            for (const std::shared_ptr<mesh>&model_mesh : model->get_meshes())
+            {
+                // Check if mesh material index is in range.
+                const int material_index = model_mesh->get_material_index();
+                if (material_index <= model->get_materials().size())
+                {
+                    model->get_materials().at(material_index)->bind(m_geometry_shader);
+                }
+                renderer::submit_mesh(model_mesh);
+            }*/
         }
 
         m_geometry_shader->un_bind();
         m_fbo->un_bind();
+
+        renderer::set_state(renderer_state::depth, false);
     }
 
     void geometry_pass::set_outputs()

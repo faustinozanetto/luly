@@ -54,13 +54,13 @@ void basic_application::on_update()
     if (!current_scene) return;
 
     luly::ui::engine_ui::begin_frame();
-
-    const std::shared_ptr<luly::renderer::directional_light>& directional_light = current_scene->
-        get_directional_light();
-
-    glm::vec3 direction = directional_light->get_direction();
-    direction.z = sin(2 * glm::pi<float>() * 0.05f * luly::app_time::get_time());
-    directional_light->set_direction(direction);
+    /*
+        const std::shared_ptr<luly::renderer::directional_light>& directional_light = current_scene->
+            get_directional_light();
+    
+        glm::vec3 direction = directional_light->get_direction();
+        direction.z = sin(2 * glm::pi<float>() * 0.05f * luly::app_time::get_time());
+        directional_light->set_direction(direction);*/
 
     const std::shared_ptr<luly::renderer::perspective_camera>& camera = current_scene->get_camera_manager()->
         get_perspective_camera();
@@ -90,7 +90,17 @@ void basic_application::setup_scene()
     directional_light->set_z_multiplier(20.0f);
     dir_light_actor->add_component<luly::scene::directional_light_component>(directional_light);
 
+    // Skybox
+    const std::shared_ptr<luly::scene::scene_actor>& skybox_actor = scene->create_actor("Skybox Actor");
+    const std::shared_ptr<luly::renderer::texture_2d>& environment_texture =
+        luly::renderer::texture_factory::create_environment_texture_from_file(
+            "assets/hdris/kloofendal_43d_clear_puresky_4k.hdr");
+    luly::scene::skybox_component& skybox_component = skybox_actor->add_component<luly::scene::skybox_component>(
+        environment_texture
+    );
+
     // Create emissive cube
+    /*
     const std::shared_ptr<luly::scene::scene_actor>& emissive_cube_actor = scene->create_actor("Emissive Cube");
     emissive_cube_actor->add_component<luly::scene::model_renderer_component>(
         luly::renderer::model_factory::create_model_from_meshes({
@@ -153,79 +163,62 @@ void basic_application::setup_scene()
         }
     }
 */
-    const std::shared_ptr<luly::scene::scene_actor>& skybox_actor = scene->create_actor("Skybox Actor");
-    const std::shared_ptr<luly::renderer::texture_2d>& environment_texture =
-        luly::renderer::texture_factory::create_environment_texture_from_file(
-            "assets/hdris/kloofendal_43d_clear_puresky_4k.hdr");
-    luly::scene::skybox_component& skybox_component = skybox_actor->add_component<luly::scene::skybox_component>(
-        environment_texture
-    );
-    skybox_component.set_intensity(0.01f);
 
-    /*
-    const auto& spot_light_actor = scene->create_actor("Spot Light Emitter");
-    spot_light_actor->add_component<luly::scene::spot_light_component>(
-        std::make_shared<luly::renderer::spot_light>(glm::vec3(0.85f), glm::vec3(0, 0, 3), glm::vec3(0, 0, -1), 12.5f,
-                                                     25.0f));
-    spot_light_actor->get_component<luly::scene::transform_component>().get_transform()->set_location({0, 0, 2});
-*/
+    const std::shared_ptr<luly::scene::scene_actor>& actor = scene->create_actor("SciFi Helmet");
 
-    const std::shared_ptr<luly::scene::scene_actor>& actor = scene->create_actor("Sponza");
-   // actor->get_component<luly::scene::transform_component>().get_transform()->set_scale({0.01f, 0.01f, 0.01f});
-
-    // Loading model and creating asset.
-    const std::shared_ptr<luly::renderer::model> sponza_model = luly::renderer::model_factory::create_model_from_file(
-        "assets/models/sponza/sponza.glb");
-    const std::shared_ptr<luly::assets::asset>& sponza_model_asset = luly::assets::asset_factory::create_asset<
+    const std::shared_ptr<luly::renderer::model> sci_fi_helmet_model =
+        luly::renderer::model_factory::create_model_from_file(
+            "assets/models/vietnam-helmet/scene.gltf");
+    const std::shared_ptr<luly::assets::asset>& sci_fi_helmet_model_asset = luly::assets::asset_factory::create_asset<
         luly::renderer::model>(
-        "sponza-model", luly::assets::asset_type::model, sponza_model);
-    actor->add_component<luly::scene::model_renderer_component>(sponza_model_asset->get_data<luly::renderer::model>());
+        "sci-fi-helmet-model", luly::assets::asset_type::model, sci_fi_helmet_model);
+    actor->add_component<luly::scene::model_renderer_component>(
+        sci_fi_helmet_model_asset->get_data<luly::renderer::model>());
 
-    /*
     const std::shared_ptr<luly::renderer::texture_2d>& albedo_texture =
         luly::renderer::texture_factory::create_texture_from_file(
-            "assets/textures/tv/tv-albedo.png");
+            "assets/models/vietnam-helmet/textures/NormalTest_01_baseColor.png");
     const std::shared_ptr<luly::assets::asset>& albedo_texture_asset = luly::assets::asset_factory::create_asset<
         luly::renderer::texture_2d>(
-        "tv-albedo-texture", luly::assets::asset_type::texture, albedo_texture);
-    luly::renderer::material_texture albedo = {albedo_texture, luly::renderer::material_texture_type::albedo, true};
+        "sci-fi-helmet-albedo-texture", luly::assets::asset_type::texture, albedo_texture);
+    luly::renderer::material_texture albedo = {albedo_texture, luly::renderer::material_texture_type::albedo};
 
     const std::shared_ptr<luly::renderer::texture_2d>& normal_texture =
         luly::renderer::texture_factory::create_texture_from_file(
-            "assets/textures/tv/tv-normal.png");
+            "assets/models/vietnam-helmet/textures/NormalTest_01_normal.png");
     const std::shared_ptr<luly::assets::asset>& normal_texture_asset = luly::assets::asset_factory::create_asset<
         luly::renderer::texture_2d>(
-        "tv-normal-texture", luly::assets::asset_type::texture, normal_texture);
-    luly::renderer::material_texture normal = {normal_texture, luly::renderer::material_texture_type::normal, true};
+        "sci-fi-helmet-normal-texture", luly::assets::asset_type::texture, normal_texture);
+    luly::renderer::material_texture normal = {normal_texture, luly::renderer::material_texture_type::normal};
 
     const std::shared_ptr<luly::renderer::texture_2d>& metallic_texture =
         luly::renderer::texture_factory::create_texture_from_file(
-            "assets/textures/tv/tv-metallic.png");
+            "assets/models/vietnam-helmet/textures/NormalTest_01_metallicRoughness.png");
     const std::shared_ptr<luly::assets::asset>& metallic_texture_asset = luly::assets::asset_factory::create_asset<
         luly::renderer::texture_2d>(
-        "tv-metallic-texture", luly::assets::asset_type::texture, metallic_texture);
+        "sci-fi-helmet-metallic-texture", luly::assets::asset_type::texture, metallic_texture);
     luly::renderer::material_texture metallic = {
-        metallic_texture, luly::renderer::material_texture_type::metallic, true
+        metallic_texture, luly::renderer::material_texture_type::metallic
     };
 
     const std::shared_ptr<luly::renderer::texture_2d>& roughness_texture =
         luly::renderer::texture_factory::create_texture_from_file(
-            "assets/textures/tv/tv-roughness.png");
+            "assets/models/vietnam-helmet/textures/NormalTest_01_metallicRoughness.png");
     const std::shared_ptr<luly::assets::asset>& roughness_texture_asset = luly::assets::asset_factory::create_asset<
         luly::renderer::texture_2d>(
-        "tv-roughness-texture", luly::assets::asset_type::texture, roughness_texture);
+        "sci-fi-helmet-roughness-texture", luly::assets::asset_type::texture, roughness_texture);
     luly::renderer::material_texture roughness = {
-        roughness_texture, luly::renderer::material_texture_type::roughness, true
+        roughness_texture, luly::renderer::material_texture_type::roughness
     };
 
     const std::shared_ptr<luly::renderer::texture_2d>& ao_texture =
         luly::renderer::texture_factory::create_texture_from_file(
-            "assets/textures/tv/tv-ao.png");
+            "assets/models/vietnam-helmet/textures/NormalTest_01_ao.png");
     const std::shared_ptr<luly::assets::asset>& ao_texture_asset = luly::assets::asset_factory::create_asset<
         luly::renderer::texture_2d>(
-        "tv-ao-texture", luly::assets::asset_type::texture, ao_texture);
+        "sci-fi-helmet-ao-texture", luly::assets::asset_type::texture, ao_texture);
     luly::renderer::material_texture ao = {
-        ao_texture, luly::renderer::material_texture_type::ambient_occlusion, true
+        ao_texture, luly::renderer::material_texture_type::ambient_occlusion
     };
 
     std::map<luly::renderer::material_texture_type, luly::renderer::material_texture> textures;
@@ -235,21 +228,26 @@ void basic_application::setup_scene()
     textures.insert({luly::renderer::material_texture_type::roughness, roughness});
     textures.insert({luly::renderer::material_texture_type::ambient_occlusion, ao});
 
-    const luly::renderer::material_specification& material_specification =
+    const luly::renderer::material_specification& helmet_material_specification =
         std::make_shared<luly::renderer::material_specification_builder>()->
         with_textures(textures).build();
 
-    const std::shared_ptr<luly::renderer::material>& tv_material = std::make_shared<luly::renderer::material>(
-        material_specification);
+    const std::shared_ptr<luly::renderer::material>& sci_fi_helmet_material = std::make_shared<
+        luly::renderer::material>(
+        helmet_material_specification);
+    sci_fi_helmet_material->set_texture_channel_mode(luly::renderer::material_texture_type::roughness,
+                                                     luly::renderer::material_texture_channel_mode::green);
+    sci_fi_helmet_material->set_texture_channel_mode(luly::renderer::material_texture_type::metallic,
+                                                     luly::renderer::material_texture_channel_mode::blue);
 
     const std::shared_ptr<luly::assets::asset>& tv_material_asset = luly::assets::asset_factory::create_asset<
         luly::renderer::material>(
-        "tv-material", luly::assets::asset_type::material, tv_material);
+        "sci-fi-helmet-material", luly::assets::asset_type::material, sci_fi_helmet_material);
 
-    m_actor->add_component<luly::scene::material_component>(tv_material_asset->get_data<luly::renderer::material>());
+    actor->add_component<luly::scene::material_component>(tv_material_asset->get_data<luly::renderer::material>());
 
     // Create background actor
-    /*
+
     const std::shared_ptr<luly::scene::scene_actor>& background_actor = scene->create_actor("Background Actor");
     const std::shared_ptr<luly::renderer::model> background_model =
         luly::renderer::model_factory::create_model_from_file(
@@ -263,7 +261,6 @@ void basic_application::setup_scene()
     background_model_renderer_component.set_casts_shadows(false);
     background_actor->get_component<luly::scene::transform_component>().get_transform()->set_scale({5, 1, 5});
     background_actor->get_component<luly::scene::transform_component>().get_transform()->set_location({0, -3, 0});
-    */
 
     luly::scene::scene_manager::get().switch_scene(scene);
 }

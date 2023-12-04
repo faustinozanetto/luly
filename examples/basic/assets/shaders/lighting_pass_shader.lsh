@@ -210,8 +210,8 @@ void main()
     float ambient_occlusion = rough_metal_ao.b;
 
     float world_ambient_occlusion = texture(u_ambient_occlusion_map, o_tex_coord).r;
-    ambient_occlusion *= world_ambient_occlusion;
-    ambient_occlusion /= 2;
+    //ambient_occlusion *= world_ambient_occlusion;
+    //ambient_occlusion /= 2;
 
     vec3 view_dir = normalize(camera.position.xyz - frag_pos);
     vec3 reflect_dir = reflect(-view_dir, normal);
@@ -245,12 +245,9 @@ void main()
     vec2 brdf_lut = sample_brdf_lut_map(view_dir, normal, roughness);
     vec3 specular = prefilter * (F * brdf_lut.x + brdf_lut.y);
 
-    vec3 ambient = (kD * diffuse + specular)  * u_skybox_intensity * u_skybox_tint.rgb;
+    vec3 ambient = (kD * diffuse + specular)  * u_skybox_intensity * u_skybox_tint.rgb * ambient_occlusion;
 
     vec3 color = ambient + luminance + emissive;
 
-    color = color / (color + vec3(1.0));
-    color = pow(color, vec3(1.0/2.2));
-
-    frag_color = vec4(color, 1.0);
+    frag_color = vec4(color, full_albedo.a);
 }

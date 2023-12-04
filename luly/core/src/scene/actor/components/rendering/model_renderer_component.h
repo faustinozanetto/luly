@@ -16,7 +16,7 @@ namespace luly::scene
 
         /* Getters */
         const std::shared_ptr<renderer::model>& get_model() const { return m_model; }
-        const bool get_casts_shadows() const { return m_casts_shadows; }
+        bool get_casts_shadows() const { return m_casts_shadows; }
 
         /* Setters */
         void set_model(const std::shared_ptr<renderer::model>& model) { m_model = model; }

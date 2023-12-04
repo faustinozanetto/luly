@@ -30,7 +30,7 @@ namespace luly::renderer
         static std::shared_ptr<mesh> parse_assimp_mesh(const aiScene* assimp_scene, aiMesh* assimp_mesh,
                                                        const std::string& directory);
         static std::vector<model_texture> parse_assimp_material_textures(
-            aiMaterial* assimp_material, aiTextureType assimp_texture_type,
+            const aiMaterial* assimp_material, aiTextureType assimp_texture_type,
             const std::string& type_name, const std::string& directory, std::vector<model_texture>& loaded_textures);
     };
 }
