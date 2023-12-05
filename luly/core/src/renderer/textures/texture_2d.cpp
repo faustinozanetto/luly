@@ -53,7 +53,7 @@ namespace luly::renderer
                                     ? GL_FLOAT
                                     : GL_UNSIGNED_BYTE,
                                 m_texture_specification.data);
-            stbi_image_free(m_texture_specification.data);
+            //stbi_image_free(m_texture_specification.data);
         }
     }
 }

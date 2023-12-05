@@ -5,6 +5,7 @@
 #include "utils/ui_utils.h"
 
 #include <glm/ext/scalar_constants.hpp>
+#include <glm/gtc/epsilon.hpp>
 
 namespace luly::ui
 {
@@ -38,28 +39,18 @@ namespace luly::ui
                 directional_light->set_color(color);
             }
 
-            glm::vec3 direction = directional_light->get_direction();
-            if (ui_utils::draw_property("Direction", direction, -2 * glm::pi<float>(), 2 * glm::pi<float>(), 0.01f))
+            glm::vec2 direction_angles = directional_light->get_direction_angles();
+            if (ui_utils::draw_property("Direction", direction_angles, -180.0, 180.0))
             {
-                directional_light->set_direction(direction);
+                if (glm::epsilonEqual(direction_angles.y, 0.0f, 1e-5f)) direction_angles.y = 1e-5f;
+
+                directional_light->set_direction(direction_angles.x, direction_angles.y);
             }
 
             float intensity = directional_light->get_intensity();
             if (ui_utils::draw_property("Intensity", intensity, 0.0f, 5.0f, 0.01f))
             {
                 directional_light->set_intensity(intensity);
-            }
-
-            float distance = directional_light->get_distance();
-            if (ui_utils::draw_property("Distance", distance, 0.0f, 150.0f, 0.01f))
-            {
-                directional_light->set_distance(distance);
-            }
-
-            float z_multiplier = directional_light->get_z_multiplier();
-            if (ui_utils::draw_property("Z Multiplier", z_multiplier, 0.0f, 50.0f, 0.01f))
-            {
-                directional_light->set_z_multiplier(z_multiplier);
             }
         }
         else

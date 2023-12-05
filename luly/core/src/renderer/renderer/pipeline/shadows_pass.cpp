@@ -1,6 +1,8 @@
 ﻿#include "lypch.h"
 #include "shadows_pass.h"
 
+#include <random>
+
 #include "application/application.h"
 #include "renderer/renderer/renderer.h"
 #include "renderer/shaders/shader_factory.h"
@@ -27,7 +29,8 @@ namespace luly::renderer
 
         // Create cascaded shadows ubo.
         initialize_cascaded_shadows_parameters();
-        m_cascaded_shadows_ubo = std::make_shared<uniform_buffer_object>(sizeof(cascaded_shadows_parameters), 3);
+        generate_random_angles_texture();
+        m_cascaded_shadows_ubo = std::make_shared<uniform_buffer_object>(sizeof(cascaded_shadows_parameters), 4);
     }
 
     void shadows_pass::execute()
@@ -38,7 +41,6 @@ namespace luly::renderer
         const std::shared_ptr<directional_light>& directional_light = current_scene->get_directional_light();
         if (!directional_light) return;
 
-        update_cascaded_shadows_ubo(directional_light);
         calculate_directional_light_shadows(current_scene, directional_light);
         /*
         glCullFace(GL_FRONT);
@@ -91,6 +93,16 @@ namespace luly::renderer
         directional_shadow_map_output.name = "directional_shadow_map_output";
         directional_shadow_map_output.output = directional_light->get_shadow_maps();
         add_output(directional_shadow_map_output);
+
+        render_pass_output random_angles_map_output;
+        random_angles_map_output.name = "random_angles_map_output";
+        random_angles_map_output.output = m_random_angles_texture->get_handle_id();
+        add_output(random_angles_map_output);
+
+        render_pass_output directional_pcf_sampler_output;
+        directional_pcf_sampler_output.name = "directional_pcf_sampler_output";
+        directional_pcf_sampler_output.output = directional_light->get_shadow_map_pcf_sampler();
+        add_output(directional_pcf_sampler_output);
     }
 
     void shadows_pass::on_resize(const glm::ivec2& dimensions)
@@ -99,31 +111,49 @@ namespace luly::renderer
 
     void shadows_pass::initialize_cascaded_shadows_parameters()
     {
-        m_cascaded_shadows_parameters.cascades_count = 0;
-        m_cascaded_shadows_parameters.inverse_cascade_factor = 0.003f;
         m_cascaded_shadows_parameters.shadow_bias = 0.005f;
         m_cascaded_shadows_parameters.soft_shadows = 1;
         m_cascaded_shadows_parameters.pcf_vertical_samples = 4;
         m_cascaded_shadows_parameters.pcf_horizontal_samples = 4;
 
-        for (int i = 0; i < 16; i++)
+        for (int i = 0; i < 6; i++)
         {
             m_cascaded_shadows_parameters.cascade_plane_distances[i] = 0.0f;
         }
     }
 
-    void shadows_pass::update_cascaded_shadows_ubo(const std::shared_ptr<directional_light>& directional_light)
+    void shadows_pass::generate_random_angles_texture()
     {
-        m_cascaded_shadows_parameters.cascades_count = directional_light->get_shadow_cascade_levels().size();
+        std::uniform_real_distribution<double> distribution(0.0f, 1.0f);
+        std::mt19937 generator;
 
-        std::vector<float> cascade_planes_distances = directional_light->get_shadow_cascade_levels();
-        for (int i = 0; i < 16; i++)
+        int size = 64;
+        int buffer_size = size * size * size;
+        std::vector<glm::vec2> data;
+
+        for (int y = 0; y < size; ++y)
         {
-            if (i < cascade_planes_distances.size())
-                m_cascaded_shadows_parameters.cascade_plane_distances[i] = cascade_planes_distances[i];
-            else m_cascaded_shadows_parameters.cascade_plane_distances[i] = 0.0f;
+            for (int x = 0; x < size; ++x)
+            {
+                const float random_angle = glm::two_pi<float>() * distribution(generator);
+                // Random angles in range [0, 2PI);
+                data.emplace_back(glm::cos(random_angle), glm::sin(random_angle));
+            }
         }
 
+        texture_specification random_angles_texture_specification = {
+            size, size, 2, data.data(), texture_internal_format::rg32f
+        };
+        m_random_angles_texture = std::make_shared<texture_2d>(random_angles_texture_specification);
+    }
+
+    void shadows_pass::update_cascaded_shadows_ubo(const std::shared_ptr<directional_light>& directional_light)
+    {
+        const std::vector<float>& cascade_splits = directional_light->get_shadow_cascade_splits();
+        for (int i = 0; i < directional_light->get_cascades_count(); i++)
+        {
+            m_cascaded_shadows_parameters.cascade_plane_distances[i] = cascade_splits[i];
+        }
         m_cascaded_shadows_ubo->set_data(&m_cascaded_shadows_parameters, sizeof(m_cascaded_shadows_parameters));
     }
 
@@ -135,22 +165,23 @@ namespace luly::renderer
         const std::shared_ptr<perspective_camera>& perspective_camera = current_scene->get_camera_manager()->
             get_perspective_camera();
 
-        // Calculate cascades levels and update cascades.
-        directional_light->calculate_cascade_levels(perspective_camera->get_far_clip());
-        directional_light->update_shadow_cascades(perspective_camera);
-        
         // Setup fbo and shader.
-        m_directional_light_shadows_shader->bind();
         glBindFramebuffer(GL_FRAMEBUFFER, directional_light->get_shadow_map_fbo());
         renderer::set_viewport_size(directional_light->get_shadow_map_dimensions());
         glClear(GL_DEPTH_BUFFER_BIT);
-        // glCullFace(GL_FRONT);
+
+        glCullFace(GL_FRONT);
+        m_directional_light_shadows_shader->bind();
+
+        // Calculate cascades levels and update cascades.
+        directional_light->update_shadow_cascades(perspective_camera);
+        update_cascaded_shadows_ubo(directional_light);
 
         // Render geometry.
         render_geometry();
 
         // Reset state.
-        //glCullFace(GL_BACK);
+        glCullFace(GL_BACK);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         m_directional_light_shadows_shader->un_bind();
 

@@ -33,9 +33,81 @@ layout (binding = 6) uniform samplerCube u_prefilter_map;
 layout (binding = 7) uniform sampler2D u_brdf_map;
 layout (binding = 8) uniform sampler2D u_ambient_occlusion_map;
 layout (binding = 9) uniform sampler2DArray u_cascades_shadow_map;
+layout (binding = 10) uniform sampler2DArrayShadow u_cascades_shadow_pcf_map;
+layout (binding = 11) uniform sampler2D u_random_angles_map;
 
 uniform float u_skybox_intensity;
 uniform vec4 u_skybox_tint;
+
+float light_near_plane;
+float light_far_plane;
+float light_radius;
+
+const vec2 Poisson64[64] = vec2[](
+vec2(-0.934812, 0.366741),
+vec2(-0.918943, -0.0941496),
+vec2(-0.873226, 0.62389),
+vec2(-0.8352, 0.937803),
+vec2(-0.822138, -0.281655),
+vec2(-0.812983, 0.10416),
+vec2(-0.786126, -0.767632),
+vec2(-0.739494, -0.535813),
+vec2(-0.681692, 0.284707),
+vec2(-0.61742, -0.234535),
+vec2(-0.601184, 0.562426),
+vec2(-0.607105, 0.847591),
+vec2(-0.581835, -0.00485244),
+vec2(-0.554247, -0.771111),
+vec2(-0.483383, -0.976928),
+vec2(-0.476669, -0.395672),
+vec2(-0.439802, 0.362407),
+vec2(-0.409772, -0.175695),
+vec2(-0.367534, 0.102451),
+vec2(-0.35313, 0.58153),
+vec2(-0.341594, -0.737541),
+vec2(-0.275979, 0.981567),
+vec2(-0.230811, 0.305094),
+vec2(-0.221656, 0.751152),
+vec2(-0.214393, -0.0592364),
+vec2(-0.204932, -0.483566),
+vec2(-0.183569, -0.266274),
+vec2(-0.123936, -0.754448),
+vec2(-0.0859096, 0.118625),
+vec2(-0.0610675, 0.460555),
+vec2(-0.0234687, -0.962523),
+vec2(-0.00485244, -0.373394),
+vec2(0.0213324, 0.760247),
+vec2(0.0359813, -0.0834071),
+vec2(0.0877407, -0.730766),
+vec2(0.14597, 0.281045),
+vec2(0.18186, -0.529649),
+vec2(0.188208, -0.289529),
+vec2(0.212928, 0.063509),
+vec2(0.23661, 0.566027),
+vec2(0.266579, 0.867061),
+vec2(0.320597, -0.883358),
+vec2(0.353557, 0.322733),
+vec2(0.404157, -0.651479),
+vec2(0.410443, -0.413068),
+vec2(0.413556, 0.123325),
+vec2(0.46556, -0.176183),
+vec2(0.49266, 0.55388),
+vec2(0.506333, 0.876888),
+vec2(0.535875, -0.885556),
+vec2(0.615894, 0.0703452),
+vec2(0.637135, -0.637623),
+vec2(0.677236, -0.174291),
+vec2(0.67626, 0.7116),
+vec2(0.686331, -0.389935),
+vec2(0.691031, 0.330729),
+vec2(0.715629, 0.999939),
+vec2(0.8493, -0.0485549),
+vec2(0.863582, -0.85229),
+vec2(0.890622, 0.850581),
+vec2(0.898068, 0.633778),
+vec2(0.92053, -0.355693),
+vec2(0.933348, -0.62981),
+vec2(0.95294, 0.156896));
 
 vec3 sample_irradiance_map(vec3 normal) {
     return texture(u_irradiance_map, normal).rgb;
@@ -51,70 +123,79 @@ vec2 sample_brdf_lut_map(vec3 view_dir, vec3 normal, float roughness) {
     return texture(u_brdf_map, vec2(max(dot(normal, view_dir), 0.0), roughness)).rg;
 }
 
+vec2 shadow_pcf_rotate(vec2 uv, float angle)
+{
+    float s = sin(angle);
+    float c = cos(angle);
+    return vec2(uv.x * c - uv.y * s, uv.x * s + uv.y * c);
+}
+
+float shadow_pcf(vec2 projection_coords, float current_depth, float bias, uint cascade_index)
+{
+    vec2 texel_size = 1.0 / vec2(textureSize(u_cascades_shadow_map, 0));
+    float shadow = 0.0;
+    
+    int pcf_samples = cascaded_shadows_parameters.pcf_horizontal_samples * cascaded_shadows_parameters.pcf_vertical_samples;
+    for (int current_sample = 0; current_sample < pcf_samples; ++current_sample) {
+        int x = current_sample % cascaded_shadows_parameters.pcf_horizontal_samples  - cascaded_shadows_parameters.pcf_horizontal_samples / 2;
+        int y = current_sample / cascaded_shadows_parameters.pcf_horizontal_samples - cascaded_shadows_parameters.pcf_vertical_samples / 2;
+
+        // Read a random vector from the texture
+        vec2 random_rotation = texture(u_random_angles_map, vec2(x, y)).xy;
+
+        // Introduce a rotation based on the random vector
+        float angle = atan(random_rotation.y, random_rotation.x);
+        vec2 rotated_coords = shadow_pcf_rotate(vec2(x, y), angle);
+
+        float depth = texture(u_cascades_shadow_map, vec3(projection_coords.xy + rotated_coords * texel_size, cascade_index)).r;
+        shadow += (current_depth - bias) > depth ? 1.0 : 0.0;
+    }
+
+    return shadow / float(pcf_samples);
+}
+
+float shadow_hard(vec2 projection_coords, float current_depth, float bias, uint cascade_index) {
+    float depth = texture(u_cascades_shadow_map, vec3(projection_coords.xy, cascade_index)).r;
+    float shadow = (current_depth - bias) > depth ? 1.0: 0.0;
+    return shadow;
+}
+
 float calculate_directional_light_shadow(vec3 frag_pos, vec3 normal, vec3 light_dir) {
     vec4 frag_pos_view_space = camera.view_matrix * vec4(frag_pos, 1.0);
     float depth_value = abs(frag_pos_view_space.z);
 
     // Get the cascade shadow layer index.
-    int layer = -1;
-    for (int i = 0; i < cascaded_shadows_parameters.cascades_count; ++i)
+    int cascade_index = 0;
+    int cascades_count = 6;
+    for (int i = 0; i < cascades_count - 1; ++i)
     {
-        float cascadeDistance = cascaded_shadows_parameters.cascade_plane_distances[i];
+        float cascade_distance = cascaded_shadows_parameters.cascade_plane_distances[i];
 
-        if (depth_value < cascadeDistance)
+        if (depth_value < cascade_distance)
         {
-            layer = i;
+            cascade_index = i + 1;
             break;
         }
     }
-    if (layer == -1)
-    {
-        layer = cascaded_shadows_parameters.cascades_count;
-    }
 
-    vec4 frag_pos_light_space = u_light_space_matrices[layer] * vec4(frag_pos, 1.0);
+    vec4 frag_pos_light_space = u_light_space_matrices[cascade_index] * vec4(frag_pos, 1.0);
     vec3 projection_coords = frag_pos_light_space.xyz / frag_pos_light_space.w;
     // transform to [0,1] range
     projection_coords = projection_coords * 0.5 + 0.5;
 
     float current_depth = projection_coords.z;
     if (current_depth > 1.0)
-    {
         return 0.0;
-    }
 
     float bias = max(0.005 * (1.0 - clamp(dot(normal, light_dir), 0.0, 1.0)), cascaded_shadows_parameters.shadow_bias);
-    if (layer == cascaded_shadows_parameters.cascades_count)
-    {
-        bias *= 1 / max(camera.far_clip * cascaded_shadows_parameters.inverse_cascade_factor, 1.0f);
-    }
-    else
-    {
-        float cascadeDistance = cascaded_shadows_parameters.cascade_plane_distances[layer];
-        bias *= 1 / max(cascadeDistance * cascaded_shadows_parameters.inverse_cascade_factor, 1.0f);
-    }
-
-    // PCF shadow sampling
-    float shadow = 0.0;
+    
+    float shadow = 0.0f;
     if (cascaded_shadows_parameters.soft_shadows == 1) {
-        vec2 texel_size = 1.0 / vec2(textureSize(u_cascades_shadow_map, 0));
-
-        int pcfSamples = cascaded_shadows_parameters.pcf_horizontal_samples * cascaded_shadows_parameters.pcf_vertical_samples;
-
-        for (int currSample = 0; currSample < pcfSamples; ++currSample) {
-            int x = currSample % cascaded_shadows_parameters.pcf_horizontal_samples  - cascaded_shadows_parameters.pcf_horizontal_samples / 2;
-            int y = currSample / cascaded_shadows_parameters.pcf_horizontal_samples - cascaded_shadows_parameters.pcf_vertical_samples / 2;
-
-            float pcfDepth = texture(u_cascades_shadow_map, vec3(projection_coords.xy + vec2(x, y) * texel_size, layer)).r;
-            shadow += (current_depth - bias) > pcfDepth ? 1.0 : 0.0;
-        }
-
-        shadow /= float(pcfSamples);
+        shadow = shadow_pcf(projection_coords.xy, current_depth, bias, cascade_index);
     } else {
-        float depth = texture(u_cascades_shadow_map, vec3(projection_coords.xy, layer)).r;
-        shadow += (current_depth - bias) > depth ? 1.0: 0.0;
+        shadow = shadow_hard(projection_coords.xy, current_depth, bias, cascade_index);
     }
-
+    
     return shadow;
 }
 
@@ -203,7 +284,7 @@ void main()
     vec3 normal = normalize(texture(u_normal_map, o_tex_coord).rgb);
     vec3 rough_metal_ao = texture(u_rough_metal_ao_map, o_tex_coord).rgb;
     vec3 emissive = texture(u_emissive_map, o_tex_coord).rgb;
-    
+
     float opacity = full_albedo.a;
     float roughness = rough_metal_ao.r;
     float metallic = rough_metal_ao.g;

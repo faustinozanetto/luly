@@ -9,17 +9,18 @@
 
 namespace luly::renderer
 {
-    directional_light::directional_light(const glm::vec3& color, const glm::vec3& direction) : light(color)
+    directional_light::directional_light(const glm::vec3& color, float azimuth, float elevation)
     {
-        m_direction = direction;
-        m_distance = 20.0f;
-        m_z_multiplier = 20.0f;
-        m_cascades_count = 4;
+        m_direction_angles = glm::vec2(azimuth, elevation);
+        set_direction(azimuth, elevation);
+        m_radius = 0.35f;
+        m_cascade_split_lambda = 0.55f;
         m_shadow_map_dimensions = glm::ivec2(4096, 4096);
 
-        calculate_cascade_levels(200.0f);
-        
         // Create shadow map fbo
+        create_shadow_fbo();
+
+        /*
         glGenFramebuffers(1, &m_shadow_map_fbo);
         glGenTextures(1, &m_shadow_maps);
         glBindTexture(GL_TEXTURE_2D_ARRAY, m_shadow_maps);
@@ -27,8 +28,8 @@ namespace luly::renderer
                      m_shadow_map_dimensions.y, int(m_shadow_cascade_levels.size()) + 1,
                      0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
 
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
@@ -49,144 +50,207 @@ namespace luly::renderer
             throw 0;
         }
 
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);*/
 
-        
-        m_light_matrices_ubo = std::make_shared<uniform_buffer_object>(sizeof(glm::mat4) * 16, 2);
+        m_light_matrices_ubo = std::make_shared<uniform_buffer_object>(sizeof(glm::mat4) * m_cascades_count, 2);
+        m_frustum_planes_ubo = std::make_shared<uniform_buffer_object>(sizeof(glm::vec2) * m_cascades_count, 3);
+    }
 
-        m_cascade_bound_centers.reserve(m_shadow_cascade_levels.size() + 1);
-        for (uint32_t i = 0; i < m_shadow_cascade_levels.size() + 1; i++)
+    void directional_light::calculate_cascade_splits(const std::shared_ptr<perspective_camera>& perspective_camera)
+    {
+        m_shadow_cascade_splits_distances.clear();
+        m_shadow_cascade_splits_distances.resize(m_cascades_count);
+
+        const float near_clip = perspective_camera->get_near_clip();
+        const float far_clip = perspective_camera->get_far_clip();
+        const float clip_range = far_clip - near_clip;
+        const float ratio = far_clip / near_clip;
+
+        for (uint32_t i = 0; i < m_cascades_count; ++i)
         {
-            m_cascade_bound_centers.push_back(glm::vec3(0.0f));
+            float p = (i + 1) / float(m_cascades_count);
+            float log = near_clip * std::pow(ratio, p);
+            float uni = near_clip + clip_range * p;
+            float d = m_cascade_split_lambda * (log - uni) + uni;
+
+            m_shadow_cascade_splits_distances[i] = (d - near_clip) / clip_range; // to [0, 1] range
         }
     }
 
-    glm::mat4 directional_light::get_light_space_matrix(const std::shared_ptr<perspective_camera>& perspective_camera,
-                                                        float near_clip, float far_clip)
+    void directional_light::set_direction(float azimuth, float elevation)
     {
-        const glm::ivec2 viewport_size = renderer::get_viewport_size();
-        const float aspect_ratio = static_cast<float>(viewport_size.x) / static_cast<float>(viewport_size.y);
+        m_direction_angles = {azimuth, elevation};
 
-        const glm::mat4 projection_matrix = glm::perspective(
-            glm::radians(perspective_camera->get_fov()), aspect_ratio, near_clip,
-            far_clip);
+        float az = glm::radians(azimuth);
+        float el = glm::radians(elevation);
 
-        const std::vector<glm::vec4> corners = perspective_camera->get_frustum_corners_world_space(
-            projection_matrix, perspective_camera->get_view_matrix());
+        m_direction.x = glm::sin(el) * glm::cos(az);
+        m_direction.y = glm::cos(el);
+        m_direction.z = glm::sin(el) * glm::sin(az);
 
-        glm::vec3 center = glm::vec3(0, 0, 0);
-        for (const glm::vec4& corner : corners)
-        {
-            center += glm::vec3(corner);
-        }
-        center /= corners.size();
-
-        const glm::mat4 light_view_matrix = glm::lookAt(
-            center - m_direction,
-            center,
-            glm::vec3(0.0f, 1.0f, 0.0f)
-        );
-
-        float min_x = std::numeric_limits<float>::max();
-        float max_x = std::numeric_limits<float>::min();
-        float min_y = std::numeric_limits<float>::max();
-        float max_y = std::numeric_limits<float>::min();
-        float min_z = std::numeric_limits<float>::max();
-        float max_z = std::numeric_limits<float>::min();
-        for (const auto& v : corners)
-        {
-            const auto trf = light_view_matrix * v;
-            min_x = std::min(min_x, trf.x);
-            max_x = std::max(max_x, trf.x);
-            min_y = std::min(min_y, trf.y);
-            max_y = std::max(max_y, trf.y);
-            min_z = std::min(min_z, trf.z);
-            max_z = std::max(max_z, trf.z);
-        }
-
-        if (min_z < 0)
-        {
-            min_z *= m_z_multiplier;
-        }
-        else
-        {
-            min_z /= m_z_multiplier;
-        }
-        if (max_z < 0)
-        {
-            max_z /= m_z_multiplier;
-        }
-        else
-        {
-            if (max_z < 0.5f)
-            {
-                max_z = 0.5f;
-            }
-            max_z *= m_z_multiplier;
-        }
-
-        const glm::mat4 light_projection = glm::ortho(min_x, max_x, min_y, max_y, min_z, max_z);
-        return light_projection * light_view_matrix;
-    }
-
-    std::vector<glm::mat4> directional_light::get_light_space_matrices(
-        const std::shared_ptr<perspective_camera>& perspective_camera)
-    {
-        std::vector<glm::mat4> matrices;
-
-        for (size_t i = 0; i < m_shadow_cascade_levels.size() + 1; ++i)
-        {
-            if (i == 0)
-            {
-                matrices.push_back(get_light_space_matrix(perspective_camera, perspective_camera->get_near_clip(),
-                                                          m_shadow_cascade_levels[i]));
-            }
-            else if (i < m_shadow_cascade_levels.size())
-            {
-                matrices.push_back(get_light_space_matrix(perspective_camera, m_shadow_cascade_levels[i - 1],
-                                                          m_shadow_cascade_levels[i]));
-            }
-            else
-            {
-                matrices.push_back(get_light_space_matrix(perspective_camera, m_shadow_cascade_levels[i - 1],
-                                                          perspective_camera->get_far_clip()));
-            }
-        }
-        return matrices;
-    }
-
-    void directional_light::set_cascades_count(int cascades_count)
-    {
-        m_cascades_count = cascades_count;
-    }
-
-    void directional_light::update_shadow_map_views() const
-    {
-        for (uint32_t i = 0; i < m_shadow_cascade_levels.size(); ++i)
-        {
-            glBindTexture(GL_TEXTURE_2D, m_shadow_map_views[i]);
-            glTextureView(m_shadow_map_views[i], GL_TEXTURE_2D, m_shadow_maps, 0, i, 1, 1, 0);
-        }
-    }
-
-    void directional_light::calculate_cascade_levels(float far_clip)
-    {
-        m_shadow_cascade_levels.clear();
-        for (int i = 0; i < m_cascades_count; ++i)
-        {
-            float split_factor = static_cast<float>(i + 1) / static_cast<float>(m_cascades_count + 1);
-            float cascade_far_clip = std::pow(far_clip, split_factor);
-            m_shadow_cascade_levels.push_back(cascade_far_clip);
-        }
+        m_direction = glm::normalize(-m_direction);
     }
 
     void directional_light::update_shadow_cascades(const std::shared_ptr<perspective_camera>& perspective_camera)
     {
-        const std::vector<glm::mat4> light_space_matrices = get_light_space_matrices(perspective_camera);
-        for (size_t i = 0; i < light_space_matrices.size(); ++i)
+        calculate_cascade_splits(perspective_camera);
+        const std::vector<cascade_frustum>& cascade_frustums = calculate_shadow_frustums(perspective_camera);
+        update_ubos(cascade_frustums);
+    }
+
+    void directional_light::create_shadow_fbo()
+    {
+        glCreateTextures(GL_TEXTURE_2D_ARRAY, 1, &m_shadow_maps);
+        glTextureStorage3D(m_shadow_maps, 1, GL_DEPTH_COMPONENT32F, m_shadow_map_dimensions.x,
+                           m_shadow_map_dimensions.y, m_cascades_count);
+
+        glTextureParameteri(m_shadow_maps, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTextureParameteri(m_shadow_maps, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTextureParameteri(m_shadow_maps, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTextureParameteri(m_shadow_maps, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
+        constexpr float border_color[] = {1.0f, 1.0f, 1.0f, 1.0f};
+        glTextureParameterfv(m_shadow_maps, GL_TEXTURE_BORDER_COLOR, border_color);
+
+        glCreateFramebuffers(1, &m_shadow_map_fbo);
+        glNamedFramebufferTexture(m_shadow_map_fbo, GL_DEPTH_ATTACHMENT, m_shadow_maps, 0);
+
+        GLenum draw_buffers[] = {GL_NONE};
+        glNamedFramebufferDrawBuffers(m_shadow_map_fbo, 1, draw_buffers);
+        glNamedFramebufferReadBuffer(m_shadow_map_fbo, GL_NONE);
+
+        int status = glCheckNamedFramebufferStatus(m_shadow_map_fbo, GL_FRAMEBUFFER);
+        if (status != GL_FRAMEBUFFER_COMPLETE)
         {
-            m_light_matrices_ubo->set_data(&light_space_matrices[i], sizeof(glm::mat4x4),
+            std::cerr << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!\n";
+        }
+
+        glCreateSamplers(1, &m_shadow_map_pcf_sampler);
+        glSamplerParameteri(m_shadow_map_pcf_sampler, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+        glSamplerParameteri(m_shadow_map_pcf_sampler, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+        glSamplerParameteri(m_shadow_map_pcf_sampler, GL_TEXTURE_WRAP_S,GL_CLAMP_TO_BORDER);
+        glSamplerParameteri(m_shadow_map_pcf_sampler, GL_TEXTURE_WRAP_T,GL_CLAMP_TO_BORDER);
+        float color[4] = {1, 0, 0, 0};
+        glSamplerParameterfv(m_shadow_map_pcf_sampler, GL_TEXTURE_BORDER_COLOR, color);
+        glSamplerParameteri(m_shadow_map_pcf_sampler, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+        glSamplerParameteri(m_shadow_map_pcf_sampler, GL_TEXTURE_COMPARE_FUNC, GL_GEQUAL);
+    }
+
+    std::vector<cascade_frustum> directional_light::calculate_shadow_frustums(
+        const std::shared_ptr<perspective_camera>& perspective_camera)
+    {
+        std::vector<cascade_frustum> cascade_frustums;
+
+        const float near_clip = perspective_camera->get_near_clip();
+        const float far_clip = perspective_camera->get_far_clip();
+        const float clip_range = far_clip - near_clip;
+
+        float last_split_dist = 0.0;
+        m_average_frustum_size = 0.0;
+
+        for (uint32_t i = 0; i < m_cascades_count; ++i)
+        {
+            float split_dist = m_shadow_cascade_splits_distances[i];
+
+            glm::vec3 frustum_corners[8] = {
+                glm::vec3(-1.0f, 1.0f, -1.0f),
+                glm::vec3(1.0f, 1.0f, -1.0f),
+                glm::vec3(1.0f, -1.0f, -1.0f),
+                glm::vec3(-1.0f, -1.0f, -1.0f),
+                glm::vec3(-1.0f, 1.0f, 1.0f),
+                glm::vec3(1.0f, 1.0f, 1.0f),
+                glm::vec3(1.0f, -1.0f, 1.0f),
+                glm::vec3(-1.0f, -1.0f, 1.0f),
+            };
+
+            glm::mat4 inv_cam = glm::inverse(
+                perspective_camera->get_projection_matrix() * perspective_camera->get_view_matrix());
+            for (uint32_t i = 0; i < 8; ++i)
+            {
+                glm::vec4 corner_world_space = inv_cam * glm::vec4(frustum_corners[i], 1.0f);
+                frustum_corners[i] = corner_world_space / corner_world_space.w;
+            }
+
+            for (uint32_t i = 0; i < 4; ++i)
+            {
+                glm::vec3 dist = frustum_corners[i + 4] - frustum_corners[i];
+                frustum_corners[i + 4] = frustum_corners[i] + (dist * split_dist);
+                frustum_corners[i] = frustum_corners[i] + (dist * last_split_dist);
+            }
+
+            glm::vec3 frustum_center = glm::vec3(0.0f);
+            for (uint32_t i = 0; i < 8; ++i)
+            {
+                frustum_center += frustum_corners[i];
+            }
+            frustum_center /= 8.0f;
+
+            float radius = 0.0f;
+            for (uint32_t i = 0; i < 8; ++i)
+            {
+                float distance = glm::length(frustum_corners[i] - frustum_center);
+                radius = glm::max(radius, distance);
+            }
+            radius = ceilf(radius * 16.0f) / 16.0f;
+
+            glm::vec3 max_extents = glm::vec3(radius);
+            glm::vec3 min_extents = -max_extents;
+
+            glm::mat4 light_view_matrix = glm::lookAt(frustum_center - m_direction * -min_extents.z, frustum_center,
+                                                      glm::vec3(0.0f, 1.0f, 0.0f));
+            glm::mat4 light_ortho_matrix = glm::ortho(min_extents.x, max_extents.x, min_extents.y, max_extents.y,
+                                                      0.0f,
+                                                      max_extents.z - min_extents.z);
+
+            float split_depth = (near_clip + split_dist * clip_range) * -1.0f;
+
+            m_average_frustum_size = glm::max(m_average_frustum_size, max_extents.x - min_extents.x);
+
+            // Store cascade frustum data into the vector.
+            cascade_frustum cascade_frustum;
+            cascade_frustum.light_view_matrix = light_view_matrix;
+            cascade_frustum.light_view_projection_matrix = light_ortho_matrix * light_view_matrix;
+            cascade_frustum.frustum_planes = glm::vec2(min_extents.z, max_extents.z);
+            cascade_frustum.split_depth = split_depth;
+
+            // Stable csm.
+            glm::vec4 shadow_origin = glm::vec4(0.0, 0.0, 0.0, 1.0);
+            shadow_origin = cascade_frustum.light_view_projection_matrix * shadow_origin;
+            shadow_origin = shadow_origin * (m_shadow_map_dimensions.x / 2.0f);
+
+            glm::vec4 rounded_origin = glm::round(shadow_origin);
+            glm::vec4 round_offset = rounded_origin - shadow_origin;
+            round_offset = round_offset * (2.0f / m_shadow_map_dimensions.x);
+            round_offset.z = 0.0f;
+            round_offset.w = 0.0f;
+
+            glm::mat4& shadow_proj = light_ortho_matrix;
+            shadow_proj[3] += round_offset;
+
+            // Update light view projection matrix after stable csm calculation. 
+            cascade_frustum.light_view_projection_matrix = shadow_proj * light_view_matrix;
+
+            // Store frustum data.
+            cascade_frustums.push_back(cascade_frustum);
+
+            last_split_dist = split_dist;
+        }
+
+        return cascade_frustums;
+    }
+
+    void directional_light::update_ubos(const std::vector<cascade_frustum>& cascade_frustums)
+    {
+        m_shadow_cascade_splits.clear();
+
+        for (uint32_t i = 0; i < m_cascades_count; ++i)
+        {
+            cascade_frustum cascade_frustum = cascade_frustums[i];
+            m_shadow_cascade_splits.push_back(cascade_frustum.split_depth);
+            m_light_matrices_ubo->set_data(&cascade_frustum.light_view_projection_matrix, sizeof(glm::mat4x4),
                                            i * sizeof(glm::mat4x4));
+            m_frustum_planes_ubo->set_data(&cascade_frustum.frustum_planes, sizeof(glm::vec2),
+                                           i * sizeof(glm::vec2));
         }
     }
 }

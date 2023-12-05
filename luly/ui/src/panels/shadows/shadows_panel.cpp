@@ -38,12 +38,6 @@ namespace luly::ui
                 cascaded_shadows_parameters.shadow_bias = shadow_bias;
             }
 
-            float inverse_cascade_factor = cascaded_shadows_parameters.inverse_cascade_factor;
-            if (ui_utils::draw_property("Inverse Cascade Factor", inverse_cascade_factor, 0.0f, 5.0f, 0.00001f))
-            {
-                cascaded_shadows_parameters.inverse_cascade_factor = inverse_cascade_factor;
-            }
-
             int pcf_horizontal_samples = cascaded_shadows_parameters.pcf_horizontal_samples;
             if (ui_utils::draw_property("PCF Horizontal Samples", pcf_horizontal_samples, 1, 12))
             {
