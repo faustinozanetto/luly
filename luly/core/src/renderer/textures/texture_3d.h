@@ -4,10 +4,10 @@
 
 namespace luly::renderer
 {
-    class texture_2d : public texture
+    class texture_3d : public texture
     {
     public:
-        texture_2d(const texture_specification& texture_specification);
+        texture_3d(const texture_specification& texture_specification);
 
         /* Overrides */
         void initialize() override;
