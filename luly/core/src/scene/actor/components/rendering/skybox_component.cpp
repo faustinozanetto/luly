@@ -7,6 +7,7 @@ namespace luly::scene
     {
         set_environment_texture(environment_texture);
         m_intensity = 1.0f;
+        m_lod_level = 1.2f;
         m_tint = glm::vec3(1.0f);
     }
 

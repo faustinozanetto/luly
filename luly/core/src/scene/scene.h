@@ -25,7 +25,9 @@ namespace luly::scene
         std::shared_ptr<scene_actor> create_actor(const std::string& name);
         void on_update(float delta_time);
 
+        /** Common Actors Getters */
         const std::shared_ptr<renderer::directional_light>& get_directional_light() const;
+        const std::shared_ptr<scene_actor>& get_skybox_actor() const;
 
     private:
         void update_lights();

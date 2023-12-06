@@ -286,6 +286,7 @@ namespace luly::ui
     bool ui_utils::draw_property(const std::string& name, glm::vec4& value, bool color)
     {
         bool modified = false;
+        ImGui::PushID(name.c_str());
         // Name
         ImGui::AlignTextToFramePadding();
         ImGui::Columns(2);

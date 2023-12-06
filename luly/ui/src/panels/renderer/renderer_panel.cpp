@@ -39,14 +39,6 @@ namespace luly::ui
             ImGui::Separator();
             if (draw_render_pass_details(renderer::scene_renderer::get_data().shadows_pass))
             {
-                const std::shared_ptr<renderer::directional_light>& directional_light = scene::scene_manager::get().
-                    get_current_scene()->get_directional_light();
-                if (directional_light)
-                {
-                    ImGui::SliderInt("Cascade Index", &m_cascade_index, 0,
-                                     directional_light->get_shadow_cascade_levels().size() - 1);
-                    ui_utils::draw_property(directional_light->get_shadow_map_views()[m_cascade_index], {90.0f, 90.0f});
-                }
                 ImGui::TreePop();
             }
 

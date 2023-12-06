@@ -101,7 +101,7 @@ namespace luly::renderer
         renderer::bind_texture(2, geometry_normals_output.output);
         renderer::bind_texture(3, geometry_rough_metal_ao_output.output);
         renderer::bind_texture(4, geometry_emissive_output.output);
-        // Bind envinronment pass outputs.
+        // Bind environment pass outputs.
         renderer::bind_texture(5, environment_pass_input.render_pass->get_output("irradiance_output").output);
         renderer::bind_texture(6, environment_pass_input.render_pass->get_output("prefilter_output").output);
         renderer::bind_texture(7, environment_pass_input.render_pass->get_output("brdf_output").output);

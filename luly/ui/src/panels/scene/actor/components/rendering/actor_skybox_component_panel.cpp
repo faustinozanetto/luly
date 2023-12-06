@@ -46,9 +46,18 @@ namespace luly::ui
             }
 
             float intensity = skybox_component.get_intensity();
-            if (ui_utils::draw_property("Intesity", intensity, 0.0f, 5.0f, 0.01f))
+            if (ui_utils::draw_property("Intensity", intensity, 0.0f, 5.0f, 0.01f))
             {
                 skybox_component.set_intensity(intensity);
+            }
+
+            float lod_level = skybox_component.get_lod_level();
+            if (ui_utils::draw_property("LOD Level", lod_level, 0,
+                                        glm::log2(
+                                            static_cast<float>(skybox_component.get_environment_texture()->
+                                                get_width())), 0.01f))
+            {
+                skybox_component.set_lod_level(lod_level);
             }
 
             glm::vec3 tint = skybox_component.get_tint();

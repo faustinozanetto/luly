@@ -25,9 +25,9 @@ namespace luly::renderer
         glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &m_handle);
         glBindTexture(GL_TEXTURE_CUBE_MAP, m_handle);
 
-        uint32_t internal_format = texture_utils::get_texture_internal_format_to_opengl(
+        const uint32_t internal_format = texture_utils::get_texture_internal_format_to_opengl(
             m_texture_specification.internal_format);
-        uint32_t format = texture_utils::get_texture_format_to_opengl(
+        const uint32_t format = texture_utils::get_texture_format_to_opengl(
             texture_utils::get_texture_format_from_internal_format(m_texture_specification.internal_format));
 
         for (unsigned int i = 0; i < 6; ++i)
@@ -41,7 +41,7 @@ namespace luly::renderer
         set_wrapping(texture_wrapping_type::wrap_t, texture_wrapping::clamp_to_edge);
         set_wrapping(texture_wrapping_type::wrap_r, texture_wrapping::clamp_to_edge);
 
-        set_filtering(texture_filtering_type::filter_min, texture_filtering::linear);
+        set_filtering(texture_filtering_type::filter_min, texture_filtering::linear_mipmap_linear);
         set_filtering(texture_filtering_type::filter_mag, texture_filtering::linear);
     }
 }

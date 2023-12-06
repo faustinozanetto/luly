@@ -84,8 +84,8 @@ namespace luly::renderer
 
     void environment_pass::setup_environment()
     {
-        m_irradiance_map_size = 128;
-        m_prefilter_map_size = 256;
+        m_irradiance_map_size = 32;
+        m_prefilter_map_size = 512;
         m_brdf_map_size = 512;
         m_environment_map_size = 2048;
 
@@ -124,7 +124,7 @@ namespace luly::renderer
 
     void environment_pass::setup_environment_equirectangular_map()
     {
-        // Skyobox texture.
+        // Skybox texture.
         m_capture_projection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
         m_capture_views =
         {
@@ -202,8 +202,8 @@ namespace luly::renderer
     void environment_pass::setup_prefilter_map()
     {
         texture_specification texture_specification;
-        texture_specification.width = m_irradiance_map_size;
-        texture_specification.height = m_irradiance_map_size;
+        texture_specification.width = m_prefilter_map_size;
+        texture_specification.height = m_prefilter_map_size;
         texture_specification.channels = 3;
         texture_specification.internal_format = texture_internal_format::rgb16f;
         texture_specification.data = nullptr;
@@ -219,19 +219,21 @@ namespace luly::renderer
         renderer::bind_texture(0, m_environment_cubemap_texture->get_handle_id());
 
         m_environment_capture_fbo->bind();
-        unsigned int max_mip_map_levels = 5;
+        const unsigned int max_mip_map_levels = glm::log2(static_cast<float>(m_prefilter_map_size));
         for (unsigned int mip = 0; mip < max_mip_map_levels; ++mip)
         {
-            // reisze framebuffer according to mip-level size.
-            unsigned int mipWidth = static_cast<unsigned int>(m_prefilter_map_size * std::pow(0.5, mip));
-            unsigned int mipHeight = static_cast<unsigned int>(m_prefilter_map_size * std::pow(0.5, mip));
-            m_environment_capture_rbo->bind();
-            m_environment_capture_rbo->set_storage_parameters(mipWidth, mipHeight,
-                                                              texture_internal_format::depth_component24);
-            renderer::set_viewport_size({mipWidth, mipHeight});
+            // Resize framebuffer according to mip-level size.
+            const unsigned int mip_width = m_prefilter_map_size * std::pow(0.5, mip);
+            const unsigned int mip_height = m_prefilter_map_size * std::pow(0.5, mip);
 
-            float roughness = (float)mip / (float)(max_mip_map_levels - 1);
+            m_environment_capture_rbo->bind();
+            m_environment_capture_rbo->set_storage_parameters(mip_width, mip_height,
+                                                              texture_internal_format::depth_component24);
+            renderer::set_viewport_size({mip_width, mip_height});
+
+            const float roughness = static_cast<float>(mip) / static_cast<float>(max_mip_map_levels - 1);
             m_prefilter_shader->set_float("u_roughness", roughness);
+
             for (unsigned int i = 0; i < 6; ++i)
             {
                 m_prefilter_shader->set_mat4("u_view_matrix", m_capture_views[i]);

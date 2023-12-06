@@ -17,6 +17,7 @@ namespace luly::renderer
         int pcf_horizontal_samples;
         int pcf_vertical_samples;
         float cascade_plane_distances[3];
+        glm::vec4 cascade_debug_colors[3];
     };
 
     class shadows_pass : public render_pass
@@ -30,6 +31,7 @@ namespace luly::renderer
 
         /* Setters */
         void set_show_cascades(bool show_cascades) { m_cascaded_shadows_parameters.show_cascades = show_cascades; }
+        void set_debug_cascade_color(int cascade_index, const glm::vec3& color);
 
         /* Overrides */
         void initialize() override;

@@ -29,9 +29,7 @@ namespace luly::ui
                 shadows_pass;
             renderer::cascaded_shadows_parameters& cascaded_shadows_parameters = shadows_pass->
                 get_cascaded_shadows_parameters();
-            
-            ui_utils::draw_property("Cascaded Shadows");
-            ImGui::Separator();
+
             float shadow_bias = cascaded_shadows_parameters.shadow_bias;
             if (ui_utils::draw_property("Shadow Bias", shadow_bias, 0.0f, 5.0f, 0.00001f))
             {
@@ -56,12 +54,26 @@ namespace luly::ui
                 cascaded_shadows_parameters.soft_shadows = soft_shadows;
             }
 
-            bool show_cascades = cascaded_shadows_parameters.show_cascades;
-            if (ui_utils::draw_property("Show Cascades", show_cascades))
+            if(ImGui::TreeNode("Cascade Shadows"))
             {
-                shadows_pass->set_show_cascades(show_cascades);
+                bool show_cascades = cascaded_shadows_parameters.show_cascades;
+                if (ui_utils::draw_property("Show Cascades", show_cascades))
+                {
+                    shadows_pass->set_show_cascades(show_cascades);
+                }
+
+                for (int i = 0; i < 3; i++)
+                {
+                    glm::vec4 cascade_debug_color = cascaded_shadows_parameters.cascade_debug_colors[i];
+                    if (ui_utils::draw_property(std::format("Cascade #{} Debug Color", i + 1), cascade_debug_color))
+                    {
+                        shadows_pass->set_debug_cascade_color(i, cascade_debug_color);
+                    }
+                }
+
+                ImGui::TreePop();
             }
-            
+
             ImGui::End();
         }
     }

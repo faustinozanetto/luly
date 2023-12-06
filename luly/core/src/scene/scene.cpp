@@ -7,6 +7,7 @@
 
 #include "actor/components/lights/point_light_component.h"
 #include "actor/components/lights/spot_light_component.h"
+#include "actor/components/rendering/skybox_component.h"
 #include "renderer/scene/scene_renderer.h"
 
 namespace luly::scene
@@ -65,6 +66,17 @@ namespace luly::scene
             return directional_light;
         }
         LY_ASSERT_MSG(false, "Could not find directional light for scene!")
+        return {};
+    }
+
+    const std::shared_ptr<scene_actor>& scene::get_skybox_actor() const
+    {
+        const auto& view = m_actors_registry->view<skybox_component>();
+        for (auto [actor, skybox_component] : view.each())
+        {
+            return m_actors_map.at(actor);
+        }
+        LY_ASSERT_MSG(false, "Could not find actor with skybox component")
         return {};
     }
 

@@ -6,6 +6,9 @@
 #include "renderer/meshes/mesh_factory.h"
 #include "renderer/renderer/renderer.h"
 #include "renderer/shaders/shader_factory.h"
+#include "scene/scene_manager.h"
+#include "scene/actor/scene_actor.h"
+#include "scene/actor/components/rendering/skybox_component.h"
 
 namespace luly::renderer
 {
@@ -70,8 +73,11 @@ namespace luly::renderer
         renderer::blit_frame_buffer({0, 0}, {width, height}, {0, 0}, {width, height},
                                     renderer_bit_mask::color | renderer_bit_mask::depth, texture_filtering::nearest);
 
+        const std::shared_ptr<scene::scene_actor>& skybox_actor = scene::scene_manager::get().get_current_scene()->get_skybox_actor();
+
         // Render skybox cube using the environment cubemap texture.
         m_skybox_shader->bind();
+        m_skybox_shader->set_float("u_lod_level", skybox_actor->get_component<scene::skybox_component>().get_lod_level());
         renderer::bind_texture(0, environment_cubemap_texture.output);
         renderer::submit_mesh(m_cube_mesh);
         m_skybox_shader->un_bind();

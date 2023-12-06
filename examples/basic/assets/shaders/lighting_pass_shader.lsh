@@ -126,6 +126,13 @@ int calculate_cascade_index(float frag_pos_z) {
     return cascade_index;
 }
 
+vec3 calculate_debug_cascade_color(int cascade_index) {
+    if (cascaded_shadows_parameters.show_cascades == 0)
+        return vec3(0, 0, 0);
+        
+    return cascaded_shadows_parameters.cascade_debug_colors[cascade_index].rgb;
+}
+
 vec3 calculate_directional_light_luminance(directional_light dir_light, vec3 normal, vec3 view_dir, vec3 frag_pos, vec3 albedo, vec3 F0, float roughness, float metallic, int cascade_index) {
     vec3 L = normalize(-dir_light.direction.xyz);
     vec3 H = normalize(view_dir + L);
@@ -203,12 +210,6 @@ vec3 calculate_point_light_luminance(point_light point_light, vec3 normal, vec3 
     return final;
 }
 
-vec3 cascade_debug_colors[3] = vec3[](
-vec3(1.0, 0.25, 0.25),
-vec3(0.25, 1.0, 0.25),
-vec3(0.25, 0.25, 1.0)
-);
-
 void main()
 {
     vec3 frag_pos = texture(u_position_map, o_tex_coord).rgb;
@@ -249,9 +250,6 @@ void main()
        }
            */
 
-    vec3 cascade_debug_indicator = vec3(0.0, 0.0, 0.0);
-    cascade_debug_indicator = cascade_debug_colors[cascade_index];
-
     vec3 F = fresnel_schlick_roughness(max(dot(normal, view_dir), 0.0), F0, roughness);
 
     vec3 kS = F;
@@ -267,10 +265,9 @@ void main()
 
     vec3 ambient = (kD * diffuse + specular)  * u_skybox_intensity * u_skybox_tint.rgb * ambient_occlusion;
 
-    vec3 color = ambient + luminance + emissive;
-    
-    if (cascaded_shadows_parameters.show_cascades == 1)
-        color += cascade_debug_indicator;
+    vec3 cascade_debug_color = calculate_debug_cascade_color(cascade_index);
+
+    vec3 color = cascade_debug_color + ambient + luminance + emissive;
         
     frag_color = vec4(color, full_albedo.a);
     

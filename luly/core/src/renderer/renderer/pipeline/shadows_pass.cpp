@@ -21,6 +21,12 @@ namespace luly::renderer
     {
     }
 
+    void shadows_pass::set_debug_cascade_color(int cascade_index, const glm::vec3& color)
+    {
+        LY_ASSERT_MSG(cascade_index >= 0 && cascade_index < 3, "Cascade index out of range!")
+        m_cascaded_shadows_parameters.cascade_debug_colors[cascade_index] = glm::vec4(color, 1.0);
+    }
+
     void shadows_pass::initialize()
     {
         // Load shader.
@@ -128,6 +134,7 @@ namespace luly::renderer
         for (int i = 0; i < 3; i++)
         {
             m_cascaded_shadows_parameters.cascade_plane_distances[i] = 0.0f;
+            m_cascaded_shadows_parameters.cascade_debug_colors[i] = glm::vec4(1, 1, 1, 1);
         }
     }
 
