@@ -21,6 +21,7 @@ group "dependencies"
     include "third_party/glad"
     include "third_party/stb"
     include "third_party/imgui"
+    include "third_party/imguizmo"
 group ""
 
 group "luly"

@@ -23,6 +23,7 @@ project "luly-ui"
         "%{include_dirs.stb}",
         "%{include_dirs.entt}",
         "%{include_dirs.imgui}",
+        "%{include_dirs.imguizmo}",
     }
     
     links {
@@ -32,6 +33,7 @@ project "luly-ui"
         "glad",
         "stb",
         "imgui",
+        "imguizmo",
     }
     
     filter "configurations:debug"
