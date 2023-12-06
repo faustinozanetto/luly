@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "panels/ui_panel.h"
+#include <ImGuizmo.h>
 
 namespace luly::ui
 {
@@ -16,6 +17,10 @@ namespace luly::ui
         void set_show_panel(bool show_panel) override;
 
     private:
+        void render_transform_guizmo() const;
+        void render_scene_viewport();
+        
         static bool s_show;
+        ImGuizmo::OPERATION m_selected_operation;
     };
 }

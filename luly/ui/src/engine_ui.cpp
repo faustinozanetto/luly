@@ -15,18 +15,19 @@
 
 #include "renderer/renderer/renderer.h"
 #include "application/application.h"
+#include "utils/IconsFontAwesome6.h"
 
+#include <logging/log.h>
+#include <utils/assert.h>
+
+#include <ImGuizmo.h>
 #include <imgui.h>
 #include <imgui_internal.h>
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD
 #include <backends/imgui_impl_opengl3.h>
 #include <backends/imgui_impl_glfw.h>
 
-#include <ImGuizmo.h>
 #include <glm/gtc/type_ptr.hpp>
-
-#include <logging/log.h>
-#include <utils/assert.h>
 
 namespace luly::ui
 {
@@ -214,9 +215,21 @@ namespace luly::ui
         ImGui::CreateContext();
         ImGuiIO& io = ImGui::GetIO();
         (void)io;
+        ImGuizmo::SetImGuiContext(ImGui::GetCurrentContext());
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Enable Docking
         io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // Enable Multi-Viewport / Platform Windows
+        io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/Inter-Medium.ttf", 16.0f);
+
+        // merge in icons from Font Awesome
+        static const ImWchar icons_ranges[] = {ICON_MIN_FA, ICON_MAX_FA, 0};
+        ImFontConfig icons_config;
+        icons_config.MergeMode = true;
+        icons_config.PixelSnapH = true;
+        icons_config.GlyphMinAdvanceX = 16.0f;
+        io.Fonts->AddFontFromFileTTF("assets/fonts/fa-solid-900.ttf", 16.0f, &icons_config, icons_ranges);
+        io.Fonts->AddFontFromFileTTF("assets/fonts/fa-regular-400.ttf", 16.0f, &icons_config, icons_ranges);
+
         GLFWwindow* window = core::application::get().get_window()->get_native_handle();
         // Setup Platform/Renderer bindings
         if (!ImGui_ImplGlfw_InitForOpenGL(window, true))
