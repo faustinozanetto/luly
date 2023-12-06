@@ -11,46 +11,14 @@ namespace luly::renderer
 {
     directional_light::directional_light(const glm::vec3& color, float azimuth, float elevation)
     {
+        m_cascades_count = 3;
         m_direction_angles = glm::vec2(azimuth, elevation);
-        set_direction(azimuth, elevation);
-        m_radius = 0.35f;
         m_cascade_split_lambda = 0.55f;
         m_shadow_map_dimensions = glm::ivec2(4096, 4096);
+        set_direction(azimuth, elevation);
 
         // Create shadow map fbo
         create_shadow_fbo();
-
-        /*
-        glGenFramebuffers(1, &m_shadow_map_fbo);
-        glGenTextures(1, &m_shadow_maps);
-        glBindTexture(GL_TEXTURE_2D_ARRAY, m_shadow_maps);
-        glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT32F, m_shadow_map_dimensions.x,
-                     m_shadow_map_dimensions.y, int(m_shadow_cascade_levels.size()) + 1,
-                     0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
-
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-
-        glGenTextures(m_shadow_cascade_levels.size(), m_shadow_map_views);
-
-        constexpr float bordercolor[] = {1.0f, 1.0f, 1.0f, 1.0f};
-        glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, bordercolor);
-
-        glBindFramebuffer(GL_FRAMEBUFFER, m_shadow_map_fbo);
-        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_shadow_maps, 0);
-        glDrawBuffer(GL_NONE);
-        glReadBuffer(GL_NONE);
-
-        int status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-        if (status != GL_FRAMEBUFFER_COMPLETE)
-        {
-            std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!";
-            throw 0;
-        }
-
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);*/
 
         m_light_matrices_ubo = std::make_shared<uniform_buffer_object>(sizeof(glm::mat4) * m_cascades_count, 2);
         m_frustum_planes_ubo = std::make_shared<uniform_buffer_object>(sizeof(glm::vec2) * m_cascades_count, 3);
@@ -66,7 +34,7 @@ namespace luly::renderer
         const float clip_range = far_clip - near_clip;
         const float ratio = far_clip / near_clip;
 
-        for (uint32_t i = 0; i < m_cascades_count; ++i)
+        for (int i = 0; i < m_cascades_count; ++i)
         {
             float p = (i + 1) / float(m_cascades_count);
             float log = near_clip * std::pow(ratio, p);
@@ -112,28 +80,20 @@ namespace luly::renderer
         constexpr float border_color[] = {1.0f, 1.0f, 1.0f, 1.0f};
         glTextureParameterfv(m_shadow_maps, GL_TEXTURE_BORDER_COLOR, border_color);
 
-        glCreateFramebuffers(1, &m_shadow_map_fbo);
-        glNamedFramebufferTexture(m_shadow_map_fbo, GL_DEPTH_ATTACHMENT, m_shadow_maps, 0);
-
-        GLenum draw_buffers[] = {GL_NONE};
-        glNamedFramebufferDrawBuffers(m_shadow_map_fbo, 1, draw_buffers);
-        glNamedFramebufferReadBuffer(m_shadow_map_fbo, GL_NONE);
-
-        int status = glCheckNamedFramebufferStatus(m_shadow_map_fbo, GL_FRAMEBUFFER);
-        if (status != GL_FRAMEBUFFER_COMPLETE)
-        {
-            std::cerr << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!\n";
-        }
-
-        glCreateSamplers(1, &m_shadow_map_pcf_sampler);
-        glSamplerParameteri(m_shadow_map_pcf_sampler, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-        glSamplerParameteri(m_shadow_map_pcf_sampler, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-        glSamplerParameteri(m_shadow_map_pcf_sampler, GL_TEXTURE_WRAP_S,GL_CLAMP_TO_BORDER);
-        glSamplerParameteri(m_shadow_map_pcf_sampler, GL_TEXTURE_WRAP_T,GL_CLAMP_TO_BORDER);
-        float color[4] = {1, 0, 0, 0};
-        glSamplerParameterfv(m_shadow_map_pcf_sampler, GL_TEXTURE_BORDER_COLOR, color);
-        glSamplerParameteri(m_shadow_map_pcf_sampler, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-        glSamplerParameteri(m_shadow_map_pcf_sampler, GL_TEXTURE_COMPARE_FUNC, GL_GEQUAL);
+        m_shadow_map_fbo = std::make_shared<frame_buffer>(m_shadow_map_dimensions.x, m_shadow_map_dimensions.y);
+        glFramebufferTexture2D(m_shadow_map_fbo->get_handle_id(), GL_DEPTH_ATTACHMENT,
+                               GL_TEXTURE_2D, m_shadow_maps, 0);
+        m_shadow_map_fbo->initialize();
+        /*
+                GLenum draw_buffers[] = {GL_NONE};
+                glNamedFramebufferDrawBuffers(m_shadow_map_fbo, 1, draw_buffers);
+                glNamedFramebufferReadBuffer(m_shadow_map_fbo, GL_NONE);
+        
+                int status = glCheckNamedFramebufferStatus(m_shadow_map_fbo, GL_FRAMEBUFFER);
+                if (status != GL_FRAMEBUFFER_COMPLETE)
+                {
+                    std::cerr << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!\n";
+                }*/
     }
 
     std::vector<cascade_frustum> directional_light::calculate_shadow_frustums(
@@ -247,6 +207,7 @@ namespace luly::renderer
         {
             cascade_frustum cascade_frustum = cascade_frustums[i];
             m_shadow_cascade_splits.push_back(cascade_frustum.split_depth);
+
             m_light_matrices_ubo->set_data(&cascade_frustum.light_view_projection_matrix, sizeof(glm::mat4x4),
                                            i * sizeof(glm::mat4x4));
             m_frustum_planes_ubo->set_data(&cascade_frustum.frustum_planes, sizeof(glm::vec2),

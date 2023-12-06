@@ -59,13 +59,13 @@ namespace luly::ui
                 ui_utils::draw_property("Camera Controller Parameters");
                 ImGui::Separator();
                 float movement_speed = perspective_camera_controller->get_movement_speed();
-                if (ui_utils::draw_property("Movement Speed", movement_speed, 0.1f, 15.0f, 0.01f))
+                if (ui_utils::draw_property("Movement Speed", movement_speed, 0.1f, 30.0f, 0.01f))
                 {
                     perspective_camera_controller->set_movement_speed(movement_speed);
                 }
 
                 float mouse_speed = perspective_camera_controller->get_mouse_speed();
-                if (ui_utils::draw_property("Mouse Speed", mouse_speed, 0.1f, 15.0f, 0.01f))
+                if (ui_utils::draw_property("Mouse Speed", mouse_speed, 0.1f, 30.0f, 0.01f))
                 {
                     perspective_camera_controller->set_mouse_speed(mouse_speed);
                 }

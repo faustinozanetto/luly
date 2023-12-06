@@ -51,6 +51,13 @@ namespace luly::renderer
         never
     };
 
+    enum class renderer_cull_face_mode
+    {
+        front,
+        back,
+        both,
+    };
+
     enum class renderer_bit_mask
     {
         depth = 0x00000100,
@@ -72,9 +79,6 @@ namespace luly::renderer
         static void poll_input();
         static bool get_should_close();
         static void clear_screen();
-        static void set_clear_color(const glm::vec4& clear_color);
-        static void set_state(renderer_state state, bool is_enabled);
-        static void set_depth_func(renderer_depth_func depth_func);
 
         /* Getters */
         static glm::ivec2 get_viewport_size();
@@ -83,6 +87,10 @@ namespace luly::renderer
         /* Setters*/
         static void set_vsync_enabled(bool vsync_enabled);
         static void set_viewport_size(const glm::ivec2& viewport_size);
+        static void set_clear_color(const glm::vec4& clear_color);
+        static void set_state(renderer_state state, bool is_enabled);
+        static void set_depth_func(renderer_depth_func depth_func);
+        static void set_cull_face_mode(renderer_cull_face_mode cull_face_mode);
 
         /* Primitive Rendering */
         static void submit_arrays(int count, renderer_draw_mode draw_mode = renderer_draw_mode::triangles);
@@ -109,6 +117,7 @@ namespace luly::renderer
         /* Textures */
         static void bind_texture(int slot, uint32_t handle);
 
+        /* Frame Buffers */
         static void blit_frame_buffer(const glm::ivec2& source_position, const glm::ivec2& source_dimensions,
                                       const glm::ivec2& target_position, const glm::ivec2& target_dimensions,
                                       renderer_bit_mask mask, texture_filtering filter);
@@ -118,6 +127,7 @@ namespace luly::renderer
         static uint32_t get_renderer_state_to_opengl(renderer_state state);
         static uint32_t get_renderer_depth_func_to_opengl(renderer_depth_func depth_func);
         static uint32_t get_renderer_bit_mask_to_opengl(renderer_bit_mask bit_mask);
+        static uint32_t get_renderer_cull_face_mode_to_opengl(renderer_cull_face_mode cull_face_mode);
 
     private:
         static void initialize_data();

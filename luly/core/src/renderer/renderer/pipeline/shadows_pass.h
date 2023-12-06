@@ -15,7 +15,7 @@ namespace luly::renderer
         int soft_shadows;
         int pcf_horizontal_samples;
         int pcf_vertical_samples;
-        float cascade_plane_distances[6];
+        float cascade_plane_distances[3];
     };
 
     class shadows_pass : public render_pass
@@ -40,11 +40,12 @@ namespace luly::renderer
         void calculate_directional_light_shadows(const std::shared_ptr<scene::scene>& current_scene,
                                                  const std::shared_ptr<directional_light>& directional_light);
 
-        void render_geometry();
+        void render_geometry() const;
 
         // Cascaded shadows.
-        std::shared_ptr<texture_2d> m_random_angles_texture;
         std::shared_ptr<shader> m_directional_light_shadows_shader;
+        
+        std::shared_ptr<texture_2d> m_random_angles_texture;
         std::shared_ptr<uniform_buffer_object> m_cascaded_shadows_ubo;
         cascaded_shadows_parameters m_cascaded_shadows_parameters;
     };

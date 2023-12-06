@@ -3,11 +3,12 @@
 
 #include "common/camera.lsh"
 
-layout (location = 0) in vec3 a_pos;
-        
+layout (location = 0) out vec2 o_tex_coord;
+
 void main()
 {
-    gl_Position = camera.view_projection_matrix * vec4(a_pos, 1.0);
+    o_tex_coord    = vec2((gl_VertexID << 1) & 2, gl_VertexID & 2);
+    gl_Position = vec4(o_tex_coord * 2.0f - 1.0f, 0.0f, 1.0f);
 }
 
 #shader fragment
@@ -15,9 +16,13 @@ void main()
 
 out vec4 frag_color;
 
-uniform vec4 u_color;
+uniform int u_cascade_index;
+
+layout (location = 0) in vec2 o_tex_coord;
+
+layout(binding = 0) uniform sampler2DArray filterTexture;
 
 void main()
 {
-    frag_color = u_color;
+    frag_color = vec4(texture(filterTexture, vec3(o_tex_coord, u_cascade_index)).xxx, 1.0);
 }

@@ -1,11 +1,13 @@
-﻿layout (binding = 2) uniform directional_light_space_matrices_ubo
+﻿#define CASCADES_COUNT 3
+
+layout (binding = 2) uniform directional_light_space_matrices_ubo
 {
-    mat4 u_light_space_matrices[6];
+    mat4 u_light_space_matrices[CASCADES_COUNT];
 };
 
 layout (binding = 3) uniform directional_light_frustum_planes_ubo
 {
-    vec2 u_light_frustum_planes[6];
+    vec2 u_light_frustum_planes[CASCADES_COUNT];
 };
 
 layout (binding = 4) uniform cascaded_shadows_parameters_ubo
@@ -14,5 +16,5 @@ layout (binding = 4) uniform cascaded_shadows_parameters_ubo
     int soft_shadows;
     int pcf_horizontal_samples;
     int pcf_vertical_samples;
-    float cascade_plane_distances[6];
+    float cascade_plane_distances[CASCADES_COUNT];
 } cascaded_shadows_parameters;

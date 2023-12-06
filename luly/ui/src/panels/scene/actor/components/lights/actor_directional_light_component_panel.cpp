@@ -52,6 +52,12 @@ namespace luly::ui
             {
                 directional_light->set_intensity(intensity);
             }
+
+            float cascade_split_lambda = directional_light->get_cascade_split_lambda();
+            if (ui_utils::draw_property("Cascade Split Lambda", cascade_split_lambda, 0.0f, 5.0f, 0.01f))
+            {
+                directional_light->set_cascade_split_lambda(cascade_split_lambda);
+            }
         }
         else
         {

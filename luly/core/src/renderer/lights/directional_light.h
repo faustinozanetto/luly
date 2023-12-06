@@ -3,6 +3,7 @@
 #include "light.h"
 #include "renderer/buffers/uniform/uniform_buffer_object.h"
 #include "renderer/camera/perspective/perspective_camera.h"
+#include "renderer/framebuffer/frame_buffer.h"
 
 namespace luly::renderer
 {
@@ -22,19 +23,18 @@ namespace luly::renderer
         /* Getters */
         const glm::vec3& get_direction() const { return m_direction; }
         const glm::vec2& get_direction_angles() const { return m_direction_angles; }
-        float get_radius() const { return m_radius; }
         const std::vector<float>& get_shadow_cascade_split_distances() { return m_shadow_cascade_splits_distances; }
         const std::vector<float>& get_shadow_cascade_splits() { return m_shadow_cascade_splits; }
-        uint32_t get_shadow_map_fbo() const { return m_shadow_map_fbo; }
+        const std::shared_ptr<frame_buffer>& get_shadow_map_fbo() const { return m_shadow_map_fbo; }
         uint32_t get_shadow_maps() const { return m_shadow_maps; }
-        uint32_t get_shadow_map_pcf_sampler() const { return m_shadow_map_pcf_sampler; }
-        const glm::ivec2& get_shadow_map_dimensions() const { return m_shadow_map_dimensions; }
+        float get_cascade_split_lambda() const { return m_cascade_split_lambda; }
         int get_cascades_count() const { return m_cascades_count; }
+        const glm::ivec2& get_shadow_map_dimensions() const { return m_shadow_map_dimensions; }
         const std::shared_ptr<uniform_buffer_object>& get_light_matrices_ubo() const { return m_light_matrices_ubo; }
 
         /* Setters */
         void set_direction(float azimuth, float elevation);
-        void set_radius(float radius) { m_radius = radius; }
+        void set_cascade_split_lambda(float cascade_split_lambda) { m_cascade_split_lambda = cascade_split_lambda; }
 
         /* Methods */
         void update_shadow_cascades(const std::shared_ptr<perspective_camera>& perspective_camera);
@@ -46,20 +46,19 @@ namespace luly::renderer
             const std::shared_ptr<perspective_camera>& perspective_camera);
         void update_ubos(const std::vector<cascade_frustum>& cascade_frustums);
 
+        // Parameters
         glm::vec3 m_direction;
         glm::vec2 m_direction_angles;
-        float m_radius;
 
-        // Cascade Splits
-        const int m_cascades_count = 6;
+        // Cascaded shadows
+        int m_cascades_count;
         std::vector<float> m_shadow_cascade_splits_distances;
         std::vector<float> m_shadow_cascade_splits;
         float m_cascade_split_lambda;
         float m_average_frustum_size;
-
         glm::ivec2 m_shadow_map_dimensions;
-        uint32_t m_shadow_map_fbo;
-        uint32_t m_shadow_map_pcf_sampler;
+        std::shared_ptr<frame_buffer> m_shadow_map_fbo;
+        //uint32_t m_shadow_map_fbo;
         uint32_t m_shadow_maps;
         std::shared_ptr<uniform_buffer_object> m_light_matrices_ubo;
         std::shared_ptr<uniform_buffer_object> m_frustum_planes_ubo;

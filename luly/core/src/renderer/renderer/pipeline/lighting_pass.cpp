@@ -86,8 +86,6 @@ namespace luly::renderer
             "directional_shadow_map_output");
         const render_pass_output& random_angles_map_output = shadows_pass_input.render_pass->get_output(
             "random_angles_map_output");
-        const render_pass_output& directional_pcf_sampler_output = shadows_pass_input.render_pass->get_output(
-            "directional_pcf_sampler_output");
 
         // Blit depth from geometry pass to this fbo.
         int width = m_fbo->get_width();
@@ -103,7 +101,7 @@ namespace luly::renderer
         renderer::bind_texture(2, geometry_normals_output.output);
         renderer::bind_texture(3, geometry_rough_metal_ao_output.output);
         renderer::bind_texture(4, geometry_emissive_output.output);
-        // Bind environemnt pass outputs.
+        // Bind envinronment pass outputs.
         renderer::bind_texture(5, environment_pass_input.render_pass->get_output("irradiance_output").output);
         renderer::bind_texture(6, environment_pass_input.render_pass->get_output("prefilter_output").output);
         renderer::bind_texture(7, environment_pass_input.render_pass->get_output("brdf_output").output);
@@ -111,9 +109,7 @@ namespace luly::renderer
         //  renderer::bind_texture(8, ambient_occlusion_pass_input.render_pass->get_output("ssao_blur_output").output);
         // Bind shadow pass outputs.
         renderer::bind_texture(9, directional_shadow_map_output.output);
-        renderer::bind_texture(10, directional_shadow_map_output.output);
-        glBindSampler(10, directional_pcf_sampler_output.output);
-        renderer::bind_texture(11, random_angles_map_output.output);
+        renderer::bind_texture(10, random_angles_map_output.output);
 
         // Update rest of uniforms
         upload_skybox_uniforms();

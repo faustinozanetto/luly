@@ -60,6 +60,11 @@ namespace luly::renderer
         glDepthFunc(get_renderer_depth_func_to_opengl(depth_func));
     }
 
+    void renderer::set_cull_face_mode(renderer_cull_face_mode cull_face_mode)
+    {
+        glCullFace(get_renderer_cull_face_mode_to_opengl(cull_face_mode));
+    }
+
     glm::ivec2 renderer::get_viewport_size()
     {
         return glm::ivec2(s_data.window->get_data().width, s_data.window->get_data().height);
@@ -252,6 +257,21 @@ namespace luly::renderer
             return GL_COLOR_BUFFER_BIT;
         }
         LY_ASSERT_MSG(false, "Invalid bit mask value!")
+        return 0;
+    }
+
+    uint32_t renderer::get_renderer_cull_face_mode_to_opengl(renderer_cull_face_mode cull_face_mode)
+    {
+        switch (cull_face_mode)
+        {
+        case renderer_cull_face_mode::back:
+            return GL_BACK;
+        case renderer_cull_face_mode::front:
+            return GL_FRONT;
+        case renderer_cull_face_mode::both:
+            return GL_FRONT_AND_BACK;
+        }
+        LY_ASSERT_MSG(false, "Invalid cull face mode value!")
         return 0;
     }
 
