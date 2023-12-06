@@ -6,12 +6,14 @@
 
 #include <glm/ext/scalar_constants.hpp>
 #include <glm/gtc/epsilon.hpp>
+#include <string>
 
 namespace luly::ui
 {
     actor_directional_light_component_panel::actor_directional_light_component_panel() : actor_component_panel(
         "Directional Light Component")
     {
+        m_selected_dimensions_index = 0;
     }
 
     std::pair<bool, size_t> actor_directional_light_component_panel::get_actor_component_details()
@@ -24,12 +26,14 @@ namespace luly::ui
 
     void actor_directional_light_component_panel::on_render_component_details()
     {
-        const auto& directional_light_component = engine_ui::get_ui_data().selected_actor->get_component<
-            scene::directional_light_component>();
+        const scene::directional_light_component& directional_light_component = engine_ui::get_ui_data().selected_actor
+            ->get_component<
+                scene::directional_light_component>();
 
         if (directional_light_component.get_directional_light())
         {
-            auto& directional_light = directional_light_component.get_directional_light();
+            const std::shared_ptr<renderer::directional_light>& directional_light = directional_light_component.
+                get_directional_light();
             ui_utils::draw_property("Parameters");
             ImGui::Separator();
 
@@ -57,6 +61,26 @@ namespace luly::ui
             if (ui_utils::draw_property("Cascade Split Lambda", cascade_split_lambda, 0.0f, 5.0f, 0.01f))
             {
                 directional_light->set_cascade_split_lambda(cascade_split_lambda);
+            }
+
+            if (ImGui::BeginCombo("Shadow Map Dimensions",
+                                  m_shadow_map_dimension_names[m_selected_dimensions_index].c_str()))
+            {
+                for (int i = 0; i < std::size(m_shadow_map_dimension_names); ++i)
+                {
+                    const bool is_selected = (m_selected_dimensions_index == i);
+                    if (ImGui::Selectable(m_shadow_map_dimension_names[i].c_str(), is_selected))
+                    {
+                        directional_light->set_shadow_map_dimensions(m_shadow_map_dimensions[i]);
+                        m_selected_dimensions_index = i;
+                    }
+
+                    if (is_selected)
+                    {
+                        ImGui::SetItemDefaultFocus();
+                    }
+                }
+                ImGui::EndCombo();
             }
         }
         else

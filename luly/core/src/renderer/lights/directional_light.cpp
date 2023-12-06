@@ -59,6 +59,12 @@ namespace luly::renderer
         m_direction = glm::normalize(-m_direction);
     }
 
+    void directional_light::set_shadow_map_dimensions(const glm::ivec2& shadow_map_dimensions)
+    {
+        m_shadow_map_dimensions = shadow_map_dimensions;
+        create_shadow_fbo();
+    }
+
     void directional_light::update_shadow_cascades(const std::shared_ptr<perspective_camera>& perspective_camera)
     {
         calculate_cascade_splits(perspective_camera);
@@ -68,6 +74,8 @@ namespace luly::renderer
 
     void directional_light::create_shadow_fbo()
     {
+        glDeleteTextures(1,&m_shadow_maps);
+        
         glCreateTextures(GL_TEXTURE_2D_ARRAY, 1, &m_shadow_maps);
         glTextureStorage3D(m_shadow_maps, 1, GL_DEPTH_COMPONENT32F, m_shadow_map_dimensions.x,
                            m_shadow_map_dimensions.y, m_cascades_count);
@@ -81,19 +89,9 @@ namespace luly::renderer
         glTextureParameterfv(m_shadow_maps, GL_TEXTURE_BORDER_COLOR, border_color);
 
         m_shadow_map_fbo = std::make_shared<frame_buffer>(m_shadow_map_dimensions.x, m_shadow_map_dimensions.y);
-        glFramebufferTexture2D(m_shadow_map_fbo->get_handle_id(), GL_DEPTH_ATTACHMENT,
-                               GL_TEXTURE_2D, m_shadow_maps, 0);
+        m_shadow_map_fbo->bind();
+        m_shadow_map_fbo->attach_depth_texture(m_shadow_maps, 0);
         m_shadow_map_fbo->initialize();
-        /*
-                GLenum draw_buffers[] = {GL_NONE};
-                glNamedFramebufferDrawBuffers(m_shadow_map_fbo, 1, draw_buffers);
-                glNamedFramebufferReadBuffer(m_shadow_map_fbo, GL_NONE);
-        
-                int status = glCheckNamedFramebufferStatus(m_shadow_map_fbo, GL_FRAMEBUFFER);
-                if (status != GL_FRAMEBUFFER_COMPLETE)
-                {
-                    std::cerr << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!\n";
-                }*/
     }
 
     std::vector<cascade_frustum> directional_light::calculate_shadow_frustums(

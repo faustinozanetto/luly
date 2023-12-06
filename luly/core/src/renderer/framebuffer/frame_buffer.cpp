@@ -180,6 +180,12 @@ namespace luly::renderer
         }
     }
 
+    void frame_buffer::attach_depth_texture(uint32_t texture, int mipmaps_level)
+    {
+        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, texture, mipmaps_level);
+        m_has_depth_attachment = true;
+    }
+
     void frame_buffer::pre_initialize()
     {
         if (m_handle)

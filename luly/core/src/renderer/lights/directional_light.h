@@ -34,6 +34,7 @@ namespace luly::renderer
 
         /* Setters */
         void set_direction(float azimuth, float elevation);
+        void set_shadow_map_dimensions(const glm::ivec2& shadow_map_dimensions);
         void set_cascade_split_lambda(float cascade_split_lambda) { m_cascade_split_lambda = cascade_split_lambda; }
 
         /* Methods */

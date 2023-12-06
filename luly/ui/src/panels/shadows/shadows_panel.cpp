@@ -29,7 +29,7 @@ namespace luly::ui
                 shadows_pass;
             renderer::cascaded_shadows_parameters& cascaded_shadows_parameters = shadows_pass->
                 get_cascaded_shadows_parameters();
-
+            
             ui_utils::draw_property("Cascaded Shadows");
             ImGui::Separator();
             float shadow_bias = cascaded_shadows_parameters.shadow_bias;

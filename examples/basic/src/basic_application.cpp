@@ -86,7 +86,7 @@ void basic_application::setup_scene()
 
     const std::shared_ptr<luly::scene::scene_actor>& dir_light_actor = scene->create_actor("Light Emitter");
     const std::shared_ptr<luly::renderer::directional_light>& directional_light = std::make_shared<
-        luly::renderer::directional_light>(glm::vec3(0.85f));
+        luly::renderer::directional_light>();
     dir_light_actor->add_component<luly::scene::directional_light_component>(directional_light);
 
     // Skybox

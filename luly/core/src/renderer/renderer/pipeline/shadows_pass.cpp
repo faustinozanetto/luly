@@ -174,7 +174,6 @@ namespace luly::renderer
             get_perspective_camera();
 
         // Setup fbo and shader.
-        //glBindFramebuffer(GL_FRAMEBUFFER, directional_light->get_shadow_map_fbo());
         directional_light->get_shadow_map_fbo()->bind();
         renderer::set_viewport_size(directional_light->get_shadow_map_dimensions());
         glClear(GL_DEPTH_BUFFER_BIT);
@@ -191,7 +190,7 @@ namespace luly::renderer
 
         // Reset state.
         renderer::set_cull_face_mode(renderer_cull_face_mode::back);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        directional_light->get_shadow_map_fbo()->un_bind();
         m_directional_light_shadows_shader->un_bind();
 
         // Reset
