@@ -14,6 +14,7 @@ layout (binding = 4) uniform cascaded_shadows_parameters_ubo
 {
     float shadow_bias;
     int soft_shadows;
+    int show_cascades;
     int pcf_horizontal_samples;
     int pcf_vertical_samples;
     float cascade_plane_distances[CASCADES_COUNT];

@@ -367,6 +367,57 @@ namespace luly::ui
         return modified;
     }
 
+    bool ui_utils::draw_combo_box(const std::string& name, const std::vector<std::string>& options,
+                                  const std::function<void(const std::string& selected_option, int option_index)>&
+                                  selected_callback)
+    {
+        bool modified = false;
+        static int currentItem = 0; // Current selected item index
+
+        ImGui::PushID(name.c_str());
+
+        // Name
+        ImGui::AlignTextToFramePadding();
+        ImGui::Columns(2);
+        ImGui::PushItemWidth(-1);
+        ImGui::TextUnformatted(name.c_str());
+        ImGui::NextColumn();
+
+        // Content
+        ImGui::PushMultiItemsWidths(1, ImGui::CalcItemWidth());
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{0, 5});
+
+        if (ImGui::BeginCombo("##Combo", options[currentItem].c_str()))
+        {
+            for (int i = 0; i < options.size(); i++)
+            {
+                const bool is_selected = (currentItem == i);
+                if (ImGui::Selectable(options[i].c_str(), is_selected))
+                {
+                    currentItem = i;
+                    if (selected_callback)
+                    {
+                        selected_callback(options[i], i);
+                    }
+                    modified = true;
+                }
+                if (is_selected)
+                {
+                    ImGui::SetItemDefaultFocus();
+                }
+            }
+            ImGui::EndCombo();
+        }
+
+        ImGui::PopItemWidth();
+        ImGui::PopStyleVar();
+
+        // Reset
+        ImGui::Columns(1);
+        ImGui::PopID();
+        return modified;
+    }
+
     bool ui_utils::draw_property(uint32_t texture_handle, const ImVec2& image_size,
                                  bool flip_image)
     {
@@ -391,7 +442,7 @@ namespace luly::ui
         }
 
         ImGui::PopStyleVar();
-        
+
         return modified;
     }
 }

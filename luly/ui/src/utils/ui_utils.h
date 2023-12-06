@@ -1,10 +1,13 @@
 ﻿#pragma once
 
+#include <functional>
+
 #include "renderer/textures/texture.h"
 
 #include <imgui.h>
 #include <memory>
 #include <string>
+#include <vector>
 #include <glm/glm.hpp>
 
 namespace luly::ui
@@ -27,6 +30,9 @@ namespace luly::ui
         static bool draw_property(const std::string& name, glm::vec4& value, bool color = true);
         static bool draw_property(const std::string& name, const std::shared_ptr<renderer::texture>& texture,
                                   const ImVec2& image_size = ImVec2(64, 64), bool flip_image = true);
+        static bool draw_combo_box(const std::string& name, const std::vector<std::string>& options,
+                                   const std::function<void(const std::string& selected_option, int option_index)>&
+                                   selected_callback);
         static bool draw_property(uint32_t texture_handle,
                                   const ImVec2& image_size = ImVec2(64, 64), bool flip_image = true);
     };

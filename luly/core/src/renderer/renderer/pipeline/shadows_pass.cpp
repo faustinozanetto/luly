@@ -123,6 +123,7 @@ namespace luly::renderer
         m_cascaded_shadows_parameters.soft_shadows = 1;
         m_cascaded_shadows_parameters.pcf_vertical_samples = 4;
         m_cascaded_shadows_parameters.pcf_horizontal_samples = 4;
+        m_cascaded_shadows_parameters.show_cascades = 0;
 
         for (int i = 0; i < 3; i++)
         {

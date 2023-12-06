@@ -56,6 +56,12 @@ namespace luly::ui
                 cascaded_shadows_parameters.soft_shadows = soft_shadows;
             }
 
+            bool show_cascades = cascaded_shadows_parameters.show_cascades;
+            if (ui_utils::draw_property("Show Cascades", show_cascades))
+            {
+                shadows_pass->set_show_cascades(show_cascades);
+            }
+            
             ImGui::End();
         }
     }

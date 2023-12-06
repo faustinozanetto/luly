@@ -267,8 +267,11 @@ void main()
 
     vec3 ambient = (kD * diffuse + specular)  * u_skybox_intensity * u_skybox_tint.rgb * ambient_occlusion;
 
-    vec3 color = cascade_debug_indicator + ambient + luminance + emissive;
-
+    vec3 color = ambient + luminance + emissive;
+    
+    if (cascaded_shadows_parameters.show_cascades == 1)
+        color += cascade_debug_indicator;
+        
     frag_color = vec4(color, full_albedo.a);
     
 }

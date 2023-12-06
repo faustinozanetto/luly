@@ -17,7 +17,7 @@ namespace luly::ui
 
     private:
         int m_selected_dimensions_index;
-        std::string m_shadow_map_dimension_names[4] = {"1024x1024", "2048x2048", "4096x4096", "8192x8192"};
-        glm::ivec2 m_shadow_map_dimensions[4] = {{1024, 1024}, {2048, 2048}, {4096, 4096}, {8192, 8192}};
+        std::vector<std::string> m_shadow_map_dimension_names = {"1024x1024", "2048x2048", "4096x4096", "8192x8192"};
+        std::vector<glm::ivec2> m_shadow_map_dimensions = {{1024, 1024}, {2048, 2048}, {4096, 4096}, {8192, 8192}};
     };
 }

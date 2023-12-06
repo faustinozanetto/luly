@@ -63,25 +63,12 @@ namespace luly::ui
                 directional_light->set_cascade_split_lambda(cascade_split_lambda);
             }
 
-            if (ImGui::BeginCombo("Shadow Map Dimensions",
-                                  m_shadow_map_dimension_names[m_selected_dimensions_index].c_str()))
-            {
-                for (int i = 0; i < std::size(m_shadow_map_dimension_names); ++i)
-                {
-                    const bool is_selected = (m_selected_dimensions_index == i);
-                    if (ImGui::Selectable(m_shadow_map_dimension_names[i].c_str(), is_selected))
-                    {
-                        directional_light->set_shadow_map_dimensions(m_shadow_map_dimensions[i]);
-                        m_selected_dimensions_index = i;
-                    }
-
-                    if (is_selected)
-                    {
-                        ImGui::SetItemDefaultFocus();
-                    }
-                }
-                ImGui::EndCombo();
-            }
+            ui_utils::draw_combo_box("Shadow Map Dimensions", m_shadow_map_dimension_names,
+                                     [&](const std::string& selected_option, int option_index)
+                                     {
+                                         directional_light->set_shadow_map_dimensions(
+                                             m_shadow_map_dimensions[option_index]);
+                                     });
         }
         else
         {

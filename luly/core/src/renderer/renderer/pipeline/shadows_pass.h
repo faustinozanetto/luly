@@ -13,6 +13,7 @@ namespace luly::renderer
     {
         float shadow_bias;
         int soft_shadows;
+        int show_cascades;
         int pcf_horizontal_samples;
         int pcf_vertical_samples;
         float cascade_plane_distances[3];
@@ -24,14 +25,17 @@ namespace luly::renderer
         shadows_pass();
         ~shadows_pass() override;
 
+        /* Getters */
+        cascaded_shadows_parameters& get_cascaded_shadows_parameters() { return m_cascaded_shadows_parameters; }
+
+        /* Setters */
+        void set_show_cascades(bool show_cascades) { m_cascaded_shadows_parameters.show_cascades = show_cascades; }
+
         /* Overrides */
         void initialize() override;
         void execute() override;
         void set_outputs() override;
         void on_resize(const glm::ivec2& dimensions) override;
-
-        /* Getters */
-        cascaded_shadows_parameters& get_cascaded_shadows_parameters() { return m_cascaded_shadows_parameters; }
 
     private:
         void initialize_cascaded_shadows_parameters();
@@ -42,9 +46,8 @@ namespace luly::renderer
 
         void render_geometry() const;
 
-        // Cascaded shadows.
         std::shared_ptr<shader> m_directional_light_shadows_shader;
-        
+        bool m_show_cascades;
         std::shared_ptr<texture_2d> m_random_angles_texture;
         std::shared_ptr<uniform_buffer_object> m_cascaded_shadows_ubo;
         cascaded_shadows_parameters m_cascaded_shadows_parameters;
