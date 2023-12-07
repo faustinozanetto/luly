@@ -57,7 +57,7 @@ namespace luly::ui
     void engine_ui::set_color_scheme()
     {
         ImVec4* colors = ImGui::GetStyle().Colors;
-
+/*
         colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
         colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
         colors[ImGuiCol_WindowBg] = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
@@ -114,9 +114,9 @@ namespace luly::ui
         colors[ImGuiCol_NavWindowingDimBg] = ImVec4(1.00f, 0.00f, 0.00f, 0.20f);
         colors[ImGuiCol_ModalWindowDimBg] = ImVec4(1.00f, 0.00f, 0.00f, 0.35f);
 
+        /*
         ImGuiStyle& style = ImGui::GetStyle();
 
-        style.WindowPadding = ImVec2(6.00f, 6.00f);
         style.FramePadding = ImVec2(5.00f, 2.00f);
         style.CellPadding = ImVec2(6.00f, 6.00f);
         style.ItemSpacing = ImVec2(6.00f, 6.00f);
@@ -137,7 +137,8 @@ namespace luly::ui
         style.ScrollbarRounding = 9;
         style.GrabRounding = 3;
         style.LogSliderDeadzone = 4;
-        style.TabRounding = 4;
+        style.TabRounding = 4;*/
+        
     }
 
     void engine_ui::initialize_panels()
@@ -219,16 +220,16 @@ namespace luly::ui
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Enable Docking
         io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // Enable Multi-Viewport / Platform Windows
-        io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/Inter-Medium.ttf", 16.0f);
+        io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/Inter-Medium.ttf", 14.0f);
 
         // merge in icons from Font Awesome
         static const ImWchar icons_ranges[] = {ICON_MIN_FA, ICON_MAX_FA, 0};
         ImFontConfig icons_config;
         icons_config.MergeMode = true;
         icons_config.PixelSnapH = true;
-        icons_config.GlyphMinAdvanceX = 16.0f;
-        io.Fonts->AddFontFromFileTTF("assets/fonts/fa-solid-900.ttf", 16.0f, &icons_config, icons_ranges);
-        io.Fonts->AddFontFromFileTTF("assets/fonts/fa-regular-400.ttf", 16.0f, &icons_config, icons_ranges);
+        icons_config.GlyphMinAdvanceX = 14.0f;
+        io.Fonts->AddFontFromFileTTF("assets/fonts/fa-solid-900.ttf", 14.0f, &icons_config, icons_ranges);
+        io.Fonts->AddFontFromFileTTF("assets/fonts/fa-regular-400.ttf", 14.0f, &icons_config, icons_ranges);
 
         GLFWwindow* window = core::application::get().get_window()->get_native_handle();
         // Setup Platform/Renderer bindings

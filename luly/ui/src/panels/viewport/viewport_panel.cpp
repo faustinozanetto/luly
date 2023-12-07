@@ -10,12 +10,18 @@
 
 #include <imgui_internal.h>
 
+#include "utils/ui_utils.h"
+
 namespace luly::ui
 {
     bool viewport_panel::s_show = true;
 
     viewport_panel::viewport_panel() : ui_panel("viewport_panel")
     {
+        m_tool_operations.push_back({"Universal", ICON_FA_ARROWS_TO_DOT, ImGuizmo::UNIVERSAL});
+        m_tool_operations.push_back({"Translate",ICON_FA_ARROWS_UP_DOWN_LEFT_RIGHT, ImGuizmo::TRANSLATE});
+        m_tool_operations.push_back({"Rotate",ICON_FA_ARROWS_ROTATE, ImGuizmo::ROTATE,});
+        m_tool_operations.push_back({"Scale", ICON_FA_UP_RIGHT_AND_DOWN_LEFT_FROM_CENTER, ImGuizmo::SCALE});
     }
 
     viewport_panel::~viewport_panel()
@@ -28,60 +34,13 @@ namespace luly::ui
 
         if (ImGui::Begin("Viewport", &s_show))
         {
-            const ImGuiStyle style = ImGui::GetStyle();
-
-            // Toolbar
-            const float text_height = ImGui::CalcTextSize("A").y;
-            int toolbarItems = 3;
-            const ImVec2 toolbar_option_size = ImVec2{text_height, text_height} * 2.0f;
-            const ImVec2 toolbar_position = ImGui::GetWindowPos() + ImGui::GetCursorPos();
-            const ImVec2 toolbar_size = {
-                toolbar_option_size.x + style.WindowPadding.x * 2.0f, //
-                toolbar_option_size.y * toolbarItems + style.WindowPadding.y * 2.0f
-            };
-            ImGui::SetNextWindowPos(toolbar_position);
-            ImGui::SetNextWindowSize(toolbar_size);
-
-            const ImGuiWindowFlags toolbar_flags = ImGuiWindowFlags_NoDecoration | //
-                ImGuiWindowFlags_NoMove | //
-                ImGuiWindowFlags_NoScrollWithMouse | //
-                ImGuiWindowFlags_NoSavedSettings | //
-                ImGuiWindowFlags_NoBringToFrontOnFocus;
-
-            const ImGuiSelectableFlags toolbar_option_flags = ImGuiSelectableFlags_NoPadWithHalfSpacing;
-
-            if (ImGui::Begin("##ViewportToolbar", nullptr, toolbar_flags))
-            {
-                // Bring the toolbar window always on top.
-                ImGui::BringWindowToDisplayFront(ImGui::GetCurrentWindow());
-
-                ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, ImVec2(0.5f, 0.5f));
-                if (ImGui::Selectable(ICON_FA_ARROWS_UP_DOWN_LEFT_RIGHT, m_selected_operation == ImGuizmo::TRANSLATE,
-                                      toolbar_option_flags,
-                                      toolbar_option_size))
-                {
-                    m_selected_operation = ImGuizmo::TRANSLATE;
-                }
-                if (ImGui::Selectable(ICON_FA_ARROWS_ROTATE, m_selected_operation == ImGuizmo::ROTATE,
-                                      toolbar_option_flags,
-                                      toolbar_option_size))
-                {
-                    m_selected_operation = ImGuizmo::ROTATE;
-                }
-                if (ImGui::Selectable(
-                    ICON_FA_UP_RIGHT_AND_DOWN_LEFT_FROM_CENTER, m_selected_operation == ImGuizmo::SCALE,
-                    toolbar_option_flags, toolbar_option_size))
-                {
-                    m_selected_operation = ImGuizmo::SCALE;
-                }
-                ImGui::PopStyleVar();
-            }
-            ImGui::End();
-
+            //  render_viewport_toolbar();
+            render_transform_tools();
             render_scene_viewport();
             render_transform_guizmo();
+
+            ImGui::End();
         }
-        ImGui::End();
     }
 
     bool viewport_panel::get_show_panel()
@@ -147,5 +106,45 @@ namespace luly::ui
         ImGui::Image(reinterpret_cast<ImTextureID>(render_target),
                      ImVec2{viewportPanelSize.x, viewportPanelSize.y}, ImVec2{0, 1},
                      ImVec2{1, 0});
+    }
+
+    void viewport_panel::render_transform_tools()
+    {
+        const float text_height = ImGui::CalcTextSize("A").y;
+        const ImVec2 option_size = ImVec2{text_height, text_height} * 2.0f;
+        const ImVec2 toolbar_position = ImGui::GetWindowPos() + ImGui::GetCursorPos();
+        ImGui::SetNextWindowPos(toolbar_position);
+
+        const ImGuiWindowFlags toolbar_flags = ImGuiWindowFlags_NoDecoration |
+            ImGuiWindowFlags_NoMove |
+            ImGuiWindowFlags_NoScrollWithMouse |
+            ImGuiWindowFlags_NoSavedSettings |
+            ImGuiWindowFlags_NoBringToFrontOnFocus;
+
+        const ImGuiSelectableFlags toolbar_option_flags = ImGuiSelectableFlags_NoPadWithHalfSpacing;
+
+        if (ImGui::Begin("##ViewportToolbar", nullptr, toolbar_flags))
+        {
+            ImGui::BeginGroup();
+            ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, ImVec2(0.5f, 0.5f));
+            for (operation_tool_data& operation_tool_data : m_tool_operations)
+            {
+                ImGui::PushID(operation_tool_data.operation);
+
+                const bool is_selected = (operation_tool_data.operation == m_selected_operation);
+                if (ImGui::Selectable(operation_tool_data.icon.c_str(), is_selected, toolbar_option_flags, option_size))
+                {
+                    m_selected_operation = operation_tool_data.operation;
+                }
+                ui_utils::draw_tooltip(operation_tool_data.name.c_str());
+
+                ImGui::PopID();
+
+                ImGui::SameLine();
+            }
+            ImGui::PopStyleVar();
+            ImGui::EndGroup();
+            ImGui::End();
+        }
     }
 }
