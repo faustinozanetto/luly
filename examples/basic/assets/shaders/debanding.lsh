@@ -1,0 +1,56 @@
+#shader vertex
+#version 450
+
+layout (location = 0) in vec3 a_pos;
+layout (location = 1) in vec2 a_tex_coord;
+
+layout (location = 0) out vec2 o_tex_coord;
+
+void main() {
+    o_tex_coord = a_tex_coord;
+    gl_Position = vec4(a_pos, 1.0);
+}
+
+#shader fragment
+#version 450
+
+layout (location = 0) out vec4 frag_color;
+
+layout (location = 0) in vec2 o_tex_coord;
+
+layout (binding = 0) uniform sampler2D u_texture;
+
+float bayer_dither(float value, vec2 offset) {
+    // Bayer dithering matrix
+    float dither_matrix[4][4] = {
+        0.0, 2.0, 3.0, 1.0,
+        4.0, 6.0, 7.0, 5.0,
+        3.0, 1.0, 0.0, 2.0,
+        7.0, 5.0, 4.0, 6.0
+    };
+
+    int i = int(mod(o_tex_coord.x + offset.x, 4.0));
+    int j = int(mod(o_tex_coord.y + offset.y, 4.0));
+
+    float threshold = dither_matrix[i][j] / 16.0;
+
+    return clamp(value + threshold, 0.0, 1.0);
+}
+
+void main() {
+  vec4 color = texture(u_texture, o_tex_coord);
+  float average = (color.r + color.g + color.b) / 3.0;
+
+  // Dither the average luminance
+  float dithered_average = bayer_dither(average, vec2(0.5, 0.5));
+
+  // Apply dithering to each color channel
+  color.r = bayer_dither(color.r, vec2(0.0, 0.0));
+  color.g = bayer_dither(color.g, vec2(0.25, 0.25));
+  color.b = bayer_dither(color.b, vec2(0.5, 0.5));
+
+  // Replace colors based on dithered average
+  color.rgb = vec3(dithered_average);
+
+  frag_color = color;
+}

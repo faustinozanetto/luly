@@ -26,6 +26,9 @@ namespace luly::ui
         void add_message(const std::shared_ptr<console_panel_message>& message);
 
     private:
+        ImVec4 get_level_color(spdlog::level::level_enum level);
+        const char* get_level_to_string(spdlog::level::level_enum level);
+
         std::vector<std::shared_ptr<console_panel_message>> m_messages;
         static console_panel* s_instance;
         static bool s_show;

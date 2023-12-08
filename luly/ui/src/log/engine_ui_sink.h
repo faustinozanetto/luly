@@ -5,6 +5,7 @@
 
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/base_sink.h>
+#include <time.h>
 
 namespace luly::ui
 {
@@ -28,10 +29,20 @@ namespace luly::ui
             std::string source = fmt::format("File: {0} | Function: {1} | Line: {2}", msg.source.filename,
                                              msg.source.funcname, msg.source.line);
 
+            // Convert time to time_t
+            std::time_t timestamp = std::chrono::system_clock::to_time_t(msg.time);
+
+            // Use localtime_r to get broken down time information
+            std::tm tm;
+            localtime_s(&tm, &timestamp);
+
+            // Format timestamp in HOUR:MINUTE:SECONDS
+            char timestamp_buffer[32];
+            strftime(timestamp_buffer, sizeof(timestamp_buffer), "%H:%M:%S", &tm);
 
             const auto console_panel = console_panel::get_instance();
             console_panel->add_message(
-                std::make_shared<console_panel_message>(fmt::to_string(formatted_buffer), source));
+                std::make_shared<console_panel_message>(msg.level, fmt::to_string(formatted_buffer), source, timestamp_buffer));
         }
 
         void flush_() override
