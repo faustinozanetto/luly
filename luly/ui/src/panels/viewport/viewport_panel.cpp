@@ -71,8 +71,14 @@ namespace luly::ui
         glm::mat4 view_matrix = perspective_camera->get_view_matrix();
         glm::mat4 projection_matrix = perspective_camera->get_projection_matrix();
 
+        /*
+        static const float identity_matrix[16] = { 1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f };
+        ImGuizmo::DrawGrid(glm::value_ptr(view_matrix),
+            glm::value_ptr(projection_matrix), identity_matrix, 120.f);
+            */
+
         const std::shared_ptr<scene::scene_actor>& selected_actor = engine_ui::get_ui_data().selected_actor;
-        if (selected_actor)
+        if (selected_actor && engine_ui::get_ui_data().show_guizmos)
         {
             const scene::transform_component& transform_component = selected_actor->get_component<
                 scene::transform_component>();
@@ -80,7 +86,7 @@ namespace luly::ui
 
             const float snap_values[3] = { engine_ui::get_ui_data().snap_value, engine_ui::get_ui_data().snap_value, engine_ui::get_ui_data().snap_value };
             ImGuizmo::Manipulate(glm::value_ptr(view_matrix), glm::value_ptr(projection_matrix),
-                                 engine_ui::get_ui_data().selected_guizmo_operation, ImGuizmo::WORLD, glm::value_ptr(transform),
+                                 engine_ui::get_ui_data().selected_guizmo_operation, ImGuizmo::LOCAL, glm::value_ptr(transform),
                                  nullptr, engine_ui::get_ui_data().use_snap ? snap_values : nullptr);
 
             // Update transform after ImGuizmo usage.

@@ -12,7 +12,10 @@ namespace luly::ui
 
     renderer_panel::renderer_panel() : ui_panel("renderer_panel")
     {
-        m_cascade_index = 0;
+       for (const renderer::tonemapping_type type : renderer::TONEMAPPING_TYPES)
+       {
+           m_tonemapping_names.push_back(renderer::tonemapping_pass::get_tonemapping_type_to_string(type));
+       }
     }
 
     renderer_panel::~renderer_panel()
@@ -27,13 +30,21 @@ namespace luly::ui
         {
             ui_utils::draw_property("Settings");
             ImGui::Separator();
+
             bool vsync_enabled = renderer::renderer::get_is_vsync_enabled();
             if (ui_utils::draw_property("VSync Enabled", vsync_enabled))
             {
                 renderer::renderer::set_vsync_enabled(vsync_enabled);
             }
-            ImGui::Separator();
+
+            renderer::tonemapping_type tonemapping_type = renderer::scene_renderer::get_data().tonemapping_pass->get_type();
+            if (ui_utils::draw_drop_down("Tone Mapping", m_tonemapping_names.data(), m_tonemapping_names.size(), (int*) &tonemapping_type))
+            {
+                renderer::scene_renderer::get_data().tonemapping_pass->set_type(tonemapping_type);
+            }
+
             ui_utils::draw_property("Render Passes");
+            ImGui::Separator();
 
             // Skybox Pass.
             ImGui::Separator();

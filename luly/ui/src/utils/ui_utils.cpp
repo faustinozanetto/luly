@@ -419,6 +419,54 @@ namespace luly::ui
         return modified;
     }
 
+    bool ui_utils::draw_drop_down(const std::string& name, const char** options, int32_t option_count,
+	    int32_t* selected)
+    {
+        const char* current = options[*selected];
+
+        ImGui::PushID(name.c_str());
+
+        // Name
+        ImGui::AlignTextToFramePadding();
+        ImGui::Columns(2);
+        ImGui::PushItemWidth(-1);
+        ImGui::TextUnformatted(name.c_str());
+        ImGui::NextColumn();
+
+        // Content
+        ImGui::PushMultiItemsWidths(1, ImGui::CalcItemWidth());
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 5 });
+
+        bool modified = false;
+
+    	const std::string id = "##" + std::string(name);
+        if (ImGui::BeginCombo(id.c_str(), current))
+        {
+            for (int i = 0; i < option_count; i++)
+            {
+                const bool is_selected = (current == options[i]);
+                if (ImGui::Selectable(options[i], is_selected))
+                {
+                    current = options[i];
+                    *selected = i;
+                    modified = true;
+                }
+                if (is_selected)
+                    ImGui::SetItemDefaultFocus();
+            }
+            ImGui::EndCombo();
+        }
+
+        ImGui::PopItemWidth();
+        ImGui::PopStyleVar();
+
+        // Reset
+        ImGui::Columns(1);
+        ImGui::PopID();
+
+        return modified;
+    }
+
     bool ui_utils::draw_property(uint32_t texture_handle, const ImVec2& image_size,
                                  bool flip_image)
     {

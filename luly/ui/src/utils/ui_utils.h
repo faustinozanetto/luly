@@ -33,6 +33,7 @@ namespace luly::ui
         static bool draw_combo_box(const std::string& name, const std::vector<std::string>& options,
                                    const std::function<void(const std::string& selected_option, int option_index)>&
                                    selected_callback);
+        static bool draw_drop_down(const std::string& name, const char** options, int32_t option_count, int32_t* selected);
         static bool draw_property(uint32_t texture_handle,
                                   const ImVec2& image_size = ImVec2(64, 64), bool flip_image = true);
     };

@@ -24,6 +24,6 @@ namespace luly::ui
 
         static bool s_show;
 
-        int m_cascade_index;
+        std::vector<const char*> m_tonemapping_names;
     };
 }

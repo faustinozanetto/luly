@@ -23,6 +23,7 @@ project "basic"
         "%{include_dirs.assimp}",
         "%{include_dirs.entt}",
         "%{include_dirs.imgui}",
+        "%{include_dirs.imguizmo}",
     }
     
     links {

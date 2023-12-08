@@ -47,6 +47,7 @@ namespace luly::renderer
 
         m_gamma = 2.2f;
         m_exposure = 1.0f;
+        m_type = tonemapping_type::linear;
     }
 
     void tonemapping_pass::execute()
@@ -61,6 +62,7 @@ namespace luly::renderer
         // Upload uniforms
         m_tonemapping_shader->set_float("u_exposure", m_exposure);
         m_tonemapping_shader->set_float("u_gamma", m_gamma);
+        m_tonemapping_shader->set_int("u_type", static_cast<int>(m_type));
 
         renderer::bind_texture(0, bloom_output.output);
         renderer::submit_mesh(m_screen_mesh);
@@ -80,5 +82,26 @@ namespace luly::renderer
     void tonemapping_pass::on_resize(const glm::ivec2& dimensions)
     {
         m_fbo->resize(dimensions);
+    }
+
+    const char* tonemapping_pass::get_tonemapping_type_to_string(tonemapping_type type)
+    {
+       switch(type)
+       {
+       case tonemapping_type::linear:
+           return "linear";
+       case tonemapping_type::reinhard:
+           return "reinhard";
+       case tonemapping_type::aces:
+           return "aces";
+       case tonemapping_type::filmic:
+           return "filmic";
+       case tonemapping_type::hable:
+           return "hable";
+       case tonemapping_type::luma:
+           return "luma";
+       }
+       LY_ASSERT_MSG(false, "Unknown tonemapping type!")
+       return nullptr;
     }
 }

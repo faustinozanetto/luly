@@ -13,9 +13,11 @@ namespace luly::ui
     {
         uint32_t render_target;
 
-        ImGuizmo::OPERATION selected_guizmo_operation;
+        bool show_guizmos;
         bool use_snap;
         float snap_value;
+        float guizmos_scale;
+        ImGuizmo::OPERATION selected_guizmo_operation;
 
         std::vector<std::shared_ptr<ui_panel>> panels;
         std::shared_ptr<scene::scene_actor> selected_actor;

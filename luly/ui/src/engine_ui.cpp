@@ -30,6 +30,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "input/input_manager.h"
+#include "panels/editor/editor_panel.h"
 
 namespace luly::ui
 {
@@ -147,7 +148,9 @@ namespace luly::ui
     void engine_ui::initialize_data()
     {
         s_engine_ui_data.use_snap = true;
+        s_engine_ui_data.show_guizmos = true;
         s_engine_ui_data.snap_value = 0.1f;
+        s_engine_ui_data.guizmos_scale = 0.25f;
         s_engine_ui_data.selected_guizmo_operation = ImGuizmo::UNIVERSAL;
     }
 
@@ -163,6 +166,7 @@ namespace luly::ui
         s_engine_ui_data.panels.push_back(std::make_shared<renderer_panel>());
         s_engine_ui_data.panels.push_back(std::make_shared<assets_panel>());
         s_engine_ui_data.panels.push_back(std::make_shared<shadows_panel>());
+        s_engine_ui_data.panels.push_back(std::make_shared<editor_panel>());
     }
 
     void engine_ui::initialize_log_sink()
@@ -199,6 +203,10 @@ namespace luly::ui
         else if (input::input_manager::is_key_pressed(input::key::d4))
         {
             s_engine_ui_data.selected_guizmo_operation = ImGuizmo::SCALE;
+        }
+        else if (input::input_manager::is_key_pressed(input::key::d5))
+        {
+            s_engine_ui_data.use_snap = !s_engine_ui_data.use_snap;
         }
 
         // Render all panels.
@@ -272,6 +280,8 @@ namespace luly::ui
             LY_CRITICAL("ImGui init for OpenGL failed.");
             LY_ASSERT(false)
         }
+
+        ImGuizmo::SetGizmoSizeClipSpace(s_engine_ui_data.guizmos_scale / 2.0f);
     }
 
     void engine_ui::begin_dockspace()
