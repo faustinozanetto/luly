@@ -10,6 +10,8 @@
 
 #include <random>
 
+#include "time/app_time.h"
+
 namespace luly::renderer
 {
     shadows_pass::shadows_pass() : render_pass("shadows_pass")
@@ -130,23 +132,22 @@ namespace luly::renderer
         m_cascaded_shadows_parameters.pcf_vertical_samples = 4;
         m_cascaded_shadows_parameters.pcf_horizontal_samples = 4;
         m_cascaded_shadows_parameters.show_cascades = 0;
-
+        m_cascaded_shadows_parameters.cascade_debug_colors[0] = glm::vec4(0.92f, 0.92f, 0.1f, 1);
+        m_cascaded_shadows_parameters.cascade_debug_colors[1] = glm::vec4(0.1f, 0.83f, 0.82f, 1);
+        m_cascaded_shadows_parameters.cascade_debug_colors[2] = glm::vec4(0.87f, 0.12f, 0.62f, 1);
         for (int i = 0; i < 3; i++)
         {
             m_cascaded_shadows_parameters.cascade_plane_distances[i] = 0.0f;
-            m_cascaded_shadows_parameters.cascade_debug_colors[i] = glm::vec4(1, 1, 1, 1);
         }
     }
 
     void shadows_pass::generate_random_angles_texture()
     {
         std::uniform_real_distribution<double> distribution(0.0f, 1.0f);
-        std::mt19937 generator;
+        std::mt19937 generator(app_time::get_time());
 
-        int size = 64;
-        int buffer_size = size * size * size;
+        const int size = 64;
         std::vector<glm::vec2> data;
-
         for (int y = 0; y < size; ++y)
         {
             for (int x = 0; x < size; ++x)

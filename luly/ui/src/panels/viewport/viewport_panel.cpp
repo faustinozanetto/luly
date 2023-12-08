@@ -5,12 +5,11 @@
 #include "math/math_utils.h"
 #include "scene/scene_manager.h"
 #include "scene/actor/components/transform_component.h"
+#include "utils/ui_utils.h"
 
 #include <glm/gtc/type_ptr.hpp>
 
 #include <imgui_internal.h>
-
-#include "utils/ui_utils.h"
 
 namespace luly::ui
 {
@@ -34,8 +33,7 @@ namespace luly::ui
 
         if (ImGui::Begin("Viewport", &s_show))
         {
-            //  render_viewport_toolbar();
-            render_transform_tools();
+            render_toolbar();
             render_scene_viewport();
             render_transform_guizmo();
 
@@ -80,11 +78,12 @@ namespace luly::ui
                 scene::transform_component>();
             glm::mat4 transform = transform_component.get_transform()->get_transform();
 
+            const float snap_values[3] = { engine_ui::get_ui_data().snap_value, engine_ui::get_ui_data().snap_value, engine_ui::get_ui_data().snap_value };
             ImGuizmo::Manipulate(glm::value_ptr(view_matrix), glm::value_ptr(projection_matrix),
-                                 m_selected_operation, ImGuizmo::WORLD, glm::value_ptr(transform),
-                                 nullptr, nullptr);
+                                 engine_ui::get_ui_data().selected_guizmo_operation, ImGuizmo::WORLD, glm::value_ptr(transform),
+                                 nullptr, engine_ui::get_ui_data().use_snap ? snap_values : nullptr);
 
-            // Update transform after imguizmo usage.
+            // Update transform after ImGuizmo usage.
             if (ImGuizmo::IsUsing())
             {
                 glm::vec3 translation, scale;
@@ -99,52 +98,69 @@ namespace luly::ui
         }
     }
 
-    void viewport_panel::render_scene_viewport()
+    void viewport_panel::render_toolbar()
     {
-        const ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-        const uint32_t render_target = engine_ui::get_ui_data().render_target;
-        ImGui::Image(reinterpret_cast<ImTextureID>(render_target),
-                     ImVec2{viewportPanelSize.x, viewportPanelSize.y}, ImVec2{0, 1},
-                     ImVec2{1, 0});
-    }
-
-    void viewport_panel::render_transform_tools()
-    {
+		const ImGuiStyle style = ImGui::GetStyle();
         const float text_height = ImGui::CalcTextSize("A").y;
         const ImVec2 option_size = ImVec2{text_height, text_height} * 2.0f;
-        const ImVec2 toolbar_position = ImGui::GetWindowPos() + ImGui::GetCursorPos();
-        ImGui::SetNextWindowPos(toolbar_position);
 
-        const ImGuiWindowFlags toolbar_flags = ImGuiWindowFlags_NoDecoration |
-            ImGuiWindowFlags_NoMove |
+        const ImVec2 panel_position = ImGui::GetWindowPos() + ImGui::GetCursorPos() + style.WindowPadding;
+        ImGui::SetNextWindowPos(panel_position);
+
+        const ImGuiWindowFlags panel_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove |
             ImGuiWindowFlags_NoScrollWithMouse |
             ImGuiWindowFlags_NoSavedSettings |
             ImGuiWindowFlags_NoBringToFrontOnFocus;
 
-        const ImGuiSelectableFlags toolbar_option_flags = ImGuiSelectableFlags_NoPadWithHalfSpacing;
+        const ImGuiSelectableFlags option_flags = ImGuiSelectableFlags_NoPadWithHalfSpacing;
 
-        if (ImGui::Begin("##ViewportToolbar", nullptr, toolbar_flags))
+        if (ImGui::Begin("##TransformTools", nullptr, panel_flags))
         {
             ImGui::BeginGroup();
             ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, ImVec2(0.5f, 0.5f));
-            for (operation_tool_data& operation_tool_data : m_tool_operations)
+
             {
-                ImGui::PushID(operation_tool_data.operation);
-
-                const bool is_selected = (operation_tool_data.operation == m_selected_operation);
-                if (ImGui::Selectable(operation_tool_data.icon.c_str(), is_selected, toolbar_option_flags, option_size))
+                for (operation_tool_data& operation_tool_data : m_tool_operations)
                 {
-                    m_selected_operation = operation_tool_data.operation;
+                    ImGui::PushID(operation_tool_data.operation);
+
+                    const bool is_selected = (operation_tool_data.operation == engine_ui::get_ui_data().selected_guizmo_operation);
+                    if (ImGui::Selectable(operation_tool_data.icon.c_str(), is_selected, option_flags, option_size))
+                    {
+                        engine_ui::get_ui_data().selected_guizmo_operation = operation_tool_data.operation;
+                    }
+                    ui_utils::draw_tooltip(operation_tool_data.name.c_str());
+
+                    ImGui::PopID();
+
+                    ImGui::SameLine();
+                    ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
+                    ImGui::SameLine();
                 }
-                ui_utils::draw_tooltip(operation_tool_data.name.c_str());
-
-                ImGui::PopID();
-
-                ImGui::SameLine();
             }
-            ImGui::PopStyleVar();
+
+            {
+                if (ImGui::Selectable(ICON_FA_RULER_COMBINED, engine_ui::get_ui_data().use_snap == true, option_flags, option_size))
+                {
+                    engine_ui::get_ui_data().use_snap = !engine_ui::get_ui_data().use_snap;
+                }
+                ui_utils::draw_tooltip("Use Snapping");
+            }
+       
+
             ImGui::EndGroup();
+            ImGui::PopStyleVar();
+
             ImGui::End();
         }
+    }
+
+    void viewport_panel::render_scene_viewport()
+    {
+	    const ImVec2 scene_view_size = ImGui::GetContentRegionAvail();
+
+        const uint32_t render_target = engine_ui::get_ui_data().render_target;
+        ImGui::Image(reinterpret_cast<ImTextureID>(render_target), scene_view_size, ImVec2{0, 1},
+        ImVec2{1, 0});
     }
 }

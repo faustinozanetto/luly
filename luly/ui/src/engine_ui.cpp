@@ -29,6 +29,8 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+#include "input/input_manager.h"
+
 namespace luly::ui
 {
     engine_ui_data engine_ui::s_engine_ui_data = {};
@@ -36,6 +38,7 @@ namespace luly::ui
     void engine_ui::initialize()
     {
         LY_TRACE("Engine UI initialization started...");
+        initialize_data();
         initialize_imgui();
         initialize_panels();
         initialize_log_sink();
@@ -141,6 +144,13 @@ namespace luly::ui
         
     }
 
+    void engine_ui::initialize_data()
+    {
+        s_engine_ui_data.use_snap = true;
+        s_engine_ui_data.snap_value = 0.1f;
+        s_engine_ui_data.selected_guizmo_operation = ImGuizmo::UNIVERSAL;
+    }
+
     void engine_ui::initialize_panels()
     {
         s_engine_ui_data.panels.push_back(std::make_shared<menubar_panel>());
@@ -173,7 +183,26 @@ namespace luly::ui
 
     void engine_ui::on_update()
     {
-        for (const auto& ui_panel : s_engine_ui_data.panels)
+        // Check for key press.
+        if (input::input_manager::is_key_pressed(input::key::d1))
+        {
+            s_engine_ui_data.selected_guizmo_operation = ImGuizmo::UNIVERSAL;
+        }
+        else if (input::input_manager::is_key_pressed(input::key::d2))
+        {
+            s_engine_ui_data.selected_guizmo_operation = ImGuizmo::TRANSLATE;
+        }
+        else if (input::input_manager::is_key_pressed(input::key::d3))
+        {
+            s_engine_ui_data.selected_guizmo_operation = ImGuizmo::ROTATE;
+        }
+        else if (input::input_manager::is_key_pressed(input::key::d4))
+        {
+            s_engine_ui_data.selected_guizmo_operation = ImGuizmo::SCALE;
+        }
+
+        // Render all panels.
+        for (const std::shared_ptr<ui_panel>& ui_panel : s_engine_ui_data.panels)
         {
             ui_panel->on_render_panel();
         }
