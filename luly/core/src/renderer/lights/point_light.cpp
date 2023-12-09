@@ -10,7 +10,7 @@ namespace luly::renderer
     {
         m_position = position;
 
-        m_shadow_map_dimensions = glm::ivec2(4096, 4096);
+        m_shadow_map_dimensions = glm::ivec2(2048, 2048);
         m_shadow_map_near_plane = 0.1f;
         m_shadow_map_far_plane = 30.0f;
         m_shadow_map_projection = glm::perspective(glm::radians(90.0f), 1.0f, m_shadow_map_near_plane,

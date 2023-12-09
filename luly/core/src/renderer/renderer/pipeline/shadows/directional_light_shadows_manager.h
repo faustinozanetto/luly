@@ -11,7 +11,7 @@ namespace luly::renderer
 
     struct directional_light_shadows_data
     {
-        int show_cascades;
+        bool show_cascades;
         float shadow_bias;
         float cascade_plane_distances[CASCADES_COUNT];
         glm::vec4 cascade_debug_colors[CASCADES_COUNT];

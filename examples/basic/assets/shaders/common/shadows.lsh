@@ -12,15 +12,20 @@ layout (binding = DIRECTIONAL_LIGHT_FRUSTUM_PLANES_UBO_LOCATION) uniform directi
 
 layout (binding = DIRECTIONAL_LIGHT_SHADOWS_UBO_LOCATION) uniform directional_light_shadows_ubo
 {
+    bool show_cascades;
     float shadow_bias;
-    int show_cascades;
     float cascade_plane_distances[CASCADES_COUNT];
     vec4 cascade_debug_colors[CASCADES_COUNT];
 } u_directional_light_shadows;
 
+layout (binding = POINT_LIGHT_SHADOWS_UBO_LOCATION) uniform point_light_shadows_ubo
+{
+    float shadow_bias;
+} u_point_light_shadows;
+
 layout (binding = SHADOWS_UBO_LOCATION) uniform shadows_ubo
 {
-    int soft_shadows;
+    bool soft_shadows;
     int pcf_horizontal_samples;
     int pcf_vertical_samples;
 } u_shadows;

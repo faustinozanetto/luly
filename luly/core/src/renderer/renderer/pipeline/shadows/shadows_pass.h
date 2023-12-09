@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "directional_light_shadows_manager.h"
+#include "point_light_shadows_manager.h"
 #include "renderer/buffers/uniform/uniform_buffer_object.h"
 #include "renderer/lights/point_light.h"
 #include "renderer/renderer/pass/render_pass.h"
@@ -12,7 +13,7 @@ namespace luly::renderer
 {
     struct shadows_data
     {
-        int soft_shadows;
+        bool soft_shadows;
         int pcf_horizontal_samples;
         int pcf_vertical_samples;
     };
@@ -24,9 +25,14 @@ namespace luly::renderer
         ~shadows_pass() override;
 
         /* Getters */
-        const std::shared_ptr<directional_light_shadows_manager>& get_directional_light_shadows_manager() const
+    	std::shared_ptr<directional_light_shadows_manager>& get_directional_light_shadows_manager()
         {
             return m_directional_light_shadows_manager;
+        }
+
+    	std::shared_ptr<point_light_shadows_manager>& get_point_light_shadows_manager()
+        {
+            return m_point_light_shadows_manager;
         }
 
         shadows_data& get_shadows_data() { return m_shadows_data; }
@@ -42,18 +48,10 @@ namespace luly::renderer
         void update_shadows_ubo() const;
 
         void generate_random_angles_texture();
-        /*
-                void calculate_point_lights_shadows(const std::shared_ptr<scene::scene>& current_scene) const;
-                void calculate_point_light_shadow(const std::shared_ptr<scene::scene>& current_scene,
-                                                  const std::shared_ptr<point_light>& point_light) const;
-                                                  
-        
-                std::shared_ptr<shader> m_point_light_shadows_shader;*/
 
         std::shared_ptr<directional_light_shadows_manager> m_directional_light_shadows_manager;
+        std::shared_ptr<point_light_shadows_manager> m_point_light_shadows_manager;
 
-        /* Cascaded Shadows */
-        bool m_show_cascades;
         std::shared_ptr<texture_2d> m_random_angles_texture;
 
         std::shared_ptr<uniform_buffer_object> m_shadows_ubo;

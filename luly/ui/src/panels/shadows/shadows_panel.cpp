@@ -62,11 +62,7 @@ namespace luly::ui
                     directional_light_shadows_data.shadow_bias = shadow_bias;
                 }
 
-                bool show_cascades = static_cast<bool>(directional_light_shadows_data.show_cascades);
-                if (ui_utils::draw_property("Show Cascades", show_cascades))
-                {
-                    directional_light_shadows_data.show_cascades = show_cascades ? 1 : 0;
-                }
+                ui_utils::draw_property("Show Cascades", directional_light_shadows_data.show_cascades);
 
                 for (int i = 0; i < CASCADES_COUNT; i++)
                 {

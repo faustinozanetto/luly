@@ -103,7 +103,7 @@ float calculate_directional_light_shadow(vec3 frag_pos, vec3 normal, vec3 light_
     float bias = max(0.005 * (1.0 - clamp(dot(normal, light_dir), 0.0, 1.0)), u_directional_light_shadows.shadow_bias);
 
     float shadow = 0.0f;
-    if (u_shadows.soft_shadows == 1) {
+    if (u_shadows.soft_shadows) {
         shadow = shadow_pcf(projection_coords.xy, current_depth, bias, cascade_index);
     } else {
         shadow = shadow_hard(projection_coords.xy, current_depth, bias, cascade_index);
@@ -113,7 +113,6 @@ float calculate_directional_light_shadow(vec3 frag_pos, vec3 normal, vec3 light_
 }
 
 int calculate_cascade_index(float frag_pos_z) {
-    // Get the cascade shadow layer index.
     int cascade_index = 0;
     for (int i = 0; i < CASCADES_COUNT - 1; ++i)
     {
@@ -128,7 +127,7 @@ int calculate_cascade_index(float frag_pos_z) {
 }
 
 vec3 calculate_debug_cascade_color(int cascade_index) {
-    if (u_directional_light_shadows.show_cascades == 0)
+    if (!u_directional_light_shadows.show_cascades)
         return vec3(0, 0, 0);
         
     return u_directional_light_shadows.cascade_debug_colors[cascade_index].rgb;

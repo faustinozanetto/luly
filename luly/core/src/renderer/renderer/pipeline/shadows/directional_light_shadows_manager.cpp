@@ -24,6 +24,10 @@ namespace luly::renderer
         const std::shared_ptr<perspective_camera>& perspective_camera = current_scene->get_camera_manager()->
             get_perspective_camera();
 
+        // Calculate cascades and update ubo.
+        directional_light->update_shadow_cascades(perspective_camera);
+        update_shadows_ubo(directional_light);
+
         // Bind fbo and shader.
         directional_light->get_shadow_map_fbo()->bind();
         renderer::set_viewport_size(directional_light->get_shadow_map_dimensions());
@@ -32,10 +36,6 @@ namespace luly::renderer
         // Bind shader
         renderer::set_cull_face_mode(renderer_cull_face_mode::front);
         m_directional_light_shadows_shader->bind();
-
-        // Calculate cascades and update ubo.
-        directional_light->update_shadow_cascades(perspective_camera);
-        update_shadows_ubo(directional_light);
 
         // Render geometry.
         render_geometry(m_directional_light_shadows_shader);
@@ -59,7 +59,7 @@ namespace luly::renderer
 
     void directional_light_shadows_manager::initialize_shadows_data()
     {
-        m_directional_light_shadows_data.show_cascades = 0;
+        m_directional_light_shadows_data.show_cascades = false;
         m_directional_light_shadows_data.shadow_bias = 0.005f;
         m_directional_light_shadows_data.cascade_debug_colors[0] = glm::vec4(0.92f, 0.92f, 0.1f, 1);
         m_directional_light_shadows_data.cascade_debug_colors[1] = glm::vec4(0.1f, 0.83f, 0.82f, 1);

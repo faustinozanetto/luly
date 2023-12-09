@@ -3,10 +3,8 @@
 
 #include "application/application.h"
 #include "renderer/renderer/renderer.h"
-#include "renderer/shaders/shader_factory.h"
 #include "scene/actor/components/transform_component.h"
 #include "scene/actor/components/lights/directional_light_component.h"
-#include "scene/actor/components/rendering/model_renderer_component.h"
 
 #include <random>
 
@@ -26,11 +24,7 @@ namespace luly::renderer
     void shadows_pass::initialize()
     {
         m_directional_light_shadows_manager = std::make_shared<directional_light_shadows_manager>();
-
-        /*
-        m_point_light_shadows_shader = shader_factory::create_shader_from_file(
-            "assets/shaders/shadows/point_light_shadows.lsh");
-*/
+        m_point_light_shadows_manager = std::make_shared<point_light_shadows_manager>();
 
         initialize_shadows_data();
         generate_random_angles_texture();
@@ -46,9 +40,9 @@ namespace luly::renderer
 
         // 1. Perform directional light cascaded shadow mapping
         m_directional_light_shadows_manager->execute(current_scene);
-
         // 2. Perform shadow pass on all point lights.
-        //  calculate_point_lights_shadows(current_scene);
+    	m_point_light_shadows_manager->execute(current_scene);
+
         renderer::set_state(renderer_state::depth, false);
         renderer::set_viewport_size(renderer::get_viewport_size());
     }
@@ -77,7 +71,7 @@ namespace luly::renderer
 
     void shadows_pass::initialize_shadows_data()
     {
-        m_shadows_data.soft_shadows = 1;
+        m_shadows_data.soft_shadows = true;
         m_shadows_data.pcf_vertical_samples = 4;
         m_shadows_data.pcf_horizontal_samples = 4;
     }
@@ -109,53 +103,4 @@ namespace luly::renderer
         };
         m_random_angles_texture = std::make_shared<texture_2d>(random_angles_texture_specification);
     }
-
-    /*
-        void shadows_pass::calculate_point_lights_shadows(const std::shared_ptr<scene::scene>& current_scene) const
-        {
-            m_point_light_shadows_shader->bind();
-    
-            const std::vector<std::shared_ptr<point_light>>& point_lights = current_scene->get_point_lights();
-            for (const std::shared_ptr<point_light>& point_light : point_lights)
-            {
-                calculate_point_light_shadow(current_scene, point_light);
-            }
-    
-            m_point_light_shadows_shader->un_bind();
-            // renderer::clear_screen();
-        }
-    
-        void shadows_pass::calculate_point_light_shadow(const std::shared_ptr<scene::scene>& current_scene,
-                                                        const std::shared_ptr<point_light>& point_light) const
-        {
-            const std::shared_ptr<perspective_camera>& perspective_camera = current_scene->get_camera_manager()->
-                get_perspective_camera();
-    
-            // Setup fbo and shader.
-            point_light->get_shadow_map_fbo()->bind();
-            renderer::set_viewport_size(point_light->get_shadow_map_dimensions());
-            glClear(GL_DEPTH_BUFFER_BIT);
-    
-            renderer::set_cull_face_mode(renderer_cull_face_mode::front);
-    
-            // Update shadow transforms
-            point_light->update_shadow_transforms(point_light->get_position());
-    
-            // Upload uniforms.
-            for (uint32_t i = 0; i < point_light->get_shadow_transforms().size(); i++)
-            {
-                m_point_light_shadows_shader->set_mat4("u_shadow_transforms[" + std::to_string(i) + "]",
-                                                       point_light->get_shadow_transforms()[i]);
-            }
-    
-            m_point_light_shadows_shader->set_float("u_far_plane", point_light->get_shadow_map_far_plane());
-            m_point_light_shadows_shader->set_vec_float3("u_light_pos", point_light->get_position());
-    
-            // Render geometry.
-            render_geometry();
-    
-            // Reset state.
-            renderer::set_cull_face_mode(renderer_cull_face_mode::back);
-            point_light->get_shadow_map_fbo()->un_bind();
-        }*/
 }
