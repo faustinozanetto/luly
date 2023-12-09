@@ -7,14 +7,13 @@
 #include "renderer/renderer/pipeline/ambient_occlusion_pass.h"
 #include "renderer/renderer/pipeline/environment_pass.h"
 #include "renderer/renderer/pipeline/lighting_pass.h"
-#include "renderer/renderer/pipeline/shadows_pass.h"
 #include "renderer/renderer/pipeline/skybox_pass.h"
 #include "renderer/renderer/pipeline/debanding_pass.h"
-
-#include <memory>
-
 #include "renderer/renderer/pipeline/bloom_pass.h"
 #include "renderer/renderer/pipeline/tonemapping_pass.h"
+#include "renderer/renderer/pipeline/shadows/shadows_pass.h"
+
+#include <memory>
 
 namespace luly::renderer
 {

@@ -5,13 +5,14 @@
 #include <glm/ext/matrix_transform.hpp>
 
 #include "renderer/renderer/renderer.h"
+#include "renderer/renderer/pipeline/shadows/directional_light_shadows_manager.h"
 #include "scene/scene.h"
 
 namespace luly::renderer
 {
     directional_light::directional_light(const glm::vec3& color, float azimuth, float elevation)
     {
-        m_cascades_count = 3;
+        m_cascades_count = CASCADES_COUNT;
         m_direction_angles = glm::vec2(azimuth, elevation);
         m_cascade_split_lambda = 0.55f;
         m_shadow_map_dimensions = glm::ivec2(4096, 4096);
@@ -20,8 +21,10 @@ namespace luly::renderer
         // Create shadow map fbo
         create_shadow_fbo();
 
-        m_light_matrices_ubo = std::make_shared<uniform_buffer_object>(sizeof(glm::mat4) * m_cascades_count, 2);
-        m_frustum_planes_ubo = std::make_shared<uniform_buffer_object>(sizeof(glm::vec2) * m_cascades_count, 3);
+        m_light_matrices_ubo = std::make_shared<uniform_buffer_object>(sizeof(glm::mat4) * m_cascades_count,
+                                                                       DIRECTIONAL_LIGHT_LIGHT_MATRICES_UBO_LOCATION);
+        m_frustum_planes_ubo = std::make_shared<uniform_buffer_object>(sizeof(glm::vec2) * m_cascades_count,
+                                                                       DIRECTIONAL_LIGHT_FRUSTUM_PLANES_UBO_LOCATION);
     }
 
     void directional_light::calculate_cascade_splits(const std::shared_ptr<perspective_camera>& perspective_camera)
@@ -74,8 +77,8 @@ namespace luly::renderer
 
     void directional_light::create_shadow_fbo()
     {
-        glDeleteTextures(1,&m_shadow_maps);
-        
+        glDeleteTextures(1, &m_shadow_maps);
+
         glCreateTextures(GL_TEXTURE_2D_ARRAY, 1, &m_shadow_maps);
         glTextureStorage3D(m_shadow_maps, 1, GL_DEPTH_COMPONENT32F, m_shadow_map_dimensions.x,
                            m_shadow_map_dimensions.y, m_cascades_count);

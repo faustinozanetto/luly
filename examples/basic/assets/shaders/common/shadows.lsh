@@ -1,22 +1,26 @@
-﻿#define CASCADES_COUNT 3
+﻿#include "common/constants.lsh"
 
-layout (binding = 2) uniform directional_light_space_matrices_ubo
+layout (binding = DIRECTIONAL_LIGHT_LIGHT_MATRICES_UBO_LOCATION) uniform directional_light_space_matrices_ubo
 {
-    mat4 u_light_space_matrices[CASCADES_COUNT];
-};
+    mat4 light_space_matrices[CASCADES_COUNT];
+} u_directional_light_space_matrices;
 
-layout (binding = 3) uniform directional_light_frustum_planes_ubo
+layout (binding = DIRECTIONAL_LIGHT_FRUSTUM_PLANES_UBO_LOCATION) uniform directional_light_frustum_planes_ubo
 {
-    vec2 u_light_frustum_planes[CASCADES_COUNT];
-};
+    vec2 light_frustum_planes[CASCADES_COUNT];
+} u_directional_light_frustum_planes;
 
-layout (binding = 4) uniform cascaded_shadows_parameters_ubo
+layout (binding = DIRECTIONAL_LIGHT_SHADOWS_UBO_LOCATION) uniform directional_light_shadows_ubo
 {
     float shadow_bias;
-    int soft_shadows;
     int show_cascades;
-    int pcf_horizontal_samples;
-    int pcf_vertical_samples;
     float cascade_plane_distances[CASCADES_COUNT];
     vec4 cascade_debug_colors[CASCADES_COUNT];
-} cascaded_shadows_parameters;
+} u_directional_light_shadows;
+
+layout (binding = SHADOWS_UBO_LOCATION) uniform shadows_ubo
+{
+    int soft_shadows;
+    int pcf_horizontal_samples;
+    int pcf_vertical_samples;
+} u_shadows;

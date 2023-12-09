@@ -124,7 +124,7 @@ namespace luly::renderer
 
     void scene_renderer::create_camera_data()
     {
-        s_data.camera_ubo = std::make_shared<uniform_buffer_object>(sizeof(camera_data), 0);
+        s_data.camera_ubo = std::make_shared<uniform_buffer_object>(sizeof(camera_data), CAMERA_UBO_LOCATION);
     }
 
     void scene_renderer::create_common_data()

@@ -1,7 +1,6 @@
 ﻿#include "lypch.h"
 #include "lighting_pass.h"
 
-#include "shadows_pass.h"
 #include "application/application.h"
 #include "renderer/meshes/mesh_factory.h"
 #include "renderer/renderer/renderer.h"
@@ -48,7 +47,7 @@ namespace luly::renderer
         // Setup lights uniform buffer object.
         initialize_lights_data();
         m_lights_ubo = std::make_shared<uniform_buffer_object>(
-            sizeof(m_lights_data), 1);
+            sizeof(m_lights_data), LIGHTS_UBO_LOCATION);
 
         // Load shader.
         m_lighting_shader = shader_factory::create_shader_from_file("assets/shaders/lighting_pass_shader.lsh");
@@ -116,7 +115,6 @@ namespace luly::renderer
         for (const std::shared_ptr<point_light>& point_light : point_lights)
         {
             point_light_shadow_maps.push_back(point_light->get_shadow_cubemap());
-           // renderer::bind_texture(starting_texture_slot++, point_light->get_shadow_cubemap());
         }
         glBindTextures(11, point_lights.size(), point_light_shadow_maps.data());
 

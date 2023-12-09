@@ -27,47 +27,53 @@ namespace luly::ui
 
             const std::shared_ptr<renderer::shadows_pass>& shadows_pass = renderer::scene_renderer::get_data().
                 shadows_pass;
-            renderer::cascaded_shadows_parameters& cascaded_shadows_parameters = shadows_pass->
-                get_cascaded_shadows_parameters();
+            renderer::shadows_data& shadows_data = shadows_pass->
+                get_shadows_data();
 
-            float shadow_bias = cascaded_shadows_parameters.shadow_bias;
-            if (ui_utils::draw_property("Shadow Bias", shadow_bias, 0.0f, 5.0f, 0.00001f))
-            {
-                cascaded_shadows_parameters.shadow_bias = shadow_bias;
-            }
-
-            int pcf_horizontal_samples = cascaded_shadows_parameters.pcf_horizontal_samples;
+            int pcf_horizontal_samples = shadows_data.pcf_horizontal_samples;
             if (ui_utils::draw_property("PCF Horizontal Samples", pcf_horizontal_samples, 1, 12))
             {
-                cascaded_shadows_parameters.pcf_horizontal_samples = pcf_horizontal_samples;
+                shadows_data.pcf_horizontal_samples = pcf_horizontal_samples;
             }
 
-            int pcf_vertical_samples = cascaded_shadows_parameters.pcf_vertical_samples;
+            int pcf_vertical_samples = shadows_data.pcf_vertical_samples;
             if (ui_utils::draw_property("PCF Vertical Samples", pcf_vertical_samples, 1, 12))
             {
-                cascaded_shadows_parameters.pcf_vertical_samples = pcf_vertical_samples;
+                shadows_data.pcf_vertical_samples = pcf_vertical_samples;
             }
 
-            bool soft_shadows = cascaded_shadows_parameters.soft_shadows;
+            bool soft_shadows = shadows_data.soft_shadows;
             if (ui_utils::draw_property("Soft Shadows", soft_shadows))
             {
-                cascaded_shadows_parameters.soft_shadows = soft_shadows;
+                shadows_data.soft_shadows = soft_shadows;
             }
 
-            if(ImGui::TreeNode("Cascade Shadows"))
+            if (ImGui::TreeNode("Cascaded Shadows"))
             {
-                bool show_cascades = cascaded_shadows_parameters.show_cascades;
-                if (ui_utils::draw_property("Show Cascades", show_cascades))
+                const std::shared_ptr<renderer::directional_light_shadows_manager>& directional_light_shadows_manager =
+                    shadows_pass->get_directional_light_shadows_manager();
+
+                renderer::directional_light_shadows_data& directional_light_shadows_data =
+                    directional_light_shadows_manager->get_directional_light_shadows_data();
+
+                float shadow_bias = directional_light_shadows_data.shadow_bias;
+                if (ui_utils::draw_property("Shadow Bias", shadow_bias, 0.0f, 5.0f, 0.00001f))
                 {
-                    shadows_pass->set_show_cascades(show_cascades);
+                    directional_light_shadows_data.shadow_bias = shadow_bias;
                 }
 
-                for (int i = 0; i < 3; i++)
+                bool show_cascades = static_cast<bool>(directional_light_shadows_data.show_cascades);
+                if (ui_utils::draw_property("Show Cascades", show_cascades))
                 {
-                    glm::vec4 cascade_debug_color = cascaded_shadows_parameters.cascade_debug_colors[i];
+                    directional_light_shadows_data.show_cascades = show_cascades ? 1 : 0;
+                }
+
+                for (int i = 0; i < CASCADES_COUNT; i++)
+                {
+                    glm::vec4 cascade_debug_color = directional_light_shadows_data.cascade_debug_colors[i];
                     if (ui_utils::draw_property(std::format("Cascade #{} Debug Color", i + 1), cascade_debug_color))
                     {
-                        shadows_pass->set_debug_cascade_color(i, cascade_debug_color);
+                        directional_light_shadows_manager->set_debug_cascade_color(i, cascade_debug_color);
                     }
                 }
 

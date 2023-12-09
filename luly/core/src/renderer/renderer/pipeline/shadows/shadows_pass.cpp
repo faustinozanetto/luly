@@ -23,38 +23,32 @@ namespace luly::renderer
     {
     }
 
-    void shadows_pass::set_debug_cascade_color(int cascade_index, const glm::vec3& color)
-    {
-        LY_ASSERT_MSG(cascade_index >= 0 && cascade_index < 3, "Cascade index out of range!")
-        m_cascaded_shadows_parameters.cascade_debug_colors[cascade_index] = glm::vec4(color, 1.0);
-    }
-
     void shadows_pass::initialize()
     {
-        // Load shader.
-        m_directional_light_shadows_shader = shader_factory::create_shader_from_file(
-            "assets/shaders/shadows/directional_light_shadows.lsh");
+        m_directional_light_shadows_manager = std::make_shared<directional_light_shadows_manager>();
+
+        /*
         m_point_light_shadows_shader = shader_factory::create_shader_from_file(
             "assets/shaders/shadows/point_light_shadows.lsh");
+*/
 
-        // Create cascaded shadows ubo.
-        initialize_cascaded_shadows_parameters();
+        initialize_shadows_data();
         generate_random_angles_texture();
-        m_cascaded_shadows_ubo = std::make_shared<uniform_buffer_object>(sizeof(cascaded_shadows_parameters), 4);
+        m_shadows_ubo = std::make_shared<uniform_buffer_object>(sizeof(shadows_data), SHADOWS_UBO_LOCATION);
     }
 
     void shadows_pass::execute()
     {
-        renderer::set_state(renderer_state::depth, true);
         const std::shared_ptr<scene::scene>& current_scene = scene::scene_manager::get().get_current_scene();
 
+        renderer::set_state(renderer_state::depth, true);
+        update_shadows_ubo();
+
         // 1. Perform directional light cascaded shadow mapping
-        const std::shared_ptr<directional_light>& directional_light = current_scene->get_directional_light();
-        if (directional_light)
-			calculate_directional_light_shadows(current_scene, directional_light);
+        m_directional_light_shadows_manager->execute(current_scene);
 
         // 2. Perform shadow pass on all point lights.
-        calculate_point_lights_shadows(current_scene);
+        //  calculate_point_lights_shadows(current_scene);
         renderer::set_state(renderer_state::depth, false);
         renderer::set_viewport_size(renderer::get_viewport_size());
     }
@@ -81,21 +75,16 @@ namespace luly::renderer
     {
     }
 
-    void shadows_pass::initialize_cascaded_shadows_parameters()
+    void shadows_pass::initialize_shadows_data()
     {
-        m_cascaded_shadows_parameters.shadow_bias = 0.005f;
-        m_cascaded_shadows_parameters.soft_shadows = 1;
-        m_cascaded_shadows_parameters.pcf_vertical_samples = 4;
-        m_cascaded_shadows_parameters.pcf_horizontal_samples = 4;
-        m_cascaded_shadows_parameters.show_cascades = 0;
-        m_cascaded_shadows_parameters.cascade_debug_colors[0] = glm::vec4(0.92f, 0.92f, 0.1f, 1);
-        m_cascaded_shadows_parameters.cascade_debug_colors[1] = glm::vec4(0.1f, 0.83f, 0.82f, 1);
-        m_cascaded_shadows_parameters.cascade_debug_colors[2] = glm::vec4(0.87f, 0.12f, 0.62f, 1);
+        m_shadows_data.soft_shadows = 1;
+        m_shadows_data.pcf_vertical_samples = 4;
+        m_shadows_data.pcf_horizontal_samples = 4;
+    }
 
-        for (int i = 0; i < 3; i++)
-        {
-            m_cascaded_shadows_parameters.cascade_plane_distances[i] = 0.0f;
-        }
+    void shadows_pass::update_shadows_ubo() const
+    {
+        m_shadows_ubo->set_data(&m_shadows_data, sizeof(m_shadows_data));
     }
 
     void shadows_pass::generate_random_angles_texture()
@@ -121,108 +110,52 @@ namespace luly::renderer
         m_random_angles_texture = std::make_shared<texture_2d>(random_angles_texture_specification);
     }
 
-    void shadows_pass::update_cascaded_shadows_ubo(const std::shared_ptr<directional_light>& directional_light)
-    {
-        const std::vector<float>& cascade_splits = directional_light->get_shadow_cascade_splits();
-        for (int i = 0; i < directional_light->get_cascades_count(); i++)
+    /*
+        void shadows_pass::calculate_point_lights_shadows(const std::shared_ptr<scene::scene>& current_scene) const
         {
-            m_cascaded_shadows_parameters.cascade_plane_distances[i] = cascade_splits[i];
+            m_point_light_shadows_shader->bind();
+    
+            const std::vector<std::shared_ptr<point_light>>& point_lights = current_scene->get_point_lights();
+            for (const std::shared_ptr<point_light>& point_light : point_lights)
+            {
+                calculate_point_light_shadow(current_scene, point_light);
+            }
+    
+            m_point_light_shadows_shader->un_bind();
+            // renderer::clear_screen();
         }
-        m_cascaded_shadows_ubo->set_data(&m_cascaded_shadows_parameters, sizeof(m_cascaded_shadows_parameters));
-    }
-
-    void shadows_pass::calculate_point_lights_shadows(const std::shared_ptr<scene::scene>& current_scene) const
-    {
-        m_point_light_shadows_shader->bind();
-
-        const std::vector<std::shared_ptr<point_light>>& point_lights = current_scene->get_point_lights();
-        for (const std::shared_ptr<point_light>& point_light : point_lights)
+    
+        void shadows_pass::calculate_point_light_shadow(const std::shared_ptr<scene::scene>& current_scene,
+                                                        const std::shared_ptr<point_light>& point_light) const
         {
-            calculate_point_light_shadow(current_scene, point_light);
-        }
-
-        m_point_light_shadows_shader->un_bind();
-       // renderer::clear_screen();
-    }
-
-    void shadows_pass::calculate_point_light_shadow(const std::shared_ptr<scene::scene>& current_scene,
-                                                    const std::shared_ptr<point_light>& point_light) const
-    {
-        const std::shared_ptr<perspective_camera>& perspective_camera = current_scene->get_camera_manager()->
-            get_perspective_camera();
-
-        // Setup fbo and shader.
-        point_light->get_shadow_map_fbo()->bind();
-        renderer::set_viewport_size(point_light->get_shadow_map_dimensions());
-        glClear(GL_DEPTH_BUFFER_BIT);
-
-        renderer::set_cull_face_mode(renderer_cull_face_mode::front);
-
-        // Update shadow transforms
-        point_light->update_shadow_transforms(point_light->get_position());
-
-        // Upload uniforms.
-        for (uint32_t i = 0; i < point_light->get_shadow_transforms().size(); i++)
-        {
-            m_point_light_shadows_shader->set_mat4("u_shadow_transforms[" + std::to_string(i) + "]",
-                                                   point_light->get_shadow_transforms()[i]);
-        }
-
-        m_point_light_shadows_shader->set_float("u_far_plane", point_light->get_shadow_map_far_plane());
-        m_point_light_shadows_shader->set_vec_float3("u_light_pos", point_light->get_position());
-
-        // Render geometry.
-        render_geometry();
-
-        // Reset state.
-        renderer::set_cull_face_mode(renderer_cull_face_mode::back);
-        point_light->get_shadow_map_fbo()->un_bind();
-    }
-
-    void shadows_pass::calculate_directional_light_shadows(const std::shared_ptr<scene::scene>& current_scene,
-                                                           const std::shared_ptr<directional_light>& directional_light)
-    {
-        const std::shared_ptr<perspective_camera>& perspective_camera = current_scene->get_camera_manager()->
-            get_perspective_camera();
-
-        // Setup fbo and shader.
-        directional_light->get_shadow_map_fbo()->bind();
-        renderer::set_viewport_size(directional_light->get_shadow_map_dimensions());
-        glClear(GL_DEPTH_BUFFER_BIT);
-
-        renderer::set_cull_face_mode(renderer_cull_face_mode::front);
-        m_directional_light_shadows_shader->bind();
-
-        // Calculate cascades levels and update cascades.
-        directional_light->update_shadow_cascades(perspective_camera);
-        update_cascaded_shadows_ubo(directional_light);
-
-        // Render geometry.
-        render_geometry();
-
-        // Reset state.
-        renderer::set_cull_face_mode(renderer_cull_face_mode::back);
-        directional_light->get_shadow_map_fbo()->un_bind();
-        m_directional_light_shadows_shader->un_bind();
-    }
-
-    void shadows_pass::render_geometry() const
-    {
-        const std::shared_ptr<scene::scene>& current_scene = scene::scene_manager::get().get_current_scene();
-
-        const auto& registry = current_scene->get_registry();
-        const auto& view = registry->view<scene::transform_component, scene::model_renderer_component>();
-
-        for (auto [actor, transform_component, model_renderer_component] : view.each())
-        {
-            const std::shared_ptr<math::transform>& transform = transform_component.get_transform();
-            const std::shared_ptr<model>& model = model_renderer_component.get_model();
-
-            if (!model_renderer_component.get_casts_shadows()) continue;
-
-            m_directional_light_shadows_shader->set_mat4("u_transform", transform->get_transform());
-
-            renderer::submit_model(model);
-        }
-    }
+            const std::shared_ptr<perspective_camera>& perspective_camera = current_scene->get_camera_manager()->
+                get_perspective_camera();
+    
+            // Setup fbo and shader.
+            point_light->get_shadow_map_fbo()->bind();
+            renderer::set_viewport_size(point_light->get_shadow_map_dimensions());
+            glClear(GL_DEPTH_BUFFER_BIT);
+    
+            renderer::set_cull_face_mode(renderer_cull_face_mode::front);
+    
+            // Update shadow transforms
+            point_light->update_shadow_transforms(point_light->get_position());
+    
+            // Upload uniforms.
+            for (uint32_t i = 0; i < point_light->get_shadow_transforms().size(); i++)
+            {
+                m_point_light_shadows_shader->set_mat4("u_shadow_transforms[" + std::to_string(i) + "]",
+                                                       point_light->get_shadow_transforms()[i]);
+            }
+    
+            m_point_light_shadows_shader->set_float("u_far_plane", point_light->get_shadow_map_far_plane());
+            m_point_light_shadows_shader->set_vec_float3("u_light_pos", point_light->get_position());
+    
+            // Render geometry.
+            render_geometry();
+    
+            // Reset state.
+            renderer::set_cull_face_mode(renderer_cull_face_mode::back);
+            point_light->get_shadow_map_fbo()->un_bind();
+        }*/
 }
