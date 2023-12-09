@@ -52,10 +52,10 @@ namespace luly::renderer
         renderer::clear_screen();
         m_screen_shader->bind();
 
-        const render_pass_input& tonemapping_pass_input = m_inputs.at("tonemapping_pass_input");
-        const render_pass_output& tonemapping_pass_output = tonemapping_pass_input.render_pass->get_output("tonemapping_output");
+        const render_pass_input& debanding_pass_input = m_inputs.at("debanding_pass_input");
+        const render_pass_output& debanding_pass_output = debanding_pass_input.render_pass->get_output("debanding_output");
 
-        renderer::bind_texture(0, tonemapping_pass_output.output);
+        renderer::bind_texture(0, debanding_pass_output.output);
         renderer::submit_mesh(m_screen_mesh);
 
         m_screen_shader->un_bind();

@@ -28,7 +28,7 @@ namespace luly::renderer
 
         std::vector<frame_buffer_attachment> attachments = {
             {
-                texture_internal_format::rgba16f,
+                texture_internal_format::r11g11b10,
                 texture_filtering::linear,
                 texture_wrapping::clamp_to_edge, viewport_size
             },

@@ -17,10 +17,10 @@ namespace luly::ui
 
     viewport_panel::viewport_panel() : ui_panel("viewport_panel")
     {
-        m_tool_operations.push_back({"Universal", ICON_FA_ARROWS_TO_DOT, ImGuizmo::UNIVERSAL});
-        m_tool_operations.push_back({"Translate",ICON_FA_ARROWS_UP_DOWN_LEFT_RIGHT, ImGuizmo::TRANSLATE});
-        m_tool_operations.push_back({"Rotate",ICON_FA_ARROWS_ROTATE, ImGuizmo::ROTATE,});
-        m_tool_operations.push_back({"Scale", ICON_FA_UP_RIGHT_AND_DOWN_LEFT_FROM_CENTER, ImGuizmo::SCALE});
+        m_tool_operations.push_back({"Universal", ICON_MDI_CROP_ROTATE, ImGuizmo::UNIVERSAL});
+        m_tool_operations.push_back({"Translate",ICON_MDI_ARROW_ALL, ImGuizmo::TRANSLATE});
+        m_tool_operations.push_back({"Rotate",ICON_MDI_ROTATE_ORBIT, ImGuizmo::ROTATE,});
+        m_tool_operations.push_back({"Scale", ICON_MDI_ARROW_EXPAND_ALL, ImGuizmo::SCALE});
     }
 
     viewport_panel::~viewport_panel()
@@ -146,7 +146,7 @@ namespace luly::ui
             }
 
             {
-                if (ImGui::Selectable(ICON_FA_RULER_COMBINED, engine_ui::get_ui_data().use_snap == true, option_flags, option_size))
+                if (ImGui::Selectable(ICON_MDI_MAGNET, engine_ui::get_ui_data().use_snap == true, option_flags, option_size))
                 {
                     engine_ui::get_ui_data().use_snap = !engine_ui::get_ui_data().use_snap;
                 }

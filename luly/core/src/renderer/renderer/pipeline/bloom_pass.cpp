@@ -107,11 +107,11 @@ namespace luly::renderer
         m_down_sample_shader->set_vec_float2("u_source_res", renderer::get_viewport_size());
         m_down_sample_shader->set_int("u_mip_level", 0);
 
-        for (int i = 0; i < m_mips.size(); i++)
+        for (uint32_t i = 0; i < m_mips.size(); i++)
         {
             bloom_pass_mip_data& current_bloom_mip = m_mips[i];
             renderer::set_viewport_size(current_bloom_mip.size);
-            // Attach bloom mip textue to rbo.
+            // Attach bloom mip texture to rbo.
             m_fbo->attach_texture(current_bloom_mip.texture, GL_FRAMEBUFFER, render_buffer_attachment_type::color,
                                   GL_TEXTURE_2D, false, 0);
 
@@ -140,9 +140,9 @@ namespace luly::renderer
 
         m_up_sample_shader->bind();
         m_up_sample_shader->set_float("u_filter_radius", m_filter_radius);
-        for (int i = m_mips.size() - 1; i > 0; i--)
+        for (uint32_t i = m_mips.size() - 1; i > 0; i--)
         {
-            bloom_pass_mip_data& current_bloom_mip = m_mips[i];
+	        const bloom_pass_mip_data& current_bloom_mip = m_mips[i];
             bloom_pass_mip_data& next_bloom_mip = m_mips[i - 1];
             // Bind mip texture
             renderer::bind_texture(0, current_bloom_mip.texture->get_handle_id());

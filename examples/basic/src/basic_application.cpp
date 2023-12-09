@@ -93,8 +93,8 @@ void basic_application::setup_scene()
     const std::shared_ptr<luly::scene::scene_actor>& skybox_actor = scene->create_actor("Skybox Actor");
     const std::shared_ptr<luly::renderer::texture_2d>& environment_texture =
         luly::renderer::texture_factory::create_environment_texture_from_file(
-            "assets/hdris/kloofendal_43d_clear_puresky_4k.hdr");
-    luly::scene::skybox_component& skybox_component = skybox_actor->add_component<luly::scene::skybox_component>(
+            "assets/hdris/blue_photo_studio_4k.hdr");
+	skybox_actor->add_component<luly::scene::skybox_component>(
         environment_texture
     );
 

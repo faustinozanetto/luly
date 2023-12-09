@@ -15,7 +15,7 @@
 
 #include "renderer/renderer/renderer.h"
 #include "application/application.h"
-#include "utils/IconsFontAwesome6.h"
+#include "utils/IconsMaterialDesignIcons.h"
 
 #include <logging/log.h>
 #include <utils/assert.h>
@@ -257,19 +257,23 @@ namespace luly::ui
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Enable Docking
         io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // Enable Multi-Viewport / Platform Windows
+
+        // Setup font.
         io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/Inter-Medium.ttf", 14.0f);
 
-        // merge in icons from Font Awesome
-        static const ImWchar icons_ranges[] = {ICON_MIN_FA, ICON_MAX_FA, 0};
+        // Setup icons font.
+        static const ImWchar icons_ranges[] = { ICON_MIN_MDI, ICON_MAX_MDI, 0};
         ImFontConfig icons_config;
         icons_config.MergeMode = true;
         icons_config.PixelSnapH = true;
-        icons_config.GlyphMinAdvanceX = 14.0f;
-        io.Fonts->AddFontFromFileTTF("assets/fonts/fa-solid-900.ttf", 14.0f, &icons_config, icons_ranges);
-        io.Fonts->AddFontFromFileTTF("assets/fonts/fa-regular-400.ttf", 14.0f, &icons_config, icons_ranges);
+        icons_config.GlyphOffset.y = 1.0f;
+        icons_config.OversampleH = icons_config.OversampleV = 1;
+        icons_config.GlyphMinAdvanceX = 4.0f;
+        icons_config.SizePixels = 12.0f;
+        io.Fonts->AddFontFromFileTTF("assets/fonts/materialdesignicons-webfont.ttf", 14.0f, &icons_config, icons_ranges);
 
-        GLFWwindow* window = core::application::get().get_window()->get_native_handle();
         // Setup Platform/Renderer bindings
+        GLFWwindow* window = core::application::get().get_window()->get_native_handle();
         if (!ImGui_ImplGlfw_InitForOpenGL(window, true))
         {
             LY_CRITICAL("ImGui init for GLFW failed.");

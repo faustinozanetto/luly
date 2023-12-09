@@ -39,10 +39,10 @@ namespace luly::renderer
         // s_data.ambient_occlusion_pass->execute();
 
         perform_lighting_pass();
-        s_data.bloom_pass->execute();
-
         s_data.skybox_pass->execute();
+        s_data.bloom_pass->execute();
         s_data.tonemapping_pass->execute();
+        s_data.debanding_pass->execute();
         perform_final_pass();
     }
 
@@ -59,6 +59,7 @@ namespace luly::renderer
         s_data.skybox_pass->set_outputs();
         s_data.bloom_pass->set_outputs();
         s_data.tonemapping_pass->set_outputs();
+        s_data.debanding_pass->set_outputs();
         s_data.final_pass->set_outputs();
     }
 
@@ -72,10 +73,11 @@ namespace luly::renderer
         s_data.geometry_pass->on_resize(viewport_size);
         s_data.lighting_pass->on_resize(viewport_size);
         s_data.skybox_pass->on_resize(viewport_size);
-        s_data.final_pass->on_resize(viewport_size);
         //s_data.ambient_occlusion_pass->on_resize(viewport_size);
         s_data.bloom_pass->on_resize(viewport_size);
         s_data.tonemapping_pass->on_resize(viewport_size);
+        s_data.debanding_pass->on_resize(viewport_size);
+        s_data.final_pass->on_resize(viewport_size);
     }
 
     scene_renderer_data& scene_renderer::get_data()
@@ -112,8 +114,11 @@ namespace luly::renderer
         s_data.tonemapping_pass = std::make_shared<tonemapping_pass>();
         s_data.tonemapping_pass->add_input({s_data.bloom_pass, "bloom_pass_input"});
 
+        s_data.debanding_pass = std::make_shared<debanding_pass>();
+        s_data.debanding_pass->add_input({s_data.tonemapping_pass, "tonemapping_pass_input"});
+
         s_data.final_pass = std::make_shared<final_pass>();
-        s_data.final_pass->add_input({s_data.tonemapping_pass, "tonemapping_pass_input"});
+        s_data.final_pass->add_input({s_data.debanding_pass, "debanding_pass_input"});
         LY_TRACE("Pipeline passes created successfully!");
     }
 

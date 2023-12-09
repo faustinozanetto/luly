@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "utils/IconsFontAwesome6.h"
+#include "utils/IconsMaterialDesignIcons.h"
 #include <imgui.h>
 #include <string>
 

@@ -9,6 +9,7 @@
 #include "renderer/renderer/pipeline/lighting_pass.h"
 #include "renderer/renderer/pipeline/shadows_pass.h"
 #include "renderer/renderer/pipeline/skybox_pass.h"
+#include "renderer/renderer/pipeline/debanding_pass.h"
 
 #include <memory>
 
@@ -36,6 +37,7 @@ namespace luly::renderer
         std::shared_ptr<lighting_pass> lighting_pass;
     //    std::shared_ptr<ambient_occlusion_pass> ambient_occlusion_pass;
         std::shared_ptr<skybox_pass> skybox_pass;
+        std::shared_ptr<debanding_pass> debanding_pass;
         std::shared_ptr<bloom_pass> bloom_pass;
         std::shared_ptr<tonemapping_pass> tonemapping_pass;
         std::shared_ptr<final_pass> final_pass;
