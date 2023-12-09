@@ -59,7 +59,6 @@ namespace luly::renderer
         float m_average_frustum_size;
         glm::ivec2 m_shadow_map_dimensions;
         std::shared_ptr<frame_buffer> m_shadow_map_fbo;
-        //uint32_t m_shadow_map_fbo;
         uint32_t m_shadow_maps;
         std::shared_ptr<uniform_buffer_object> m_light_matrices_ubo;
         std::shared_ptr<uniform_buffer_object> m_frustum_planes_ubo;

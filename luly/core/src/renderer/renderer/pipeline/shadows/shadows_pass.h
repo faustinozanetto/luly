@@ -2,6 +2,7 @@
 
 #include "renderer/buffers/uniform/uniform_buffer_object.h"
 #include "renderer/lights/directional_light.h"
+#include "renderer/lights/point_light.h"
 #include "renderer/renderer/pass/render_pass.h"
 #include "renderer/shaders/shader.h"
 #include "renderer/textures/texture_2d.h"
@@ -9,6 +10,8 @@
 
 namespace luly::renderer
 {
+#define CASCADES_COUNT 3
+
     struct cascaded_shadows_parameters
     {
         float shadow_bias;
@@ -16,8 +19,8 @@ namespace luly::renderer
         int show_cascades;
         int pcf_horizontal_samples;
         int pcf_vertical_samples;
-        float cascade_plane_distances[3];
-        glm::vec4 cascade_debug_colors[3];
+        float cascade_plane_distances[CASCADES_COUNT];
+        glm::vec4 cascade_debug_colors[CASCADES_COUNT];
     };
 
     class shadows_pass : public render_pass
@@ -43,12 +46,19 @@ namespace luly::renderer
         void initialize_cascaded_shadows_parameters();
         void generate_random_angles_texture();
         void update_cascaded_shadows_ubo(const std::shared_ptr<directional_light>& directional_light);
+
+        void calculate_point_lights_shadows(const std::shared_ptr<scene::scene>& current_scene) const;
+        void calculate_point_light_shadow(const std::shared_ptr<scene::scene>& current_scene,
+                                          const std::shared_ptr<point_light>& point_light) const;
         void calculate_directional_light_shadows(const std::shared_ptr<scene::scene>& current_scene,
                                                  const std::shared_ptr<directional_light>& directional_light);
 
         void render_geometry() const;
 
         std::shared_ptr<shader> m_directional_light_shadows_shader;
+        std::shared_ptr<shader> m_point_light_shadows_shader;
+
+        /* Cascaded Shadows */
         bool m_show_cascades;
         std::shared_ptr<texture_2d> m_random_angles_texture;
         std::shared_ptr<uniform_buffer_object> m_cascaded_shadows_ubo;

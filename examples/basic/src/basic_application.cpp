@@ -113,8 +113,8 @@ void basic_application::setup_scene()
         material_specification);
     emissive_cube_actor->add_component<luly::scene::material_component>(emissive_material);
     /*
-    
-    /*
+    */
+   
     const std::shared_ptr<luly::renderer::mesh>& sphere_mesh = luly::renderer::mesh_factory::create_sphere_mesh(
         10, 10, 0.05f);
     float grid_gap = 0.2f;
@@ -161,7 +161,7 @@ void basic_application::setup_scene()
             });
         }
     }
-*/
+
 
     const std::shared_ptr<luly::scene::scene_actor>& actor = scene->create_actor("SciFi Helmet");
 

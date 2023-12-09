@@ -69,6 +69,20 @@ namespace luly::scene
         return {};
     }
 
+     std::vector<std::shared_ptr<renderer::point_light>> scene::get_point_lights() const
+    {
+        std::vector<std::shared_ptr<renderer::point_light>> point_lights;
+        
+        const auto& view = m_actors_registry->view<point_light_component>();
+        for (auto [actor, point_light_component] : view.each())
+        {
+            const std::shared_ptr<renderer::point_light>& point_light = point_light_component.
+                get_point_light();
+            point_lights.push_back(point_light);
+        }
+        return point_lights;
+    }
+
     const std::shared_ptr<scene_actor>& scene::get_skybox_actor() const
     {
         const auto& view = m_actors_registry->view<skybox_component>();

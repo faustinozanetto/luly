@@ -111,6 +111,15 @@ namespace luly::renderer
         renderer::bind_texture(9, directional_shadow_map_output.output);
         renderer::bind_texture(10, random_angles_map_output.output);
 
+       std::vector<uint32_t >point_light_shadow_maps;
+        const std::vector<std::shared_ptr<point_light>>& point_lights = scene::scene_manager::get().get_current_scene()->get_point_lights();
+        for (const std::shared_ptr<point_light>& point_light : point_lights)
+        {
+            point_light_shadow_maps.push_back(point_light->get_shadow_cubemap());
+           // renderer::bind_texture(starting_texture_slot++, point_light->get_shadow_cubemap());
+        }
+        glBindTextures(11, point_lights.size(), point_light_shadow_maps.data());
+
         // Update rest of uniforms
         upload_skybox_uniforms();
 

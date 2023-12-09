@@ -4,6 +4,7 @@
 #include <entt/entt.hpp>
 
 #include "renderer/lights/directional_light.h"
+#include "renderer/lights/point_light.h"
 
 namespace luly::scene
 {
@@ -27,6 +28,7 @@ namespace luly::scene
 
         /** Common Actors Getters */
         const std::shared_ptr<renderer::directional_light>& get_directional_light() const;
+    	std::vector<std::shared_ptr<renderer::point_light>> get_point_lights() const;
         const std::shared_ptr<scene_actor>& get_skybox_actor() const;
 
     private:
