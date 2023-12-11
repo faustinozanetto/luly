@@ -7,15 +7,17 @@
 
 #include <glm/glm.hpp>
 
-#include "renderer/lights/directional_light.h"
+#include "renderer/textures/texture_1d.h"
 
 namespace luly::renderer
 {
+#define MAX_POINT_LIGHTS 6
+#define MAX_SPOT_LIGHTS 6
+
     struct point_light_data
     {
         glm::vec4 color;
         glm::vec4 position;
-        glm::vec4 shadow_map;
     };
 
     struct spot_light_data
@@ -36,8 +38,8 @@ namespace luly::renderer
 
     struct lights_data
     {
-        point_light_data point_lights[16];
-        spot_light_data spot_lights[16];
+        point_light_data point_lights[MAX_POINT_LIGHTS];
+        spot_light_data spot_lights[MAX_SPOT_LIGHTS];
         directional_light_data directional_light;
     };
 
@@ -57,8 +59,9 @@ namespace luly::renderer
 
     private:
         void initialize_lights_data();
+        void generate_poisson_texture();
         void collect_lights();
-        void update_lights_buffer();
+        void update_lights_buffer() const;
         void upload_skybox_uniforms();
 
         lights_data m_lights_data;
@@ -66,5 +69,6 @@ namespace luly::renderer
         std::shared_ptr<uniform_buffer_object> m_lights_ubo;
         std::shared_ptr<shader> m_lighting_shader;
         std::shared_ptr<mesh> m_screen_mesh;
+        std::shared_ptr<texture_2d> m_poisson_distribution_texture;
     };
 }

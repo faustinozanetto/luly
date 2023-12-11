@@ -1,6 +1,6 @@
 ﻿#include "common/constants.lsh"
 
-layout(std140, binding = CAMERA_UBO_LOCATION) uniform camera_ubo
+layout(binding = CAMERA_UBO_LOCATION) uniform camera_ubo
 {
     mat4 view_matrix;
     mat4 projection_matrix;

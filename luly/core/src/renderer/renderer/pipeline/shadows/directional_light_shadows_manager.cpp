@@ -26,7 +26,7 @@ namespace luly::renderer
 
         // Calculate cascades and update ubo.
         directional_light->update_shadow_cascades(perspective_camera);
-        update_shadows_ubo(directional_light);
+        update_shadows_data(directional_light);
 
         // Bind fbo and shader.
         directional_light->get_shadow_map_fbo()->bind();
@@ -46,15 +46,25 @@ namespace luly::renderer
         m_directional_light_shadows_shader->un_bind();
     }
 
+    void directional_light_shadows_manager::bind_uniforms(const std::shared_ptr<shader>& shader)
+    {
+        shader->set_int("u_directional_light_shadows.show_cascades", m_directional_light_shadows_data.show_cascades);
+        shader->set_float("u_directional_light_shadows.shadow_bias", m_directional_light_shadows_data.shadow_bias);
+        for (int i = 0; i < CASCADES_COUNT; i++)
+        {
+            shader->set_float("u_directional_light_shadows.cascade_plane_distances[" + std::to_string(i) + "]",
+                              m_directional_light_shadows_data.cascade_plane_distances[i]);
+            shader->set_vec_float4("u_directional_light_shadows.cascade_debug_colors[" + std::to_string(i) + "]",
+                                   m_directional_light_shadows_data.cascade_debug_colors[i]);
+        }
+    }
+
     void directional_light_shadows_manager::initialize()
     {
         m_directional_light_shadows_shader = shader_factory::create_shader_from_file(
             "assets/shaders/shadows/directional_light_shadows.lsh");
 
         initialize_shadows_data();
-
-        m_directional_light_shadows_ubo  = std::make_shared<uniform_buffer_object>(
-            sizeof(m_directional_light_shadows_data), DIRECTIONAL_LIGHT_SHADOWS_UBO_LOCATION);
     }
 
     void directional_light_shadows_manager::initialize_shadows_data()
@@ -69,15 +79,13 @@ namespace luly::renderer
         m_directional_light_shadows_data.cascade_plane_distances[2] = 0.0f;
     }
 
-    void directional_light_shadows_manager::update_shadows_ubo(
+    void directional_light_shadows_manager::update_shadows_data(
         const std::shared_ptr<directional_light>& directional_light)
     {
         const std::vector<float>& cascade_splits = directional_light->get_shadow_cascade_splits();
-        for (int i = 0; i < directional_light->get_cascades_count(); i++)
+        for (int i = 0; i < CASCADES_COUNT; i++)
         {
             m_directional_light_shadows_data.cascade_plane_distances[i] = cascade_splits[i];
         }
-        m_directional_light_shadows_ubo->set_data(&m_directional_light_shadows_data,
-                                                  sizeof(m_directional_light_shadows_data));
     }
 }

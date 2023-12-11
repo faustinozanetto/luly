@@ -1,4 +1,6 @@
-﻿struct directional_light {
+﻿#include "common/constants.lsh"
+
+struct directional_light {
     vec4 color;
     vec4 direction;
 };
@@ -6,7 +8,6 @@
 struct point_light {
     vec4 color;
     vec4 position;
-    vec4 shadow_map;
 };
 
 struct spot_light {
@@ -16,9 +17,9 @@ struct spot_light {
     vec4 angles;
 };
 
-layout (std140, binding = 1) uniform lights_ubo
+layout (std140, binding = LIGHTS_UBO_LOCATION) uniform lights_ubo
 {
-    point_light point_lights[16];
-    spot_light spot_lights[16];
+    point_light point_lights[MAX_POINT_LIGHTS];
+    spot_light spot_lights[MAX_SPOT_LIGHTS];
     directional_light directional_light;
-} lights;
+} u_lights;

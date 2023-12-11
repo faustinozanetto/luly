@@ -90,8 +90,8 @@ namespace luly::renderer
     {
         shader->set_vec_float3("u_material.albedo", {0.85f, 0.85f, 0.85f});
         shader->set_vec_float3("u_material.emissive", {0.0f, 0.0f, 0.0f});
-        shader->set_float("u_material.roughness", 1.0f);
-        shader->set_float("u_material.metallic", 0.0f);
+        shader->set_float("u_material.roughness", 0.99f);
+        shader->set_float("u_material.metallic", 0.01f);
         shader->set_float("u_material.ambient_occlusion", 1.0f);
         shader->set_float("u_material.tilling", 1.0f);
         shader->set_float("u_material.emissive_strength", 0.0f);

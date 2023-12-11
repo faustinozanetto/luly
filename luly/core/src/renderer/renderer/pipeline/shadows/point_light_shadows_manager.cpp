@@ -1,6 +1,7 @@
 #include "lypch.h"
 #include "point_light_shadows_manager.h"
 
+#include "renderer/renderer/pipeline/lighting_pass.h"
 #include "renderer/shaders/shader_factory.h"
 
 namespace luly::renderer
@@ -16,11 +17,24 @@ namespace luly::renderer
         if (point_lights.empty()) return;
 
         m_point_light_shadows_shader->bind();
+        int light_index = 0;
         for (const std::shared_ptr<point_light>& point_light : point_lights)
         {
+            m_point_light_shadows_data.far_planes[light_index++] = point_light->get_shadow_map_far_plane();
+
             calculate_point_light_shadow(point_light);
         }
         m_point_light_shadows_shader->un_bind();
+    }
+
+    void point_light_shadows_manager::bind_uniforms(const std::shared_ptr<shader>& shader)
+    {
+        shader->set_float("u_point_light_shadows.shadow_bias", m_point_light_shadows_data.shadow_bias);
+        for (int i = 0; i < MAX_POINT_LIGHTS; i++)
+        {
+            shader->set_float("u_point_light_shadows.far_planes[" + std::to_string(i) + "]",
+                              m_point_light_shadows_data.far_planes[i]);
+        }
     }
 
     void point_light_shadows_manager::initialize()
@@ -29,21 +43,15 @@ namespace luly::renderer
             "assets/shaders/shadows/point_light_shadows.lsh");
 
         initialize_shadows_data();
-
-        m_point_light_shadows_ubo  = std::make_shared<uniform_buffer_object>(
-            sizeof(m_point_light_shadows_data), POINT_LIGHT_SHADOWS_UBO_LOCATION);
     }
 
     void point_light_shadows_manager::initialize_shadows_data()
     {
         m_point_light_shadows_data.shadow_bias = 0.005f;
-    }
-
-    void point_light_shadows_manager::update_shadows_ubo(
-        const std::shared_ptr<point_light>& point_light)
-    {
-        m_point_light_shadows_ubo->set_data(&m_point_light_shadows_data,
-                                                  sizeof(m_point_light_shadows_data));
+        for (int i = 0; i < MAX_POINT_LIGHTS; i++)
+        {
+            m_point_light_shadows_data.far_planes[i] = 0.0f;
+        }
     }
 
     void point_light_shadows_manager::calculate_point_light_shadow(const std::shared_ptr<point_light>& point_light)
@@ -62,7 +70,7 @@ namespace luly::renderer
         for (uint32_t i = 0; i < point_light->get_shadow_transforms().size(); i++)
         {
             m_point_light_shadows_shader->set_mat4("u_shadow_transforms[" + std::to_string(i) + "]",
-                point_light->get_shadow_transforms()[i]);
+                                                   point_light->get_shadow_transforms()[i]);
         }
 
         m_point_light_shadows_shader->set_float("u_far_plane", point_light->get_shadow_map_far_plane());

@@ -9,6 +9,7 @@
 #include "scene/actor/components/lights/point_light_component.h"
 #include "scene/actor/components/lights/spot_light_component.h"
 #include "scene/actor/components/rendering/skybox_component.h"
+#include "utils/PoissonGenerator.h"
 
 namespace luly::renderer
 {
@@ -47,7 +48,9 @@ namespace luly::renderer
         // Setup lights uniform buffer object.
         initialize_lights_data();
         m_lights_ubo = std::make_shared<uniform_buffer_object>(
-            sizeof(m_lights_data), LIGHTS_UBO_LOCATION);
+            sizeof(lights_data), LIGHTS_UBO_LOCATION);
+
+        generate_poisson_texture();
 
         // Load shader.
         m_lighting_shader = shader_factory::create_shader_from_file("assets/shaders/lighting_pass_shader.lsh");
@@ -81,11 +84,10 @@ namespace luly::renderer
             "rough_metal_ao_output");
         const render_pass_output& geometry_emissive_output = geometry_pass_input.render_pass->get_output(
             "emissive_output");
+        
         const render_pass_output& directional_shadow_map_output = shadows_pass_input.render_pass->get_output(
             "directional_shadow_map_output");
-        const render_pass_output& random_angles_map_output = shadows_pass_input.render_pass->get_output(
-            "random_angles_map_output");
-
+            
         // Blit depth from geometry pass to this fbo.
         int width = m_fbo->get_width();
         int height = m_fbo->get_height();
@@ -108,10 +110,12 @@ namespace luly::renderer
         //  renderer::bind_texture(8, ambient_occlusion_pass_input.render_pass->get_output("ssao_blur_output").output);
         // Bind shadow pass outputs.
         renderer::bind_texture(9, directional_shadow_map_output.output);
-        renderer::bind_texture(10, random_angles_map_output.output);
+        renderer::bind_texture(10, m_poisson_distribution_texture->get_handle_id());
 
-       std::vector<uint32_t >point_light_shadow_maps;
-        const std::vector<std::shared_ptr<point_light>>& point_lights = scene::scene_manager::get().get_current_scene()->get_point_lights();
+        std::vector<uint32_t> point_light_shadow_maps;
+        const std::vector<std::shared_ptr<point_light>>& point_lights = scene::scene_manager::get().get_current_scene()
+            ->get_point_lights();
+        point_light_shadow_maps.reserve(point_lights.size());
         for (const std::shared_ptr<point_light>& point_light : point_lights)
         {
             point_light_shadow_maps.push_back(point_light->get_shadow_cubemap());
@@ -120,6 +124,7 @@ namespace luly::renderer
 
         // Update rest of uniforms
         upload_skybox_uniforms();
+        scene_renderer::get_data().shadows_pass->bind_uniforms(m_lighting_shader);
 
         // Render screen quad mesh.
         renderer::submit_mesh(m_screen_mesh);
@@ -143,30 +148,55 @@ namespace luly::renderer
 
     void lighting_pass::update_lights()
     {
-        initialize_lights_data();
         collect_lights();
         update_lights_buffer();
     }
 
     void lighting_pass::initialize_lights_data()
     {
-        for (point_light_data point_light : m_lights_data.point_lights)
+        for (int i = 0; i < MAX_POINT_LIGHTS; i++)
         {
-            point_light.color = glm::vec4(0);
-            point_light.position = glm::vec4(0);
-            point_light.shadow_map = glm::vec4(0);
+            m_lights_data.point_lights[i].color = glm::vec4(0);
+            m_lights_data.point_lights[i].position = glm::vec4(0);
         }
 
-        for (spot_light_data spot_light : m_lights_data.spot_lights)
+        for (int i = 0; i < MAX_SPOT_LIGHTS; i++)
         {
-            spot_light.color = glm::vec4(0);
-            spot_light.position = glm::vec4(0);
-            spot_light.direction = glm::vec4(0);
-            spot_light.angles = glm::vec4(0);
+            m_lights_data.spot_lights[i].color = glm::vec4(0);
+            m_lights_data.spot_lights[i].position = glm::vec4(0);
+            m_lights_data.spot_lights[i].direction = glm::vec4(0);
+            m_lights_data.spot_lights[i].angles = glm::vec4(0);
         }
 
         m_lights_data.directional_light.color = glm::vec4(0);
         m_lights_data.directional_light.direction = glm::vec4(0);
+    }
+
+    void lighting_pass::generate_poisson_texture()
+    {
+        PoissonGenerator::DefaultPRNG prng;
+
+        size_t attemps = 0;
+        int samples = 64;
+        int total_samples = samples * samples;
+        std::vector<PoissonGenerator::Point> points = generatePoissonPoints(total_samples, prng, false, 40);
+        while (points.size() < total_samples && ++attemps < 100)
+        {
+            points = generatePoissonPoints(total_samples, prng);
+        }
+
+        if (attemps == 100)
+            LY_ASSERT_MSG(false, "Failed to generate Poisson distribution texture!")
+
+        std::vector<glm::vec2> data(total_samples);
+        for (auto i = 0; i < total_samples; i++)
+        {
+	        const PoissonGenerator::Point& point = points[i];
+            data[i] = { point.x, point.y };
+        }
+
+        texture_specification texture_specification = { samples, samples, 2, data.data() };
+        m_poisson_distribution_texture = std::make_shared<texture_2d>(texture_specification);
     }
 
     void lighting_pass::collect_lights()
@@ -181,12 +211,11 @@ namespace luly::renderer
         {
             const std::shared_ptr<point_light>& point_light = point_light_component.get_point_light();
 
-            point_light_data point_light_data;
-            point_light_data.position = glm::vec4(point_light->get_position(), 1.0);
-            point_light_data.color = glm::vec4(point_light->get_color(), point_light->get_intensity());
-            point_light_data.shadow_map = glm::vec4(point_light->get_shadow_map_far_plane());
+            m_lights_data.point_lights[point_lights_count].position = glm::vec4(point_light->get_position(), 1.0);
+            m_lights_data.point_lights[point_lights_count].color = glm::vec4(
+                point_light->get_color(), point_light->get_intensity());
 
-            m_lights_data.point_lights[point_lights_count++] = point_light_data;
+            point_lights_count++;
         }
 
         // Spot lights.
@@ -196,14 +225,15 @@ namespace luly::renderer
         {
             const std::shared_ptr<spot_light>& spot_light = spot_light_component.get_spot_light();
 
-            spot_light_data spot_light_data;
-            spot_light_data.position = glm::vec4(spot_light->get_position(), 1.0);
-            spot_light_data.color = glm::vec4(spot_light->get_color(), spot_light->get_intensity());
-            spot_light_data.direction = glm::vec4(spot_light->get_direction(), 1.0);
-            spot_light_data.angles = glm::vec4(spot_light->get_inner_cone_angle(), spot_light->get_outer_cone_angle(),
-                                               0, 0);
+            m_lights_data.spot_lights[spot_lights_count].position = glm::vec4(spot_light->get_position(), 1.0);
+            m_lights_data.spot_lights[spot_lights_count].color = glm::vec4(
+                spot_light->get_color(), spot_light->get_intensity());
+            m_lights_data.spot_lights[spot_lights_count].direction = glm::vec4(spot_light->get_direction(), 1.0);
+            m_lights_data.spot_lights[spot_lights_count].angles = glm::vec4(
+                spot_light->get_inner_cone_angle(), spot_light->get_outer_cone_angle(),
+                0, 0);
 
-            m_lights_data.spot_lights[spot_lights_count++] = spot_light_data;
+            spot_lights_count++;
         }
 
         // Directional lights.
@@ -213,18 +243,15 @@ namespace luly::renderer
             const std::shared_ptr<directional_light>& directional_light = directional_light_component.
                 get_directional_light();
 
-            directional_light_data directional_light_data;
-            directional_light_data.direction = glm::vec4(directional_light->get_direction(), 1.0);
-            directional_light_data.color =
+            m_lights_data.directional_light.direction = glm::vec4(directional_light->get_direction(), 1.0);
+            m_lights_data.directional_light.color =
                 glm::vec4(directional_light->get_color(), directional_light->get_intensity());
-
-            m_lights_data.directional_light = directional_light_data;
         }
     }
 
-    void lighting_pass::update_lights_buffer()
+    void lighting_pass::update_lights_buffer() const
     {
-        m_lights_ubo->set_data(&m_lights_data, sizeof(m_lights_data));
+        m_lights_ubo->set_data(&m_lights_data, sizeof(lights_data));
     }
 
     void lighting_pass::upload_skybox_uniforms()

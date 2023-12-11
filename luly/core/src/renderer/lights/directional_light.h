@@ -28,7 +28,6 @@ namespace luly::renderer
         const std::shared_ptr<frame_buffer>& get_shadow_map_fbo() const { return m_shadow_map_fbo; }
         uint32_t get_shadow_maps() const { return m_shadow_maps; }
         float get_cascade_split_lambda() const { return m_cascade_split_lambda; }
-        int get_cascades_count() const { return m_cascades_count; }
         const glm::ivec2& get_shadow_map_dimensions() const { return m_shadow_map_dimensions; }
         const std::shared_ptr<uniform_buffer_object>& get_light_matrices_ubo() const { return m_light_matrices_ubo; }
 
@@ -52,7 +51,6 @@ namespace luly::renderer
         glm::vec2 m_direction_angles;
 
         // Cascaded shadows
-        int m_cascades_count;
         std::vector<float> m_shadow_cascade_splits_distances;
         std::vector<float> m_shadow_cascade_splits;
         float m_cascade_split_lambda;

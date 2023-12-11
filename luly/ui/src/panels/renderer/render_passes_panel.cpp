@@ -23,11 +23,12 @@ namespace luly::ui
 
         if (ImGui::Begin("Render Passes", &s_show))
         {
-            if (draw_render_pass_details(renderer::scene_renderer::get_data().shadows_pass))
+            /*
+        	if (draw_render_pass_details(renderer::scene_renderer::get_data().shadows_pass))
             {
                 ImGui::TreePop();
             }
-            ImGui::Separator();
+            ImGui::Separator();*/
 
             if (draw_render_pass_details(renderer::scene_renderer::get_data().geometry_pass))
             {

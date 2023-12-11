@@ -24,25 +24,28 @@ namespace luly::renderer
         ~directional_light_shadows_manager() override = default;
 
         /* Getters */
-        directional_light_shadows_data& get_directional_light_shadows_data()
+        const directional_light_shadows_data& get_directional_light_shadows_data() const
         {
             return m_directional_light_shadows_data;
         }
 
         /* Setters */
+        void set_bias(float bias) { m_directional_light_shadows_data.shadow_bias = bias; }
+        void set_show_cascades(bool show_cascades) { m_directional_light_shadows_data.show_cascades = show_cascades; }
         void set_debug_cascade_color(int cascade_index, const glm::vec3& color);
 
         /* Overrides */
         void execute(const std::shared_ptr<scene::scene>& current_scene) override;
+        void bind_uniforms(const std::shared_ptr<shader>& shader) override;
 
     private:
         void initialize();
         void initialize_shadows_data();
-        void update_shadows_ubo(const std::shared_ptr<directional_light>& directional_light);
+        
+        void update_shadows_data(const std::shared_ptr<directional_light>& directional_light);
 
         std::shared_ptr<shader> m_directional_light_shadows_shader;
 
-        std::shared_ptr<uniform_buffer_object> m_directional_light_shadows_ubo;
         directional_light_shadows_data m_directional_light_shadows_data;
     };
 }

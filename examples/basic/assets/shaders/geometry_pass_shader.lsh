@@ -9,7 +9,8 @@ layout (location = 2) in vec3 a_normals;
 layout (location = 3) in vec3 a_tangent;
 layout (location = 4) in vec3 a_bi_tangent;
 
-layout (location = 0) uniform mat4 u_transform;
+layout (location = 0) uniform mat4 u_transform_matrix;
+layout (location = 1) uniform mat3 u_normal_matrix;
 
 struct geometry_out {
     vec3 frag_pos;
@@ -21,18 +22,17 @@ struct geometry_out {
 layout (location = 0) out geometry_out o_geometry;
 
 void main() {
-    mat3 normalMatrix = transpose(inverse(mat3(u_transform)));
-    vec3 T = normalize(normalMatrix * a_tangent);
-    vec3 N = normalize(normalMatrix * a_normals);
+    vec3 T = normalize(u_normal_matrix * a_tangent);
+    vec3 N = normalize(u_normal_matrix * a_normals);
     T = normalize(T - dot(T, N) * N);
     vec3 B = cross(N, T);
 
     o_geometry.tbn = mat3(T, B, N);
     o_geometry.normal = N;
     o_geometry.tex_coords = a_tex_coord;
-    o_geometry.frag_pos = vec3(u_transform * vec4(a_pos, 1.0));
+    o_geometry.frag_pos = vec3(u_transform_matrix * vec4(a_pos, 1.0));
 
-    gl_Position = camera.view_projection_matrix * u_transform * vec4(a_pos, 1.0);
+    gl_Position = camera.view_projection_matrix * u_transform_matrix * vec4(a_pos, 1.0);
 }
 
 #shader fragment
@@ -50,7 +50,7 @@ struct geometry_out {
 layout(location = 0) in geometry_out o_geometry;
 
 // Uniforms
-layout (location = 1) uniform material u_material;
+layout (location = 2) uniform material u_material;
 
 // Samplers
 layout (binding = 0) uniform sampler2D u_albedo_map;
@@ -82,6 +82,7 @@ float extract_data_from_packed_texture(sampler2D texture_map, vec2 tex_coords, f
 
     return value;
 }
+
 void main() {
     g_position = o_geometry.frag_pos;
 

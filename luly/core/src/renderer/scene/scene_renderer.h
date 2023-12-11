@@ -71,10 +71,6 @@ namespace luly::renderer
         static void update_camera_data();
         static void update_camera_buffer();
 
-        static void perform_geometry_pass();
-        static void perform_lighting_pass();
-        static void perform_final_pass();
-
         static scene_renderer_data s_data;
     };
 }

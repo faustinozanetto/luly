@@ -25,12 +25,12 @@ namespace luly::renderer
         ~shadows_pass() override;
 
         /* Getters */
-    	std::shared_ptr<directional_light_shadows_manager>& get_directional_light_shadows_manager()
+        std::shared_ptr<directional_light_shadows_manager>& get_directional_light_shadows_manager()
         {
             return m_directional_light_shadows_manager;
         }
 
-    	std::shared_ptr<point_light_shadows_manager>& get_point_light_shadows_manager()
+        std::shared_ptr<point_light_shadows_manager>& get_point_light_shadows_manager()
         {
             return m_point_light_shadows_manager;
         }
@@ -43,18 +43,15 @@ namespace luly::renderer
         void set_outputs() override;
         void on_resize(const glm::ivec2& dimensions) override;
 
+        /* Methods */
+        void bind_uniforms(const std::shared_ptr<shader>& shader) const;
+
     private:
         void initialize_shadows_data();
-        void update_shadows_ubo() const;
-
-        void generate_random_angles_texture();
 
         std::shared_ptr<directional_light_shadows_manager> m_directional_light_shadows_manager;
         std::shared_ptr<point_light_shadows_manager> m_point_light_shadows_manager;
 
-        std::shared_ptr<texture_2d> m_random_angles_texture;
-
-        std::shared_ptr<uniform_buffer_object> m_shadows_ubo;
         shadows_data m_shadows_data;
     };
 }

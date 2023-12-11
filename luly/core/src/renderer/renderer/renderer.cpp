@@ -67,7 +67,7 @@ namespace luly::renderer
 
     glm::ivec2 renderer::get_viewport_size()
     {
-        return glm::ivec2(s_data.window->get_data().width, s_data.window->get_data().height);
+        return {s_data.window->get_data().width, s_data.window->get_data().height};
     }
 
     bool renderer::get_is_vsync_enabled()

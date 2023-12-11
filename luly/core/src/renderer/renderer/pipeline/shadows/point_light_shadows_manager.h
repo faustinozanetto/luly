@@ -5,11 +5,14 @@
 
 #include <memory>
 
+#include "renderer/renderer/pipeline/lighting_pass.h"
+
 namespace luly::renderer
 {
     struct point_light_shadows_data
     {
         float shadow_bias;
+        float far_planes[MAX_POINT_LIGHTS];
     };
 
     class point_light_shadows_manager : public shadow_manager
@@ -26,16 +29,15 @@ namespace luly::renderer
 
         /* Overrides */
         void execute(const std::shared_ptr<scene::scene>& current_scene) override;
+        void bind_uniforms(const std::shared_ptr<shader>& shader) override;
 
     private:
         void initialize();
         void initialize_shadows_data();
-        void update_shadows_ubo(const std::shared_ptr<point_light>& point_light);
         void calculate_point_light_shadow(const std::shared_ptr<point_light>& point_light);
 
         std::shared_ptr<shader> m_point_light_shadows_shader;
 
-        std::shared_ptr<uniform_buffer_object> m_point_light_shadows_ubo;
         point_light_shadows_data m_point_light_shadows_data;
     };
 }

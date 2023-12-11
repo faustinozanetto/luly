@@ -12,7 +12,6 @@ namespace luly::renderer
 {
     directional_light::directional_light(const glm::vec3& color, float azimuth, float elevation)
     {
-        m_cascades_count = CASCADES_COUNT;
         m_direction_angles = glm::vec2(azimuth, elevation);
         m_cascade_split_lambda = 0.55f;
         m_shadow_map_dimensions = glm::ivec2(4096, 4096);
@@ -21,25 +20,25 @@ namespace luly::renderer
         // Create shadow map fbo
         create_shadow_fbo();
 
-        m_light_matrices_ubo = std::make_shared<uniform_buffer_object>(sizeof(glm::mat4) * m_cascades_count,
+        m_light_matrices_ubo = std::make_shared<uniform_buffer_object>(sizeof(glm::mat4) * CASCADES_COUNT,
                                                                        DIRECTIONAL_LIGHT_LIGHT_MATRICES_UBO_LOCATION);
-        m_frustum_planes_ubo = std::make_shared<uniform_buffer_object>(sizeof(glm::vec2) * m_cascades_count,
+        m_frustum_planes_ubo = std::make_shared<uniform_buffer_object>(sizeof(glm::vec2) * CASCADES_COUNT,
                                                                        DIRECTIONAL_LIGHT_FRUSTUM_PLANES_UBO_LOCATION);
     }
 
     void directional_light::calculate_cascade_splits(const std::shared_ptr<perspective_camera>& perspective_camera)
     {
         m_shadow_cascade_splits_distances.clear();
-        m_shadow_cascade_splits_distances.resize(m_cascades_count);
+        m_shadow_cascade_splits_distances.resize(CASCADES_COUNT);
 
         const float near_clip = perspective_camera->get_near_clip();
         const float far_clip = perspective_camera->get_far_clip();
         const float clip_range = far_clip - near_clip;
         const float ratio = far_clip / near_clip;
 
-        for (int i = 0; i < m_cascades_count; ++i)
+        for (int i = 0; i < CASCADES_COUNT; ++i)
         {
-            float p = (i + 1) / float(m_cascades_count);
+            float p = (i + 1) / float(CASCADES_COUNT);
             float log = near_clip * std::pow(ratio, p);
             float uni = near_clip + clip_range * p;
             float d = m_cascade_split_lambda * (log - uni) + uni;
@@ -81,7 +80,7 @@ namespace luly::renderer
 
         glCreateTextures(GL_TEXTURE_2D_ARRAY, 1, &m_shadow_maps);
         glTextureStorage3D(m_shadow_maps, 1, GL_DEPTH_COMPONENT32F, m_shadow_map_dimensions.x,
-                           m_shadow_map_dimensions.y, m_cascades_count);
+                           m_shadow_map_dimensions.y, CASCADES_COUNT);
 
         glTextureParameteri(m_shadow_maps, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTextureParameteri(m_shadow_maps, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -109,7 +108,7 @@ namespace luly::renderer
         float last_split_dist = 0.0;
         m_average_frustum_size = 0.0;
 
-        for (uint32_t i = 0; i < m_cascades_count; ++i)
+        for (uint32_t i = 0; i < CASCADES_COUNT; ++i)
         {
             float split_dist = m_shadow_cascade_splits_distances[i];
 
@@ -204,7 +203,7 @@ namespace luly::renderer
     {
         m_shadow_cascade_splits.clear();
 
-        for (uint32_t i = 0; i < m_cascades_count; ++i)
+        for (uint32_t i = 0; i < CASCADES_COUNT; ++i)
         {
             cascade_frustum cascade_frustum = cascade_frustums[i];
             m_shadow_cascade_splits.push_back(cascade_frustum.split_depth);

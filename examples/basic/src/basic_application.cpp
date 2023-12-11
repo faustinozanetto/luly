@@ -5,7 +5,6 @@
 #include "engine_ui.h"
 #include "imgui.h"
 #include "renderer/models/model_factory.h"
-#include "renderer/renderer/renderer.h"
 #include "renderer/textures/texture_factory.h"
 #include "scene/scene.h"
 
@@ -164,6 +163,9 @@ void basic_application::setup_scene()
 
 
     const std::shared_ptr<luly::scene::scene_actor>& actor = scene->create_actor("SciFi Helmet");
+    luly::scene::transform_component& actor_transform = actor->get_component<luly::scene::transform_component>();
+    actor_transform.get_transform()->set_location({ -0.15f, 1.1f, -0.5f });
+    actor_transform.get_transform()->set_scale({ 0.25f,0.25f,0.25f });
 
     const std::shared_ptr<luly::renderer::model> sci_fi_helmet_model =
         luly::renderer::model_factory::create_model_from_file(
@@ -250,7 +252,7 @@ void basic_application::setup_scene()
     const std::shared_ptr<luly::scene::scene_actor>& background_actor = scene->create_actor("Background Actor");
     const std::shared_ptr<luly::renderer::model> background_model =
         luly::renderer::model_factory::create_model_from_file(
-            "assets/models/floor.obj");
+            "assets/models/cornell_box/CornellBox-Original.obj");
     const std::shared_ptr<luly::assets::asset>& background_model_asset = luly::assets::asset_factory::create_asset<
         luly::renderer::model>(
         "background-model", luly::assets::asset_type::model, background_model);
@@ -258,8 +260,8 @@ void basic_application::setup_scene()
         luly::scene::model_renderer_component>(
         background_model_asset->get_data<luly::renderer::model>());
     background_model_renderer_component.set_casts_shadows(false);
-    background_actor->get_component<luly::scene::transform_component>().get_transform()->set_scale({5, 1, 5});
-    background_actor->get_component<luly::scene::transform_component>().get_transform()->set_location({0, -3, 0});
+    background_actor->get_component<luly::scene::transform_component>().get_transform()->set_scale({5,5,5});
+    background_actor->get_component<luly::scene::transform_component>().get_transform()->set_location({0, 0, 0});
 
     luly::scene::scene_manager::get().switch_scene(scene);
 }

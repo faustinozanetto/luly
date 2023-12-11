@@ -81,9 +81,8 @@ namespace luly::renderer
     {
         renderer::set_state(renderer_state::depth, true);
         m_fbo->bind();
-        renderer::set_clear_color({0.0f, 0.0f, 0.0f, 1.0f});
-        renderer::clear_screen();
         m_geometry_shader->bind();
+        renderer::clear_screen();
 
         const std::shared_ptr<scene::scene>& current_scene = scene::scene_manager::get().get_current_scene();
 
@@ -102,7 +101,7 @@ namespace luly::renderer
             const std::shared_ptr<model>& model = model_renderer_component.get_model();
 
             // Check if has material_component
-            bool has_material_component = registry->any_of<scene::material_component>(actor);
+            const bool has_material_component = registry->any_of<scene::material_component>(actor);
             if (has_material_component)
             {
                 scene::material_component& material_component = registry->get<scene::material_component>(actor);
@@ -115,7 +114,9 @@ namespace luly::renderer
                 material::bind_default(m_geometry_shader);
             }
 
-            m_geometry_shader->set_mat4("u_transform", transform->get_transform());
+            glm::mat3 normal_matrix = glm::transpose(glm::inverse(glm::mat3(transform->get_transform())));
+            m_geometry_shader->set_mat3("u_normal_matrix", normal_matrix);
+            m_geometry_shader->set_mat4("u_transform_matrix", transform->get_transform());
 
             renderer::submit_model(model);
             /*

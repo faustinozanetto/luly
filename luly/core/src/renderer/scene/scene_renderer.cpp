@@ -34,16 +34,16 @@ namespace luly::renderer
 
         s_data.shadows_pass->execute();
 
-        perform_geometry_pass();
+        s_data.geometry_pass->execute();
 
         // s_data.ambient_occlusion_pass->execute();
 
-        perform_lighting_pass();
+        s_data.lighting_pass->execute();
         s_data.skybox_pass->execute();
         s_data.bloom_pass->execute();
         s_data.tonemapping_pass->execute();
         s_data.debanding_pass->execute();
-        perform_final_pass();
+        s_data.final_pass->execute();
     }
 
     void scene_renderer::end_render()
@@ -145,20 +145,5 @@ namespace luly::renderer
     void scene_renderer::update_camera_buffer()
     {
         s_data.camera_ubo->set_data(&s_data.camera_data, sizeof(camera_data));
-    }
-
-    void scene_renderer::perform_geometry_pass()
-    {
-        s_data.geometry_pass->execute();
-    }
-
-    void scene_renderer::perform_lighting_pass()
-    {
-        s_data.lighting_pass->execute();
-    }
-
-    void scene_renderer::perform_final_pass()
-    {
-        s_data.final_pass->execute();
     }
 }

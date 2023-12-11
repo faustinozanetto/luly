@@ -33,11 +33,15 @@ layout (binding = 6) uniform samplerCube u_prefilter_map;
 layout (binding = 7) uniform sampler2D u_brdf_map;
 layout (binding = 8) uniform sampler2D u_ambient_occlusion_map;
 layout (binding = 9) uniform sampler2DArray u_directional_light_shadow_map;
-layout (binding = 10) uniform sampler2D u_random_angles_map;
-layout (binding = 11) uniform samplerCube u_point_light_shadow_maps[4];
+layout (binding = 10) uniform sampler2D u_poisson_distribution_map;
+layout (binding = 11) uniform samplerCube u_point_light_shadow_maps[MAX_POINT_LIGHTS];
 
 uniform float u_skybox_intensity;
 uniform vec4 u_skybox_tint;
+
+uniform shadows u_shadows;
+uniform directional_light_shadows u_directional_light_shadows;
+uniform point_light_shadows u_point_light_shadows;
 
 vec3 sample_irradiance_map(vec3 normal) {
     return texture(u_irradiance_map, normal).rgb;
@@ -60,10 +64,10 @@ vec2 shadow_pcf_rotate(vec2 uv, float angle)
     return vec2(uv.x * c - uv.y * s, uv.x * s + uv.y * c);
 }
 
-float shadow_pcf(vec2 projection_coords, float current_depth, float bias, uint cascade_index)
+float directional_light_shadow_pcf(vec3 frag_pos, vec2 projection_coords, float current_depth, float bias, uint cascade_index)
 {
-    vec2 texel_size = 1.0 / vec2(textureSize(u_directional_light_shadow_map, 0));
     float shadow = 0.0;
+    vec2 texel_size = 1.0 / vec2(textureSize(u_directional_light_shadow_map, 0));
 
     int pcf_samples = u_shadows.pcf_horizontal_samples * u_shadows.pcf_vertical_samples;
     for (int current_sample = 0; current_sample < pcf_samples; ++current_sample) {
@@ -71,20 +75,21 @@ float shadow_pcf(vec2 projection_coords, float current_depth, float bias, uint c
         int y = current_sample / u_shadows.pcf_horizontal_samples - u_shadows.pcf_vertical_samples / 2;
 
         // Read a random vector from the texture
-        vec2 random_rotation = texture(u_random_angles_map, vec2(x, y)).xy;
+        vec2 random_rotation = texture(u_poisson_distribution_map, vec2(x, y)).rg;
 
         // Introduce a rotation based on the random vector
         float angle = atan(random_rotation.y, random_rotation.x);
         vec2 rotated_coords = shadow_pcf_rotate(vec2(x, y), angle);
 
-        float depth = texture(u_directional_light_shadow_map, vec3(projection_coords.xy + rotated_coords * texel_size, cascade_index)).r;
+        vec3 sample_coords = vec3(projection_coords.xy + rotated_coords * texel_size, cascade_index);
+        float depth = texture(u_directional_light_shadow_map, sample_coords).r;
         shadow += (current_depth - bias) > depth ? 1.0 : 0.0;
     }
 
     return shadow / float(pcf_samples);
 }
 
-float shadow_hard(vec2 projection_coords, float current_depth, float bias, uint cascade_index) {
+float directional_light_shadow_hard(vec2 projection_coords, float current_depth, float bias, uint cascade_index) {
     float depth = texture(u_directional_light_shadow_map, vec3(projection_coords.xy, cascade_index)).r;
     float shadow = (current_depth - bias) > depth ? 1.0: 0.0;
     return shadow;
@@ -98,15 +103,15 @@ float calculate_directional_light_shadow(vec3 frag_pos, vec3 normal, vec3 light_
 
     float current_depth = projection_coords.z;
     if (current_depth > 1.0)
-    return 0.0;
+        return 0.0;
 
     float bias = max(0.005 * (1.0 - clamp(dot(normal, light_dir), 0.0, 1.0)), u_directional_light_shadows.shadow_bias);
 
-    float shadow = 0.0f;
-    if (u_shadows.soft_shadows) {
-        shadow = shadow_pcf(projection_coords.xy, current_depth, bias, cascade_index);
+    float shadow = 0.0;
+    if (u_shadows.soft_shadows == 1) {
+        shadow = directional_light_shadow_pcf(frag_pos, projection_coords.xy, current_depth, bias, cascade_index);
     } else {
-        shadow = shadow_hard(projection_coords.xy, current_depth, bias, cascade_index);
+        shadow = directional_light_shadow_hard(projection_coords.xy, current_depth, bias, cascade_index);
     }
 
     return shadow;
@@ -127,7 +132,7 @@ int calculate_cascade_index(float frag_pos_z) {
 }
 
 vec3 calculate_debug_cascade_color(int cascade_index) {
-    if (!u_directional_light_shadows.show_cascades)
+    if (u_directional_light_shadows.show_cascades == 0)
         return vec3(0, 0, 0);
         
     return u_directional_light_shadows.cascade_debug_colors[cascade_index].rgb;
@@ -161,62 +166,60 @@ vec3 calculate_directional_light_luminance(directional_light dir_light, vec3 nor
     return final;
 }
 
+float point_light_shadow_hard(vec3 frag_to_light, float bias, int light_index) {
+    float closest_depth = texture(u_point_light_shadow_maps[light_index], frag_to_light).r;
+    closest_depth *= u_point_light_shadows.far_planes[light_index];
+    
+    float current_depth = length(frag_to_light);
+    float shadow = (current_depth - bias) > closest_depth ? 1.0: 0.0;
+    
+    return shadow;
+}
+
+vec3 point_light_sample_offset_vectors[20] = vec3[]
+(
+vec3( 1, 1, 1), vec3( 1, -1, 1), vec3(-1, -1, 1), vec3(-1, 1, 1),
+vec3( 1, 1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1, 1, -1),
+vec3( 1, 1, 0), vec3( 1, -1, 0), vec3(-1, -1, 0), vec3(-1, 1, 0),
+vec3( 1, 0, 1), vec3(-1, 0, 1), vec3( 1, 0, -1), vec3(-1, 0, -1),
+vec3( 0, 1, 1), vec3( 0, -1, 1), vec3( 0, -1, -1), vec3( 0, 1, -1)
+);
+
+float point_light_shadow_pcf(vec3 frag_pos, vec3 frag_to_light, float bias, int light_index) {
+    float shadow = 0.0;
+    
+    float view_distance = length(camera.position.xyz - frag_pos);
+    float disk_radius = (1.0 + (view_distance / u_point_light_shadows.far_planes[light_index])) / 25.0;
+    float current_depth = length(frag_to_light);
+
+    //int pcf_samples = u_shadows.pcf_horizontal_samples * u_shadows.pcf_vertical_samples;
+    int pcf_samples = 20;
+    for (int current_sample = 0; current_sample < pcf_samples; ++current_sample) {
+        vec3 offset = point_light_sample_offset_vectors[current_sample] * disk_radius;
+
+        float depth = texture(u_point_light_shadow_maps[light_index], frag_to_light + offset).r;
+        depth *= u_point_light_shadows.far_planes[light_index];
+
+        shadow += (current_depth - bias) > depth ? 1.0 : 0.0;
+    }
+
+    return shadow / float(pcf_samples);
+}
+
 float calculate_point_light_shadow(point_light point_light, vec3 frag_pos, int light_index) {
     vec3 frag_to_light = frag_pos - point_light.position.xyz;
-    float closest_depth = texture(u_point_light_shadow_maps[light_index], frag_to_light).r;
-    closest_depth *= 30.0;
-    float current_depth = length(frag_to_light);
-    float bias = 0.05; 
-    float shadow = current_depth -  bias > closest_depth ? 1.0 : 0.0;
-
-    return shadow;
-
-   /*
-    vec3 frag_to_light = frag_pos - point_light.position.xyz;
-    float closest_depth = texture(u_point_light_shadow_maps[light_index], frag_to_light).r;
-    closest_depth *= light.far_plane;
-    float current_depth = length(frag_to_light);
 
     float shadow = 0.0;
-    int samples = 20;
-
-    float view_distance = length(camera.position.xyz - frag_pos);
-    float disk_radius = (1.0 + (view_distance / point_light.far_plane)) / 25.0;
-
-    for(int i = 0; i < samples; ++i)
-    {
-        float closest_depth = texture(u_point_light_shadow_maps[light_index], frag_to_light + sampleOffsetDirections[i] * disk_radius).r;
-        closest_depth *= light.far_plane; // undo mapping [0;1]
-        if(current_depth - light.bias > closest_depth) {
-            shadow += 1.0;
-        }
-     }
-     */
+    if (u_shadows.soft_shadows == 1) {
+        shadow = point_light_shadow_pcf(frag_pos, frag_to_light, u_point_light_shadows.shadow_bias, light_index);
+    } else {
+        shadow = point_light_shadow_hard(frag_to_light, u_point_light_shadows.shadow_bias, light_index);
+    }
+    
+    return shadow;
 }
 
 vec3 calculate_point_light_luminance(point_light point_light, vec3 normal, vec3 view_dir, vec3 reflect_dir, vec3 frag_pos, vec3 albedo, vec3 F0, float roughness, float metallic, int light_index) {
-    /*    
-    // Lambertian diffuse reflection
-        vec3 light_dir = normalize(point_light.position.xyz - frag_pos);
-        
-        float distance = length(point_light.position.xyz - frag_pos);
-        float attenuation = 1.0 / (point_light_constant + point_light_linear * distance + point_light_quadratic * (distance * distance));
-        float NdotL = max(dot(normalize(normal), light_dir), 0.0);
-        
-        vec3 diffuse = albedo / PI;
-        
-        // Cook-Torrance specular reflection
-        vec3 specular = cook_torrance_brdf(normalize(normal), view_dir, light_dir, roughness, F0);
-        
-        // Final lighting equation with attenuation
-        float intensity = point_light.color.a;
-        vec3 luminance = attenuation * NdotL * max(diffuse + specular, vec3(0.0)) * point_light.color.rgb * intensity;
-        
-            
-        float shadow = calculate_point_shadow(point_light, frag_pos);
-            
-        return (1-shadow) * luminance;
-    */
     vec3 L = normalize(point_light.position.xyz - frag_pos);
     vec3 H = normalize(view_dir + L);
 
@@ -271,14 +274,16 @@ void main()
 
     int cascade_index = calculate_cascade_index(frag_pos_view_space.z);
 
-    vec3 luminance = calculate_directional_light_luminance(lights.directional_light, normal, view_dir, frag_pos, albedo, F0, roughness, metallic, cascade_index);
-      
-    for (int i = 0; i < 1; i++) {
-        luminance += calculate_point_light_luminance(lights.point_lights[i], normal, view_dir, reflect_dir, frag_pos, albedo, F0, roughness, metallic, i);   
+    vec3 luminance = vec3(0.0);
+  
+    luminance += calculate_directional_light_luminance(u_lights.directional_light, normal, view_dir, frag_pos, albedo, F0, roughness, metallic, cascade_index);
+ 
+    for (int i = 0; i < MAX_POINT_LIGHTS; i++) {
+        luminance += calculate_point_light_luminance(u_lights.point_lights[i], normal, view_dir, reflect_dir, frag_pos, albedo, F0, roughness, metallic, i);   
     }
-         /*
+    /*
        for (int i = 0; i < 16; i++) {
-           luminance += calculate_spot_light_luminance(lights.spot_lights[i], normal, view_dir, frag_pos, albedo, F0, roughness, metallic);
+           luminance += calculate_spot_light_luminance(u_lights.spot_lights[i], normal, view_dir, frag_pos, albedo, F0, roughness, metallic);
        }
            */
 
@@ -295,7 +300,7 @@ void main()
     vec2 brdf_lut = sample_brdf_lut_map(view_dir, normal, roughness);
     vec3 specular = prefilter * (F * brdf_lut.x + brdf_lut.y);
 
-    vec3 ambient = (kD * diffuse + specular)  * u_skybox_intensity * u_skybox_tint.rgb * ambient_occlusion;
+    vec3 ambient = (kD * diffuse + specular) * u_skybox_intensity * u_skybox_tint.rgb * ambient_occlusion;
 
     vec3 cascade_debug_color = calculate_debug_cascade_color(cascade_index);
 

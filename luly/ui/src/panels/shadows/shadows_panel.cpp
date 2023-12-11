@@ -24,7 +24,7 @@ namespace luly::ui
         {
             ui_utils::draw_property("Settings");
             ImGui::Separator();
-
+       
             const std::shared_ptr<renderer::shadows_pass>& shadows_pass = renderer::scene_renderer::get_data().
                 shadows_pass;
             renderer::shadows_data& shadows_data = shadows_pass->
@@ -53,16 +53,20 @@ namespace luly::ui
                 const std::shared_ptr<renderer::directional_light_shadows_manager>& directional_light_shadows_manager =
                     shadows_pass->get_directional_light_shadows_manager();
 
-                renderer::directional_light_shadows_data& directional_light_shadows_data =
+                const renderer::directional_light_shadows_data& directional_light_shadows_data =
                     directional_light_shadows_manager->get_directional_light_shadows_data();
 
                 float shadow_bias = directional_light_shadows_data.shadow_bias;
-                if (ui_utils::draw_property("Shadow Bias", shadow_bias, 0.0f, 5.0f, 0.00001f))
+                if (ui_utils::draw_property("Shadow Bias", shadow_bias, 0.0f, 5.0f, 0.0001f))
                 {
-                    directional_light_shadows_data.shadow_bias = shadow_bias;
+                    directional_light_shadows_manager->set_bias(shadow_bias);
                 }
 
-                ui_utils::draw_property("Show Cascades", directional_light_shadows_data.show_cascades);
+                bool show_cascades = directional_light_shadows_data.show_cascades;
+                if (ui_utils::draw_property("Show Cascades", show_cascades))
+                {
+                    directional_light_shadows_manager->set_show_cascades(show_cascades);
+                }
 
                 for (int i = 0; i < CASCADES_COUNT; i++)
                 {
@@ -72,7 +76,7 @@ namespace luly::ui
                         directional_light_shadows_manager->set_debug_cascade_color(i, cascade_debug_color);
                     }
                 }
-
+                
                 ImGui::TreePop();
             }
 

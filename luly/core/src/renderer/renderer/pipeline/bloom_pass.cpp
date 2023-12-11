@@ -24,7 +24,7 @@ namespace luly::renderer
 
         m_samples_count = 6;
         m_filter_radius = 0.005f;
-        m_strength = 0.01f;
+        m_strength = 0.02f;
         m_mips.resize(m_samples_count);
 
         m_fbo = std::make_shared<frame_buffer>(viewport_size.x, viewport_size.y);
