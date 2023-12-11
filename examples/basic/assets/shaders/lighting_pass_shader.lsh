@@ -157,7 +157,10 @@ vec3 calculate_directional_light_luminance(directional_light dir_light, vec3 nor
     vec3 specular = numerator / max(denominator, 0.001);
     float NdotL = max(dot(normal, L), 0.0);
 
-    float shadow = calculate_directional_light_shadow(frag_pos, normal, L, cascade_index);
+    float shadow = 0.0;
+    if (u_directional_light_shadows.enable_shadows)
+        shadow = calculate_directional_light_shadow(frag_pos, normal, L, cascade_index);
+    
     vec3 final = (1 - shadow) * (kD * albedo / PI + specular) * radiance * NdotL;
 
     float intensity = dir_light.color.a;
@@ -240,7 +243,10 @@ vec3 calculate_point_light_luminance(point_light point_light, vec3 normal, vec3 
     // add to outgoing radiance Lo
     float NdotL = max(dot(normal, L), 0.0);
 
-    float shadow = calculate_point_light_shadow(point_light, frag_pos, light_index);
+    float shadow = 0.0;
+    if (u_point_light_shadows.enable_shadows[light_index])
+        shadow = calculate_point_light_shadow(point_light, frag_pos, light_index);
+    
     vec3 final = (1 - shadow) * (kD * albedo / PI + specular) * radiance * NdotL;
 
     return final;

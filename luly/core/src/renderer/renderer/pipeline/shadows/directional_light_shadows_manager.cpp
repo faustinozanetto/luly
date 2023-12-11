@@ -1,6 +1,8 @@
 #include "lypch.h"
 #include "directional_light_shadows_manager.h"
 
+#include "scene/actor/components/lights/directional_light_component.h"
+#include "renderer/renderer/renderer.h"
 #include "renderer/shaders/shader_factory.h"
 
 namespace luly::renderer
@@ -18,19 +20,27 @@ namespace luly::renderer
 
     void directional_light_shadows_manager::execute(const std::shared_ptr<scene::scene>& current_scene)
     {
-        const std::shared_ptr<directional_light>& directional_light = current_scene->get_directional_light();
-        if (!directional_light) return;
+        const std::vector<scene::directional_light_component>& directional_lights = current_scene->
+            get_directional_light();
+        if (directional_lights.empty()) return;
 
+        const scene::directional_light_component& directional_light = directional_lights.front();
         const std::shared_ptr<perspective_camera>& perspective_camera = current_scene->get_camera_manager()->
             get_perspective_camera();
 
+        // Check if light has shadow mapping enable.
+        const bool enable_shadows = directional_light.get_enable_shadows();
+        m_directional_light_shadows_data.enable_shadows = enable_shadows;
+
+        if (!enable_shadows) return;
+
         // Calculate cascades and update ubo.
-        directional_light->update_shadow_cascades(perspective_camera);
-        update_shadows_data(directional_light);
+        directional_light.get_directional_light()->update_shadow_cascades(perspective_camera);
+        update_shadows_cascades_data(directional_light.get_directional_light());
 
         // Bind fbo and shader.
-        directional_light->get_shadow_map_fbo()->bind();
-        renderer::set_viewport_size(directional_light->get_shadow_map_dimensions());
+        directional_light.get_directional_light()->get_shadow_map_fbo()->bind();
+        renderer::set_viewport_size(directional_light.get_directional_light()->get_shadow_map_dimensions());
         glClear(GL_DEPTH_BUFFER_BIT);
 
         // Bind shader
@@ -42,7 +52,7 @@ namespace luly::renderer
 
         // Reset state.
         renderer::set_cull_face_mode(renderer_cull_face_mode::back);
-        directional_light->get_shadow_map_fbo()->un_bind();
+        directional_light.get_directional_light()->get_shadow_map_fbo()->un_bind();
         m_directional_light_shadows_shader->un_bind();
     }
 
@@ -50,6 +60,7 @@ namespace luly::renderer
     {
         shader->set_int("u_directional_light_shadows.show_cascades", m_directional_light_shadows_data.show_cascades);
         shader->set_float("u_directional_light_shadows.shadow_bias", m_directional_light_shadows_data.shadow_bias);
+        shader->set_int("u_directional_light_shadows.enable_shadows", m_directional_light_shadows_data.enable_shadows);
         for (int i = 0; i < CASCADES_COUNT; i++)
         {
             shader->set_float("u_directional_light_shadows.cascade_plane_distances[" + std::to_string(i) + "]",
@@ -70,6 +81,7 @@ namespace luly::renderer
     void directional_light_shadows_manager::initialize_shadows_data()
     {
         m_directional_light_shadows_data.show_cascades = false;
+        m_directional_light_shadows_data.enable_shadows = false;
         m_directional_light_shadows_data.shadow_bias = 0.005f;
         m_directional_light_shadows_data.cascade_debug_colors[0] = glm::vec4(0.92f, 0.92f, 0.1f, 1);
         m_directional_light_shadows_data.cascade_debug_colors[1] = glm::vec4(0.1f, 0.83f, 0.82f, 1);
@@ -79,7 +91,7 @@ namespace luly::renderer
         m_directional_light_shadows_data.cascade_plane_distances[2] = 0.0f;
     }
 
-    void directional_light_shadows_manager::update_shadows_data(
+    void directional_light_shadows_manager::update_shadows_cascades_data(
         const std::shared_ptr<directional_light>& directional_light)
     {
         const std::vector<float>& cascade_splits = directional_light->get_shadow_cascade_splits();

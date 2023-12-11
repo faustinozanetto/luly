@@ -23,10 +23,12 @@ struct directional_light_shadows
     float shadow_bias;
     float cascade_plane_distances[CASCADES_COUNT];
     vec4 cascade_debug_colors[CASCADES_COUNT];
+    bool enable_shadows;
 };
 
 struct point_light_shadows
 {
     float shadow_bias;
     float far_planes[MAX_POINT_LIGHTS];
+    bool enable_shadows[MAX_POINT_LIGHTS];
 };

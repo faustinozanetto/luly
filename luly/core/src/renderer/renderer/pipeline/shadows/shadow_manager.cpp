@@ -1,6 +1,7 @@
 ﻿#include "lypch.h"
 #include "shadow_manager.h"
 
+#include "renderer/renderer/renderer.h"
 #include "scene/scene_manager.h"
 #include "scene/actor/components/transform_component.h"
 #include "scene/actor/components/rendering/model_renderer_component.h"

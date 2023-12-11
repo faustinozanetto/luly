@@ -21,12 +21,12 @@ namespace luly::ui
 
     void actor_point_light_component_panel::on_render_component_details()
     {
-        const auto& point_light_component = engine_ui::get_ui_data().selected_actor->get_component<
+        scene::point_light_component& point_light_component = engine_ui::get_ui_data().selected_actor->get_component<
             scene::point_light_component>();
 
         if (point_light_component.get_point_light())
         {
-            auto& point_light = point_light_component.get_point_light();
+            const std::shared_ptr<renderer::point_light>& point_light = point_light_component.get_point_light();
             ui_utils::draw_property("Parameters");
             ImGui::Separator();
 
@@ -42,10 +42,19 @@ namespace luly::ui
                 point_light->set_intensity(intensity);
             }
 
+            ui_utils::draw_property("Shadow Mapping");
+            ImGui::Separator();
+
             float shadow_map_far_plane = point_light->get_shadow_map_far_plane();
             if (ui_utils::draw_property("Shadow Map Far Plane", shadow_map_far_plane, 0.01f, 350.0f, 0.01f))
             {
                 point_light->set_shadow_map_far_plane(shadow_map_far_plane);
+            }
+
+            bool enable_shadows = point_light_component.get_enable_shadows();
+            if (ui_utils::draw_property("Enable Shadows", enable_shadows))
+            {
+                point_light_component.set_enable_shadows(enable_shadows);
             }
         }
         else

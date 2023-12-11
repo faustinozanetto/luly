@@ -4,7 +4,6 @@
 #include "scene/actor/components/lights/directional_light_component.h"
 #include "utils/ui_utils.h"
 
-#include <glm/ext/scalar_constants.hpp>
 #include <glm/gtc/epsilon.hpp>
 #include <string>
 
@@ -26,7 +25,7 @@ namespace luly::ui
 
     void actor_directional_light_component_panel::on_render_component_details()
     {
-        const scene::directional_light_component& directional_light_component = engine_ui::get_ui_data().selected_actor
+        scene::directional_light_component& directional_light_component = engine_ui::get_ui_data().selected_actor
             ->get_component<
                 scene::directional_light_component>();
 
@@ -57,10 +56,19 @@ namespace luly::ui
                 directional_light->set_intensity(intensity);
             }
 
+            ui_utils::draw_property("Shadow Mapping");
+            ImGui::Separator();
+
             float cascade_split_lambda = directional_light->get_cascade_split_lambda();
             if (ui_utils::draw_property("Cascade Split Lambda", cascade_split_lambda, 0.0f, 5.0f, 0.01f))
             {
                 directional_light->set_cascade_split_lambda(cascade_split_lambda);
+            }
+            
+            bool enable_shadows = directional_light_component.get_enable_shadows();
+            if (ui_utils::draw_property("Enable Shadows", enable_shadows))
+            {
+                directional_light_component.set_enable_shadows(enable_shadows);
             }
 
             ui_utils::draw_combo_box("Shadow Map Dimensions", m_shadow_map_dimension_names,

@@ -4,10 +4,10 @@
 #include "actor/components/name_component.h"
 #include "actor/components/transform_component.h"
 #include "actor/components/lights/directional_light_component.h"
-
 #include "actor/components/lights/point_light_component.h"
 #include "actor/components/lights/spot_light_component.h"
 #include "actor/components/rendering/skybox_component.h"
+
 #include "renderer/scene/scene_renderer.h"
 
 namespace luly::scene
@@ -55,30 +55,24 @@ namespace luly::scene
         update_lights();
     }
 
-    const std::shared_ptr<renderer::directional_light>& scene::get_directional_light() const
+    std::vector<directional_light_component> scene::get_directional_light() const
     {
+        std::vector<directional_light_component> directional_lights;
         const auto& view = m_actors_registry->view<directional_light_component>();
         for (auto [actor, directional_light_component] : view.each())
         {
-            const std::shared_ptr<renderer::directional_light>& directional_light = directional_light_component.
-                get_directional_light();
-
-            return directional_light;
+            directional_lights.push_back(directional_light_component);
         }
-        LY_ASSERT_MSG(false, "Could not find directional light for scene!")
-        return {};
+        return directional_lights;
     }
 
-     std::vector<std::shared_ptr<renderer::point_light>> scene::get_point_lights() const
+    std::vector<point_light_component> scene::get_point_lights() const
     {
-        std::vector<std::shared_ptr<renderer::point_light>> point_lights;
-        
+        std::vector<point_light_component> point_lights;
         const auto& view = m_actors_registry->view<point_light_component>();
         for (auto [actor, point_light_component] : view.each())
         {
-            const std::shared_ptr<renderer::point_light>& point_light = point_light_component.
-                get_point_light();
-            point_lights.push_back(point_light);
+            point_lights.push_back(point_light_component);
         }
         return point_lights;
     }

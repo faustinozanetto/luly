@@ -81,7 +81,7 @@ void basic_application::setup_scene()
 
     luly::scene::scene_manager::get().add_scene(scene);
 
-    scene->get_camera_manager()->get_perspective_camera()->set_far_clip(750.0f);
+    scene->get_camera_manager()->get_perspective_camera()->set_far_clip(110.0f);
 
     const std::shared_ptr<luly::scene::scene_actor>& dir_light_actor = scene->create_actor("Light Emitter");
     const std::shared_ptr<luly::renderer::directional_light>& directional_light = std::make_shared<
@@ -93,9 +93,10 @@ void basic_application::setup_scene()
     const std::shared_ptr<luly::renderer::texture_2d>& environment_texture =
         luly::renderer::texture_factory::create_environment_texture_from_file(
             "assets/hdris/blue_photo_studio_4k.hdr");
-	skybox_actor->add_component<luly::scene::skybox_component>(
+	luly::scene::skybox_component& skybox_component = skybox_actor->add_component<luly::scene::skybox_component>(
         environment_texture
     );
+    skybox_component.set_intensity(0.1f);
 
     // Create emissive cube
     /*
@@ -111,8 +112,7 @@ void basic_application::setup_scene()
     const std::shared_ptr<luly::renderer::material>& emissive_material = std::make_shared<luly::renderer::material>(
         material_specification);
     emissive_cube_actor->add_component<luly::scene::material_component>(emissive_material);
-    /*
-    */
+*/
    
     const std::shared_ptr<luly::renderer::mesh>& sphere_mesh = luly::renderer::mesh_factory::create_sphere_mesh(
         10, 10, 0.05f);
@@ -160,7 +160,6 @@ void basic_application::setup_scene()
             });
         }
     }
-
 
     const std::shared_ptr<luly::scene::scene_actor>& actor = scene->create_actor("SciFi Helmet");
     luly::scene::transform_component& actor_transform = actor->get_component<luly::scene::transform_component>();

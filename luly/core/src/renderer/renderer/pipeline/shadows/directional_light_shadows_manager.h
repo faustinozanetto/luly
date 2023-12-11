@@ -5,6 +5,8 @@
 
 #include <memory>
 
+#include "renderer/lights/directional_light.h"
+
 namespace luly::renderer
 {
 #define CASCADES_COUNT 3
@@ -15,6 +17,7 @@ namespace luly::renderer
         float shadow_bias;
         float cascade_plane_distances[CASCADES_COUNT];
         glm::vec4 cascade_debug_colors[CASCADES_COUNT];
+        bool enable_shadows;
     };
 
     class directional_light_shadows_manager : public shadow_manager
@@ -42,7 +45,7 @@ namespace luly::renderer
         void initialize();
         void initialize_shadows_data();
         
-        void update_shadows_data(const std::shared_ptr<directional_light>& directional_light);
+        void update_shadows_cascades_data(const std::shared_ptr<directional_light>& directional_light);
 
         std::shared_ptr<shader> m_directional_light_shadows_shader;
 

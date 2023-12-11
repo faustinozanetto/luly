@@ -27,7 +27,7 @@ namespace luly::renderer
 
         /* Getters */
         uint32_t get_handle() const { return m_handle; }
-        uint32_t get_uniform_location(const std::string& uniform_name);
+        int get_uniform_location(const std::string& uniform_name);
 
         /* Overrides */
         void bind() override;
@@ -53,7 +53,7 @@ namespace luly::renderer
         void check_for_link_errors(const std::vector<uint32_t>& shader_ids) const;
 
         uint32_t m_handle;
-        std::unordered_map<std::string, uint32_t> m_uniforms;
+        std::unordered_map<std::string, int> m_uniforms;
         std::unordered_map<shader_type, std::string> m_contents;
     };
 }

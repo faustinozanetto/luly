@@ -1,11 +1,11 @@
 #pragma once
 
-#include "renderer/shaders/shader.h"
 #include "shadow_manager.h"
+#include "renderer/shaders/shader.h"
+#include "renderer/lights/point_light.h"
+#include "renderer/renderer/pipeline/lighting_pass.h"
 
 #include <memory>
-
-#include "renderer/renderer/pipeline/lighting_pass.h"
 
 namespace luly::renderer
 {
@@ -13,6 +13,7 @@ namespace luly::renderer
     {
         float shadow_bias;
         float far_planes[MAX_POINT_LIGHTS];
+        bool enable_shadows[MAX_POINT_LIGHTS];
     };
 
     class point_light_shadows_manager : public shadow_manager

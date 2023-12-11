@@ -7,6 +7,7 @@ namespace luly::scene
         const std::shared_ptr<renderer::point_light>& point_light)
     {
         m_point_light = point_light;
+        m_enable_shadows = true;
     }
 
     point_light_component::~point_light_component()

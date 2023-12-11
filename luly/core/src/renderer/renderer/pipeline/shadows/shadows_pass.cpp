@@ -48,11 +48,13 @@ namespace luly::renderer
         clear_outputs();
 
         const std::shared_ptr<scene::scene>& current_scene = scene::scene_manager::get().get_current_scene();
-        const std::shared_ptr<directional_light>& directional_light = current_scene->get_directional_light();
+        const std::vector<scene::directional_light_component>& directional_lights = current_scene->
+            get_directional_light();
+        if (directional_lights.empty()) return;
 
         render_pass_output directional_shadow_map_output;
         directional_shadow_map_output.name = "directional_shadow_map_output";
-        directional_shadow_map_output.output = directional_light->get_shadow_maps();
+        directional_shadow_map_output.output = directional_lights.front().get_directional_light()->get_shadow_maps();
         add_output(directional_shadow_map_output);
     }
 

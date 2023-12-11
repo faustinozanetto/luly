@@ -59,6 +59,15 @@ namespace luly::ui
                 }
                 ImGui::TreePop();
             }
+
+            ui_utils::draw_property("Parameters");
+            ImGui::Separator();
+
+            bool casts_shadows = model_renderer_component.get_casts_shadows();
+            if (ui_utils::draw_property("Casts Shadows", casts_shadows))
+            {
+                model_renderer_component.set_casts_shadows(casts_shadows);
+            }
         }
         else
         {

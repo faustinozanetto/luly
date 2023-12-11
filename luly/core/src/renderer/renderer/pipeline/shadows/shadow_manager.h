@@ -1,6 +1,8 @@
 ﻿#pragma once
 
 #include "scene/scene.h"
+#include "renderer/shaders/shader.h"
+
 #include <memory>
 
 namespace luly::renderer
@@ -8,7 +10,7 @@ namespace luly::renderer
     class shadow_manager
     {
     public:
-        virtual  ~shadow_manager() = default;
+        virtual ~shadow_manager() = default;
 
         /* Virtuals */
         virtual void execute(const std::shared_ptr<scene::scene>& current_scene) = 0;

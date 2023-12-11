@@ -18,9 +18,9 @@ namespace luly::renderer
         glDeleteProgram(m_handle);
     }
 
-    uint32_t shader::get_uniform_location(const std::string& uniform_name)
+    int shader::get_uniform_location(const std::string& uniform_name)
     {
-        if (m_uniforms.find(uniform_name) != m_uniforms.end())
+        if (m_uniforms.contains(uniform_name))
             return m_uniforms[uniform_name];
 
         int location = glGetUniformLocation(m_handle, uniform_name.c_str());

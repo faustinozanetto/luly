@@ -3,6 +3,7 @@
 
 #include "renderer/renderer/pipeline/lighting_pass.h"
 #include "renderer/shaders/shader_factory.h"
+#include "scene/actor/components/lights/point_light_component.h"
 
 namespace luly::renderer
 {
@@ -13,17 +14,26 @@ namespace luly::renderer
 
     void point_light_shadows_manager::execute(const std::shared_ptr<scene::scene>& current_scene)
     {
-        const std::vector<std::shared_ptr<point_light>>& point_lights = current_scene->get_point_lights();
+        const std::vector<scene::point_light_component>& point_lights = current_scene->get_point_lights();
         if (point_lights.empty()) return;
 
         m_point_light_shadows_shader->bind();
-        int light_index = 0;
-        for (const std::shared_ptr<point_light>& point_light : point_lights)
-        {
-            m_point_light_shadows_data.far_planes[light_index++] = point_light->get_shadow_map_far_plane();
 
-            calculate_point_light_shadow(point_light);
+        int light_index = 0;
+        for (const scene::point_light_component& point_light : point_lights)
+        {
+            const bool enable_shadows = point_light.get_enable_shadows();
+            // Update shadows data for light.
+            m_point_light_shadows_data.far_planes[light_index] = point_light.get_point_light()->
+                                                                             get_shadow_map_far_plane();
+            m_point_light_shadows_data.enable_shadows[light_index] = enable_shadows;
+
+            if (enable_shadows)
+                calculate_point_light_shadow(point_light.get_point_light());
+
+            light_index++;
         }
+
         m_point_light_shadows_shader->un_bind();
     }
 
@@ -34,6 +44,8 @@ namespace luly::renderer
         {
             shader->set_float("u_point_light_shadows.far_planes[" + std::to_string(i) + "]",
                               m_point_light_shadows_data.far_planes[i]);
+            shader->set_int("u_point_light_shadows.enable_shadows[" + std::to_string(i) + "]",
+                            m_point_light_shadows_data.enable_shadows[i]);
         }
     }
 
@@ -51,6 +63,7 @@ namespace luly::renderer
         for (int i = 0; i < MAX_POINT_LIGHTS; i++)
         {
             m_point_light_shadows_data.far_planes[i] = 0.0f;
+            m_point_light_shadows_data.enable_shadows[i] = false;
         }
     }
 

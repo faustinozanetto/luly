@@ -1,14 +1,14 @@
 ﻿#pragma once
 
 #include "renderer/camera/camera_manager.h"
-#include <entt/entt.hpp>
 
-#include "renderer/lights/directional_light.h"
-#include "renderer/lights/point_light.h"
+#include <entt/entt.hpp>
 
 namespace luly::scene
 {
     class scene_actor;
+    class point_light_component;
+    class directional_light_component;
 
     class scene
     {
@@ -27,13 +27,13 @@ namespace luly::scene
         void on_update(float delta_time);
 
         /** Common Actors Getters */
-        const std::shared_ptr<renderer::directional_light>& get_directional_light() const;
-    	std::vector<std::shared_ptr<renderer::point_light>> get_point_lights() const;
+        std::vector<directional_light_component> get_directional_light() const;
+        std::vector<point_light_component> get_point_lights() const;
         const std::shared_ptr<scene_actor>& get_skybox_actor() const;
 
     private:
         void update_lights();
-        
+
         std::string m_name;
         std::unique_ptr<entt::registry> m_actors_registry;
         std::unordered_map<entt::entity, std::shared_ptr<scene_actor>> m_actors_map;

@@ -84,10 +84,10 @@ namespace luly::renderer
             "rough_metal_ao_output");
         const render_pass_output& geometry_emissive_output = geometry_pass_input.render_pass->get_output(
             "emissive_output");
-        
+
         const render_pass_output& directional_shadow_map_output = shadows_pass_input.render_pass->get_output(
             "directional_shadow_map_output");
-            
+
         // Blit depth from geometry pass to this fbo.
         int width = m_fbo->get_width();
         int height = m_fbo->get_height();
@@ -113,12 +113,12 @@ namespace luly::renderer
         renderer::bind_texture(10, m_poisson_distribution_texture->get_handle_id());
 
         std::vector<uint32_t> point_light_shadow_maps;
-        const std::vector<std::shared_ptr<point_light>>& point_lights = scene::scene_manager::get().get_current_scene()
+        const std::vector<scene::point_light_component>& point_lights = scene::scene_manager::get().get_current_scene()
             ->get_point_lights();
         point_light_shadow_maps.reserve(point_lights.size());
-        for (const std::shared_ptr<point_light>& point_light : point_lights)
+        for (const scene::point_light_component& point_light : point_lights)
         {
-            point_light_shadow_maps.push_back(point_light->get_shadow_cubemap());
+            point_light_shadow_maps.push_back(point_light.get_point_light()->get_shadow_cubemap());
         }
         glBindTextures(11, point_lights.size(), point_light_shadow_maps.data());
 
@@ -191,11 +191,11 @@ namespace luly::renderer
         std::vector<glm::vec2> data(total_samples);
         for (auto i = 0; i < total_samples; i++)
         {
-	        const PoissonGenerator::Point& point = points[i];
-            data[i] = { point.x, point.y };
+            const PoissonGenerator::Point& point = points[i];
+            data[i] = {point.x, point.y};
         }
 
-        texture_specification texture_specification = { samples, samples, 2, data.data() };
+        texture_specification texture_specification = {samples, samples, 2, data.data()};
         m_poisson_distribution_texture = std::make_shared<texture_2d>(texture_specification);
     }
 

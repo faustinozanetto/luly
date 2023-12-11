@@ -19,14 +19,18 @@ namespace luly::scene
         {
             return m_directional_light;
         }
+        bool get_enable_shadows() const { return m_enable_shadows; }
+
 
         /* Setters */
         void set_directional_light(const std::shared_ptr<renderer::directional_light>& directional_light)
         {
             m_directional_light = directional_light;
         }
+        void set_enable_shadows(bool enable_shadows) { m_enable_shadows = enable_shadows; }
 
     private:
         std::shared_ptr<renderer::directional_light> m_directional_light;
+        bool m_enable_shadows;
     };
 }
