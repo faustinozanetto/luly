@@ -7,8 +7,6 @@
 
 #include <glm/glm.hpp>
 
-#include "renderer/textures/texture_1d.h"
-
 namespace luly::renderer
 {
 #define MAX_POINT_LIGHTS 6
@@ -18,6 +16,9 @@ namespace luly::renderer
     {
         glm::vec4 color;
         glm::vec4 position;
+        float constant_factor;
+        float linear_factor;
+        float quadratic_factor;
     };
 
     struct spot_light_data

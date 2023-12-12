@@ -7,7 +7,7 @@
 namespace luly::ui
 {
     actor_point_light_component_panel::actor_point_light_component_panel() : actor_component_panel(
-        "point Light Component")
+        "Point Light Component")
     {
     }
 
@@ -42,6 +42,26 @@ namespace luly::ui
                 point_light->set_intensity(intensity);
             }
 
+            ui_utils::draw_property("Attenuation");
+            ImGui::Separator();
+            float constant_factor = point_light->get_constant_factor();
+            if (ui_utils::draw_property("Constant Factor", constant_factor, 0.0f, 2.0f, 0.001f))
+            {
+                point_light->set_constant_factor(constant_factor);
+            }
+            
+            float linear_factor = point_light->get_linear_factor();
+            if (ui_utils::draw_property("Linear Factor", linear_factor, 0.0f, 2.0f, 0.001f))
+            {
+                point_light->set_linear_factor(linear_factor);
+            }
+
+            float quadratic_factor = point_light->get_quadratic_factor();
+            if (ui_utils::draw_property("Quadratic Factor", quadratic_factor, 0.0f, 2.0f, 0.001f))
+            {
+                point_light->set_quadratic_factor(quadratic_factor);
+            }
+            
             ui_utils::draw_property("Shadow Mapping");
             ImGui::Separator();
 

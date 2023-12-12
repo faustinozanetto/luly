@@ -158,6 +158,9 @@ namespace luly::renderer
         {
             m_lights_data.point_lights[i].color = glm::vec4(0);
             m_lights_data.point_lights[i].position = glm::vec4(0);
+            m_lights_data.point_lights[i].constant_factor = 0.0f;
+            m_lights_data.point_lights[i].quadratic_factor = 0.0f;
+            m_lights_data.point_lights[i].linear_factor = 0.0f;
         }
 
         for (int i = 0; i < MAX_SPOT_LIGHTS; i++)
@@ -214,6 +217,9 @@ namespace luly::renderer
             m_lights_data.point_lights[point_lights_count].position = glm::vec4(point_light->get_position(), 1.0);
             m_lights_data.point_lights[point_lights_count].color = glm::vec4(
                 point_light->get_color(), point_light->get_intensity());
+            m_lights_data.point_lights[point_lights_count].constant_factor = point_light->get_constant_factor();
+            m_lights_data.point_lights[point_lights_count].linear_factor = point_light->get_linear_factor();
+            m_lights_data.point_lights[point_lights_count].quadratic_factor = point_light->get_quadratic_factor();
 
             point_lights_count++;
         }

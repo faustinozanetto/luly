@@ -34,6 +34,10 @@ namespace luly::renderer
         void set_strength(float strength) { m_strength = strength; }
 
     private:
+        void generate_fbo();
+        void generate_mips();
+        void attach_mip_texture();
+        
         void perform_down_sample();
         void perform_up_sample();
         void perform_composition();

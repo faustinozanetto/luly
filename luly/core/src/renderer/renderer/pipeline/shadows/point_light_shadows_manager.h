@@ -4,6 +4,7 @@
 #include "renderer/shaders/shader.h"
 #include "renderer/lights/point_light.h"
 #include "renderer/renderer/pipeline/lighting_pass.h"
+#include "renderer/renderer/renderer.h"
 
 #include <memory>
 

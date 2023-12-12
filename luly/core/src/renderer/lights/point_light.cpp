@@ -10,6 +10,9 @@ namespace luly::renderer
     {
         m_position = position;
 
+        m_constant_factor = 1.0f;
+        m_linear_factor = 0.09f;
+        m_quadratic_factor = 0.032f;
         m_shadow_map_dimensions = glm::ivec2(2048, 2048);
         m_shadow_map_near_plane = 0.1f;
         m_shadow_map_far_plane = 30.0f;

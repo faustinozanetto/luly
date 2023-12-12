@@ -2,7 +2,6 @@
 
 #include "light.h"
 #include "renderer/framebuffer/frame_buffer.h"
-#include "renderer/renderer/renderer.h"
 
 namespace luly::renderer
 {
@@ -18,10 +17,16 @@ namespace luly::renderer
         const std::vector<glm::mat4>& get_shadow_transforms() const { return m_shadow_transforms; }
         float get_shadow_map_far_plane() const { return m_shadow_map_far_plane; }
         const glm::ivec2& get_shadow_map_dimensions() const { return m_shadow_map_dimensions; }
+        float get_quadratic_factor() const { return m_quadratic_factor; }
+        float get_linear_factor() const { return m_linear_factor; }
+        float get_constant_factor() const { return m_constant_factor; }
 
         /* Setters */
         void set_position(const glm::vec3& position) { m_position = position; }
         void set_shadow_map_far_plane(float shadow_map_far_plane);
+        void set_quadratic_factor(float quadratic_factor) { m_quadratic_factor = quadratic_factor; }
+        void set_linear_factor(float linear_factor) { m_linear_factor = linear_factor; }
+        void set_constant_factor(float constant_factor) { m_constant_factor = constant_factor; }
 
         /* Methods */
         void update_shadow_transforms(const glm::vec3& position);
@@ -30,7 +35,11 @@ namespace luly::renderer
         void create_shadow_fbo();
 
         glm::vec3 m_position;
+        float m_constant_factor;
+        float m_linear_factor;
+        float m_quadratic_factor;
 
+        /* Shadow mapping */
         std::shared_ptr<frame_buffer> m_shadow_map_fbo;
         uint32_t m_shadow_cubemap;
         glm::ivec2 m_shadow_map_dimensions;

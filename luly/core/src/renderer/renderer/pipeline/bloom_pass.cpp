@@ -18,43 +18,14 @@ namespace luly::renderer
 
     void bloom_pass::initialize()
     {
-        // Setup pass frame buffer.
-        glm::ivec2 viewport_size_int = renderer::get_viewport_size();
-        glm::vec2 viewport_size = glm::vec2(viewport_size_int);
-
+        // Default params.
         m_samples_count = 6;
         m_filter_radius = 0.005f;
         m_strength = 0.02f;
-        m_mips.resize(m_samples_count);
 
-        m_fbo = std::make_shared<frame_buffer>(viewport_size.x, viewport_size.y);
-
-        for (int i = 0; i < m_samples_count; i++)
-        {
-            bloom_pass_mip_data bloom_pass_mip_data;
-            viewport_size *= 0.5f;
-            viewport_size_int /= 2;
-
-            bloom_pass_mip_data.size = viewport_size_int;
-
-            texture_specification mip_texture_specification;
-            mip_texture_specification.width = bloom_pass_mip_data.size.x;
-            mip_texture_specification.height = bloom_pass_mip_data.size.y;
-            mip_texture_specification.channels = 3;
-            mip_texture_specification.mip_map_levels = 1;
-            mip_texture_specification.internal_format = texture_internal_format::r11g11b10;
-            mip_texture_specification.data = nullptr;
-
-            bloom_pass_mip_data.texture = std::make_shared<texture_2d>(mip_texture_specification);
-
-            m_mips[i] = bloom_pass_mip_data;
-        }
-
-        // Attach first bloom mip texture to rbo.
-        m_fbo->attach_texture(m_mips[0].texture, GL_FRAMEBUFFER,
-                              render_buffer_attachment_type::color, GL_TEXTURE_2D,
-                              true, 0);
-        m_fbo->initialize();
+        generate_fbo();
+        generate_mips();
+        attach_mip_texture();
 
         // Load shaders
         m_down_sample_shader = shader_factory::create_shader_from_file(
@@ -63,6 +34,7 @@ namespace luly::renderer
             "assets/shaders/bloom/bloom_up_sample.lsh");
         m_composition_shader = shader_factory::create_shader_from_file(
             "assets/shaders/bloom/bloom_composition.lsh");
+
         // Create screen quad
         m_screen_mesh = mesh_factory::create_screen_quad_mesh();
     }
@@ -90,7 +62,54 @@ namespace luly::renderer
 
     void bloom_pass::on_resize(const glm::ivec2& dimensions)
     {
-        //  m_fbo->resize(dimensions);
+        generate_fbo();
+        generate_mips();
+        attach_mip_texture();
+    }
+
+    void bloom_pass::generate_fbo()
+    {
+        glm::ivec2 viewport_size = renderer::get_viewport_size();
+        m_fbo = std::make_shared<frame_buffer>(viewport_size.x, viewport_size.y);
+    }
+
+    void bloom_pass::generate_mips()
+    {
+        glm::ivec2 viewport_size_int = renderer::get_viewport_size();
+        glm::vec2 viewport_size = glm::vec2(viewport_size_int);
+
+        m_mips.clear();
+        m_mips.resize(m_samples_count);
+
+        for (int i = 0; i < m_samples_count; i++)
+        {
+            bloom_pass_mip_data bloom_pass_mip_data;
+            viewport_size *= 0.5f;
+            viewport_size_int /= 2;
+
+            bloom_pass_mip_data.size = viewport_size_int;
+
+            texture_specification mip_texture_specification;
+            mip_texture_specification.width = bloom_pass_mip_data.size.x;
+            mip_texture_specification.height = bloom_pass_mip_data.size.y;
+            mip_texture_specification.channels = 3;
+            mip_texture_specification.mip_map_levels = 1;
+            mip_texture_specification.internal_format = texture_internal_format::r11g11b10;
+            mip_texture_specification.data = nullptr;
+
+            bloom_pass_mip_data.texture = std::make_shared<texture_2d>(mip_texture_specification);
+
+            m_mips[i] = bloom_pass_mip_data;
+        }
+    }
+
+    void bloom_pass::attach_mip_texture()
+    {
+        // Attach first bloom mip texture to rbo.
+        m_fbo->attach_texture(m_mips[0].texture, GL_FRAMEBUFFER,
+                              render_buffer_attachment_type::color, GL_TEXTURE_2D,
+                              true, 0);
+        m_fbo->initialize();
     }
 
     void bloom_pass::perform_down_sample()
@@ -142,7 +161,7 @@ namespace luly::renderer
         m_up_sample_shader->set_float("u_filter_radius", m_filter_radius);
         for (uint32_t i = m_mips.size() - 1; i > 0; i--)
         {
-	        const bloom_pass_mip_data& current_bloom_mip = m_mips[i];
+            const bloom_pass_mip_data& current_bloom_mip = m_mips[i];
             bloom_pass_mip_data& next_bloom_mip = m_mips[i - 1];
             // Bind mip texture
             renderer::bind_texture(0, current_bloom_mip.texture->get_handle_id());

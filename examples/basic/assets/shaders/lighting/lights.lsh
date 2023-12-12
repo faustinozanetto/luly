@@ -1,20 +1,31 @@
 ﻿#include "common/constants.lsh"
 
 struct directional_light {
-    vec4 color;
-    vec4 direction;
+    vec3 color;
+    float intensity;
+    vec2 pad1; // Padding to align the structure to 16 bytes
+    vec3 direction;
 };
 
 struct point_light {
-    vec4 color;
-    vec4 position;
+    vec3 color;
+    float intensity;
+    vec2 pad1; // Padding to align the structure to 16 bytes
+    vec3 position;
+    float constant_factor;
+    float linear_factor;
+    float quadratic_factor;
 };
 
 struct spot_light {
-    vec4 color;
-    vec4 position;
-    vec4 direction;
-    vec4 angles;
+    vec3 color;
+    float intensity;
+    vec2 pad1; // Padding to align the structure to 16 bytes
+    vec3 position;
+    vec2 pad2; // Padding to align the structure to 16 bytes
+    vec3 direction;
+    vec2 pad3; // Padding to align the structure to 16 bytes
+    vec2 angles;  // Assuming angles is a vec2 (adjust if needed)
 };
 
 layout (std140, binding = LIGHTS_UBO_LOCATION) uniform lights_ubo
