@@ -139,10 +139,10 @@ vec3 calculate_debug_cascade_color(int cascade_index) {
 }
 
 vec3 calculate_directional_light_luminance(directional_light dir_light, vec3 normal, vec3 view_dir, vec3 frag_pos, vec3 albedo, vec3 F0, float roughness, float metallic, int cascade_index) {
-    vec3 L = normalize(-dir_light.direction);
+    vec3 L = normalize(-dir_light.direction.xyz);
     vec3 H = normalize(view_dir + L);
 
-    vec3 radiance = dir_light.color;
+    vec3 radiance = dir_light.color.xyz;
 
     // cook-torrance brdf
     float NDF = distribution_ggx(normal, H, roughness);
@@ -163,7 +163,7 @@ vec3 calculate_directional_light_luminance(directional_light dir_light, vec3 nor
         shadow = calculate_directional_light_shadow(frag_pos, normal, L, cascade_index);
     
     vec3 final = (1 - shadow) * (kD * albedo / PI + specular) * radiance * NdotL;
-    final *= dir_light.intensity;
+    final *= dir_light.parameters.x;
 
     return final;
 }
@@ -209,7 +209,7 @@ float point_light_shadow_pcf(vec3 frag_pos, vec3 frag_to_light, float bias, int 
 }
 
 float calculate_point_light_shadow(point_light point_light, vec3 frag_pos, int light_index) {
-    vec3 frag_to_light = frag_pos - point_light.position;
+    vec3 frag_to_light = frag_pos - point_light.position.xyz;
 
     float shadow = 0.0;
     if (u_shadows.soft_shadows == 1) {
@@ -222,12 +222,12 @@ float calculate_point_light_shadow(point_light point_light, vec3 frag_pos, int l
 }
 
 vec3 calculate_point_light_luminance(point_light point_light, vec3 normal, vec3 view_dir, vec3 reflect_dir, vec3 frag_pos, vec3 albedo, vec3 F0, float roughness, float metallic, int light_index) {
-    vec3 L = normalize(point_light.position - frag_pos);
+    vec3 L = normalize(point_light.position.xyz - frag_pos);
     vec3 H = normalize(view_dir + L);
 
-    float distance = length(point_light.position - frag_pos);
-    float attenuation = 1.0 / (point_light.constant_factor + point_light.linear_factor * distance + point_light.quadratic_factor * (distance * distance));
-    vec3 radiance = point_light.color * attenuation;
+    float distance = length(point_light.position.xyz - frag_pos);
+    float attenuation = 1.0 / (point_light.parameters.y + point_light.parameters.z * distance + point_light.parameters.w * (distance * distance));
+    vec3 radiance = point_light.color.rgb * attenuation;
 
     // cook-torrance brdf
     float NDF = distribution_ggx(normal, H, roughness);
@@ -248,7 +248,7 @@ vec3 calculate_point_light_luminance(point_light point_light, vec3 normal, vec3 
     
     vec3 final = (1 - shadow) * (kD * albedo / PI + specular) * radiance * NdotL;
     
-    final *= point_light.intensity;
+    final *= point_light.parameters.x; // intensity is parameters.a
 
     return final;
 }
@@ -286,7 +286,8 @@ void main()
 
     luminance += calculate_directional_light_luminance(u_lights.directional_light, normal, view_dir, frag_pos, albedo, F0, roughness, metallic, cascade_index);
 
-    for (int i = 0; i < MAX_POINT_LIGHTS; i++) {
+    int point_light_count = u_lights.lights.parameters.x;
+    for (int i = 0; i < point_light_count; i++) {
         luminance += calculate_point_light_luminance(u_lights.point_lights[i], normal, view_dir, reflect_dir, frag_pos, albedo, F0, roughness, metallic, i);   
     }
     

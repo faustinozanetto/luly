@@ -2,12 +2,7 @@
 
 #include "renderer/framebuffer/frame_buffer.h"
 
-#include <memory>
-#include <string>
 #include <unordered_map>
-
-#include <logging/log.h>
-#include <utils/profiler.h>
 
 namespace luly::renderer
 {
@@ -28,32 +23,15 @@ namespace luly::renderer
     class render_pass
     {
     public:
-        render_pass(std::string name) : m_name(std::move(name))
-        {
-        }
+        render_pass(const std::string& name);
 
         virtual ~render_pass() = default;
 
         /* Getters */
         const std::string& get_name() const { return m_name; }
-
-        const render_pass_output& get_output(const std::string& name) const
-        {
-            LY_PROFILE_FUNCTION;
-            return m_outputs.at(name);
-        }
-
-        const std::unordered_map<std::string, render_pass_output>& get_outputs() const
-        {
-            LY_PROFILE_FUNCTION;
-            return m_outputs;
-        }
-
-        const std::shared_ptr<frame_buffer>& get_fbo() const
-        {
-            LY_PROFILE_FUNCTION;
-            return m_fbo;
-        }
+        const render_pass_output& get_output(const std::string& name) const;
+        const std::unordered_map<std::string, render_pass_output>& get_outputs() const;
+        const std::shared_ptr<frame_buffer>& get_fbo() const;
 
         /* Virtuals */
         virtual void initialize() = 0;
@@ -62,29 +40,9 @@ namespace luly::renderer
         virtual void on_resize(const glm::ivec2& dimensions) = 0;
 
         /* Methods */
-        void add_input(const render_pass_input& render_pass_input)
-        {
-            LY_PROFILE_FUNCTION;
-            m_inputs.insert({render_pass_input.name, render_pass_input});
-        }
-
-        void add_output(const render_pass_output& render_pass_output)
-        {
-            LY_PROFILE_FUNCTION;
-            if (m_outputs.contains(render_pass_output.name))
-            {
-                LY_WARN("Replacing old output pass with name '{0}' to render pass with name '{1}'!",
-                        render_pass_output.name, m_name);
-            }
-
-            m_outputs[render_pass_output.name] = render_pass_output;
-        }
-
-        void clear_outputs()
-        {
-            LY_PROFILE_FUNCTION;
-            m_outputs.clear();
-        }
+        void add_input(const render_pass_input& render_pass_input);
+        void add_output(const render_pass_output& render_pass_output);
+        void clear_outputs();
 
     protected:
         std::string m_name;

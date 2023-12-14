@@ -94,15 +94,15 @@ vec3 calculate_point_light_luminance(point_light point_light, vec3 normal, vec3 
 
 vec3 calculate_spot_light_luminance(spot_light spot_light, vec3 normal, vec3 view_dir, vec3 frag_pos, vec3 albedo, vec3 F0, float roughness, float metallic) {
     // Lambertian diffuse reflection
-    vec3 light_dir = normalize(spot_light.position - frag_pos);
-    float distance = length(spot_light.position - frag_pos);
+    vec3 light_dir = normalize(spot_light.position.xyz - frag_pos);
+    float distance = length(spot_light.position.xyz - frag_pos);
     float attenuation = 1.0 / (spot_light_constant + spot_light_linear * distance + spot_light_quadratic * (distance * distance));
     float NdotL = max(dot(normalize(normal), light_dir), 0.0);
 
     // Check if the fragment is within the spot light cone
-    float inner_angle = spot_light.angles.x;
-    float outer_angle = spot_light.angles.y;
-    float spot_angle = dot(normalize(-light_dir), normalize(spot_light.direction));
+    float inner_angle = spot_light.parameters.x;
+    float outer_angle = spot_light.parameters.y;
+    float spot_angle = dot(normalize(-light_dir), normalize(spot_light.direction.xyz));
     float spot_factor = smoothstep(cos(radians(outer_angle)), cos(radians(inner_angle)), spot_angle);
 
     vec3 diffuse = albedo / PI;
@@ -111,7 +111,7 @@ vec3 calculate_spot_light_luminance(spot_light spot_light, vec3 normal, vec3 vie
     vec3 specular = cook_torrance_brdf(normalize(normal), view_dir, light_dir, roughness, F0);
 
     // Final lighting equation with attenuation and spotlight factor
-    vec3 luminance = attenuation * spot_factor * NdotL * max(diffuse + specular, vec3(0.0)) * spot_light.color * spot_light.intensity;
+    vec3 luminance = attenuation * spot_factor * NdotL * max(diffuse + specular, vec3(0.0)) * spot_light.color.rgb * spot_light.parameters.y;
 
     return luminance;
 }

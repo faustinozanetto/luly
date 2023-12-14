@@ -2,33 +2,29 @@
 
 struct point_light
 {
-    vec3 color;
-    float intensity;
-    //glm::vec2 pad1; // Padding to align the structure to 16 bytes
-    vec3 position;
-    float constant_factor;
-    float linear_factor;
-    float quadratic_factor;
+    vec4 color;
+    vec4 position;
+    vec4 parameters; // intensity, constant-factor, linear-factor, quadratic-factor
 };
 
 struct spot_light
 {
-    vec3 color;
-    float intensity;
-    //  glm::vec2 pad1; // Padding to align the structure to 16 bytes
-    vec3 position;
-    // glm::vec2 pad2; // Padding to align the structure to 16 bytes
-    vec3 direction;
-    // glm::vec2 pad3; // Padding to align the structure to 16 bytes
-    vec2 angles;
+    vec4 color;
+    vec4 position;
+    vec4 direction;
+    vec4 parameters; // angles, intensity, unused, unused
 };
 
 struct directional_light
 {
-    vec3 color;
-    float intensity;
-    //glm::vec2 pad1; // Padding to align the structure to 16 bytes
-    vec3 direction;
+    vec4 color;
+    vec4 direction;
+    vec4 parameters; // intensity, unused, unused, unused
+};
+
+struct lights_data
+{
+    ivec4 parameters; // point light count, spot light count, unused , unused.
 };
 
 layout (std140, binding = LIGHTS_UBO_LOCATION) uniform lights_ubo
@@ -36,4 +32,5 @@ layout (std140, binding = LIGHTS_UBO_LOCATION) uniform lights_ubo
     point_light point_lights[MAX_POINT_LIGHTS];
     spot_light spot_lights[MAX_SPOT_LIGHTS];
     directional_light directional_light;
+    lights_data lights;
 } u_lights;

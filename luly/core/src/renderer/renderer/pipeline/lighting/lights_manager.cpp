@@ -18,8 +18,8 @@ namespace luly::renderer
         // Setup lights uniform buffer object.
         initialize_data();
         m_lights_ubo = std::make_shared<uniform_buffer_object>(
-            sizeof(m_lights_data.point_lights) + sizeof(m_lights_data.spot_lights) + sizeof(m_lights_data.
-                directional_light), LIGHTS_UBO_LOCATION);
+            sizeof(m_point_lights) + sizeof(m_spot_lights) + sizeof(m_directional_light) + sizeof(m_lights),
+            LIGHTS_UBO_LOCATION);
     }
 
     void lights_manager::update_lights()
@@ -34,31 +34,24 @@ namespace luly::renderer
         LY_PROFILE_FUNCTION;
         for (int i = 0; i < MAX_POINT_LIGHTS; i++)
         {
-            m_lights_data.point_lights[i].color = glm::vec3(0.0f);
-            m_lights_data.point_lights[i].intensity = 0.0f;
-            //  m_lights_data.point_lights[i].pad1 = glm::vec2(0.0f);
-            m_lights_data.point_lights[i].position = glm::vec3(0.0f);
-            m_lights_data.point_lights[i].constant_factor = 0.0f;
-            m_lights_data.point_lights[i].linear_factor = 0.0f;
-            m_lights_data.point_lights[i].quadratic_factor = 0.0f;
+            m_point_lights[i].color = glm::vec4(0.0f);
+            m_point_lights[i].position = glm::vec4(0.0f);
+            m_point_lights[i].parameters = glm::vec4(0.0f);
         }
 
         for (int i = 0; i < MAX_SPOT_LIGHTS; i++)
         {
-            m_lights_data.spot_lights[i].color = glm::vec3(0.0f);
-            m_lights_data.spot_lights[i].intensity = 0.0f;
-            //  m_lights_data.spot_lights[i].pad1 = glm::vec2(0.0f);
-            m_lights_data.spot_lights[i].position = glm::vec3(0.0f);
-            // m_lights_data.spot_lights[i].pad2 = glm::vec2(0.0f);
-            m_lights_data.spot_lights[i].direction = glm::vec3(0.0f);
-            // m_lights_data.spot_lights[i].pad3 = glm::vec2(0.0f);
-            m_lights_data.spot_lights[i].angles = glm::vec2(0.0f);
+            m_spot_lights[i].color = glm::vec4(0.0f);
+            m_spot_lights[i].position = glm::vec4(0.0f);
+            m_spot_lights[i].direction = glm::vec4(0.0f);
+            m_spot_lights[i].parameters = glm::vec4(0.0f);
         }
 
-        m_lights_data.directional_light.color = glm::vec3(0.0f);
-        m_lights_data.directional_light.intensity = 0.0f;
-        //m_lights_data.directional_light.pad1 = glm::vec2(0.0f);
-        m_lights_data.directional_light.direction = glm::vec3(0.0f);
+        m_directional_light.color = glm::vec4(0.0f);
+        m_directional_light.direction = glm::vec4(0.0f);
+        m_directional_light.parameters = glm::vec4(0.0f);
+
+        m_lights.parameters = glm::ivec4(0);
     }
 
     void lights_manager::collect_lights()
@@ -74,12 +67,12 @@ namespace luly::renderer
         {
             const std::shared_ptr<point_light>& point_light = point_light_component.get_point_light();
 
-            m_lights_data.point_lights[point_lights_count].position = point_light->get_position();
-            m_lights_data.point_lights[point_lights_count].color = point_light->get_color();
-            m_lights_data.point_lights[point_lights_count].intensity = point_light->get_intensity();
-            m_lights_data.point_lights[point_lights_count].constant_factor = point_light->get_constant_factor();
-            m_lights_data.point_lights[point_lights_count].linear_factor = point_light->get_linear_factor();
-            m_lights_data.point_lights[point_lights_count].quadratic_factor = point_light->get_quadratic_factor();
+            m_point_lights[point_lights_count].position = glm::vec4(point_light->get_position(), 1.0);
+            m_point_lights[point_lights_count].color = glm::vec4(point_light->get_color(), 1.0);
+            m_point_lights[point_lights_count].parameters = glm::vec4(point_light->get_intensity()
+                                                                      , point_light->get_constant_factor(),
+                                                                      point_light->get_linear_factor(),
+                                                                      point_light->get_quadratic_factor());
 
             point_lights_count++;
         }
@@ -91,12 +84,12 @@ namespace luly::renderer
         {
             const std::shared_ptr<spot_light>& spot_light = spot_light_component.get_spot_light();
 
-            m_lights_data.spot_lights[spot_lights_count].position = spot_light->get_position();
-            m_lights_data.spot_lights[spot_lights_count].color = spot_light->get_color();
-            m_lights_data.spot_lights[spot_lights_count].intensity = spot_light->get_intensity();
-            m_lights_data.spot_lights[spot_lights_count].direction = spot_light->get_direction();
-            m_lights_data.spot_lights[spot_lights_count].angles = glm::vec2(
-                spot_light->get_inner_cone_angle(), spot_light->get_outer_cone_angle());
+            m_spot_lights[spot_lights_count].position = glm::vec4(spot_light->get_position(), 1.0);
+            m_spot_lights[spot_lights_count].color = glm::vec4(spot_light->get_color(), 1.0);
+            m_spot_lights[spot_lights_count].direction = glm::vec4(spot_light->get_direction(), 1.0);
+            m_spot_lights[spot_lights_count].parameters = glm::vec4(
+                spot_light->get_inner_cone_angle(), spot_light->get_outer_cone_angle(), spot_light->get_intensity(),
+                0.0);
 
             spot_lights_count++;
         }
@@ -108,19 +101,23 @@ namespace luly::renderer
             const std::shared_ptr<directional_light>& directional_light = directional_light_component.
                 get_directional_light();
 
-            m_lights_data.directional_light.direction = directional_light->get_direction();
-            m_lights_data.directional_light.color = directional_light->get_color();
-            m_lights_data.directional_light.intensity = directional_light->get_intensity();
+            m_directional_light.direction = glm::vec4(directional_light->get_direction(), 1.0);
+            m_directional_light.color = glm::vec4(directional_light->get_color(), 1.0);
+            m_directional_light.parameters = glm::vec4(directional_light->get_intensity(), 0.0, 0.0, 0.0);
         }
+
+        m_lights.parameters = glm::ivec4(point_lights_count, spot_lights_count, 0, 0);
     }
 
     void lights_manager::update_lights_buffer() const
     {
         LY_PROFILE_FUNCTION;
-        m_lights_ubo->set_data(&m_lights_data.point_lights, sizeof(m_lights_data.point_lights));
-        m_lights_ubo->set_data(&m_lights_data.spot_lights, sizeof(m_lights_data.spot_lights),
-                               sizeof(m_lights_data.point_lights));
-        m_lights_ubo->set_data(&m_lights_data.directional_light, sizeof(m_lights_data.directional_light),
-                               sizeof(m_lights_data.point_lights) + sizeof(m_lights_data.spot_lights));
+        m_lights_ubo->set_data(&m_point_lights, sizeof(m_point_lights));
+        m_lights_ubo->set_data(&m_spot_lights, sizeof(m_spot_lights),
+                               sizeof(m_point_lights));
+        m_lights_ubo->set_data(&m_directional_light, sizeof(m_directional_light),
+                               sizeof(m_point_lights) + sizeof(m_spot_lights));
+        m_lights_ubo->set_data(&m_lights, sizeof(m_lights),
+                               sizeof(m_point_lights) + sizeof(m_spot_lights) + sizeof(m_directional_light));
     }
 }
