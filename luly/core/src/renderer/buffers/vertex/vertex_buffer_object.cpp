@@ -15,36 +15,41 @@ namespace luly::renderer
 
     void vertex_buffer_object::bind()
     {
+        LY_PROFILE_FUNCTION;
         glBindBuffer(GL_ARRAY_BUFFER, m_handle);
     }
 
     void vertex_buffer_object::un_bind()
     {
+        LY_PROFILE_FUNCTION;
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
     void vertex_buffer_object::set_attribute(uint32_t index, int size, uint32_t type, int stride, bool normalized,
                                              const void* data)
     {
+        LY_PROFILE_FUNCTION;
         glEnableVertexAttribArray(index);
         glVertexAttribPointer(index, size, type, normalized, stride, data);
     }
 
     void vertex_buffer_object::set_data(vertex_buffer_object_usage buffer_usage, int size, const void* data)
     {
+        LY_PROFILE_FUNCTION;
         bind();
         glBufferData(GL_ARRAY_BUFFER, size, data, get_buffer_usage_to_opengl(buffer_usage));
     }
-
-
+    
     void vertex_buffer_object::set_layout_descriptor(
         const std::shared_ptr<vertex_buffer_layout_descriptor>& layout_descriptor)
     {
+        LY_PROFILE_FUNCTION;
         m_layout_descriptor = layout_descriptor;
     }
 
     uint32_t vertex_buffer_object::get_buffer_usage_to_opengl(vertex_buffer_object_usage buffer_usage)
     {
+        LY_PROFILE_FUNCTION;
         switch (buffer_usage)
         {
         case vertex_buffer_object_usage::static_draw:

@@ -6,6 +6,7 @@ namespace luly::renderer
     uint32_t render_buffer_utils::get_render_buffer_attachment_type_to_opengl(
         render_buffer_attachment_type attachment_type)
     {
+        LY_PROFILE_FUNCTION;
         switch (attachment_type)
         {
         case render_buffer_attachment_type::color:
@@ -24,6 +25,7 @@ namespace luly::renderer
     const char* render_buffer_utils::get_render_buffer_attachment_type_to_string(
         render_buffer_attachment_type attachment_type)
     {
+        LY_PROFILE_FUNCTION;
         switch (attachment_type)
         {
         case render_buffer_attachment_type::color:

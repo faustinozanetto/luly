@@ -1,4 +1,4 @@
-﻿#shader vertex
+#shader vertex
 #version 450
 
 #include "common/camera.lsh"

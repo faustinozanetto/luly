@@ -29,6 +29,7 @@ namespace luly::renderer
 
     void render_buffer::set_storage_parameters(int width, int height, texture_internal_format internal_format)
     {
+        LY_PROFILE_FUNCTION;
         m_width = width;
         m_height = height;
         m_internal_format = internal_format;
@@ -40,16 +41,19 @@ namespace luly::renderer
 
     void render_buffer::bind()
     {
+        LY_PROFILE_FUNCTION;
         glBindRenderbuffer(GL_RENDERBUFFER, m_handle);
     }
 
     void render_buffer::un_bind()
     {
+        LY_PROFILE_FUNCTION;
         glBindRenderbuffer(GL_RENDERBUFFER, 0);
     }
 
     void render_buffer::attach_to_frame_buffer(render_buffer_attachment_type attachment_type)
     {
+        LY_PROFILE_FUNCTION;
         glFramebufferRenderbuffer(
             GL_FRAMEBUFFER, render_buffer_utils::get_render_buffer_attachment_type_to_opengl(attachment_type),
             GL_RENDERBUFFER, m_handle);
@@ -57,5 +61,6 @@ namespace luly::renderer
 
     void render_buffer::resize(const glm::ivec2& dimensions)
     {
+        LY_PROFILE_FUNCTION;
     }
 }

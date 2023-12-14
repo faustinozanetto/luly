@@ -106,16 +106,19 @@ namespace luly::renderer
 
     void frame_buffer::bind()
     {
+        LY_PROFILE_FUNCTION;
         glBindFramebuffer(GL_FRAMEBUFFER, m_handle);
     }
 
     void frame_buffer::un_bind()
     {
+        LY_PROFILE_FUNCTION;
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
     void frame_buffer::initialize()
     {
+        LY_PROFILE_FUNCTION;
         bind();
 
         // Draw buffers.
@@ -144,6 +147,7 @@ namespace luly::renderer
 
     void frame_buffer::resize(const glm::ivec2& dimensions, bool resize_attachments)
     {
+        LY_PROFILE_FUNCTION;
         m_width = dimensions.x;
         m_height = dimensions.y;
 
@@ -166,6 +170,7 @@ namespace luly::renderer
                                       render_buffer_attachment_type attachment, uint32_t texture_target,
                                       bool register_attachment, int mipmaps_level)
     {
+        LY_PROFILE_FUNCTION;
         glFramebufferTexture2D(target, render_buffer_utils::get_render_buffer_attachment_type_to_opengl(attachment),
                                texture_target, texture->get_handle_id(), mipmaps_level);
         if (register_attachment)
@@ -182,12 +187,14 @@ namespace luly::renderer
 
     void frame_buffer::attach_depth_texture(uint32_t texture, int mipmaps_level)
     {
+        LY_PROFILE_FUNCTION;
         glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, texture, mipmaps_level);
         m_has_depth_attachment = true;
     }
 
     void frame_buffer::pre_initialize()
     {
+        LY_PROFILE_FUNCTION;
         if (m_handle)
         {
             glDeleteFramebuffers(1, &m_handle);
@@ -226,6 +233,7 @@ namespace luly::renderer
     void frame_buffer::attach_color_texture(const frame_buffer_attachment& attachment, uint32_t handle_id,
                                             unsigned int index) const
     {
+        LY_PROFILE_FUNCTION;
         glBindTexture(GL_TEXTURE_2D, handle_id);
         const texture_format format =
             texture_utils::get_texture_format_from_internal_format(attachment.internal_format);
@@ -262,6 +270,7 @@ namespace luly::renderer
 
     void frame_buffer::attach_depth_texture(const frame_buffer_attachment& attachment, uint32_t handle_id)
     {
+        LY_PROFILE_FUNCTION;
         glBindTexture(GL_TEXTURE_2D, handle_id);
         glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH_COMPONENT32F, attachment.size.x, attachment.size.y);
 

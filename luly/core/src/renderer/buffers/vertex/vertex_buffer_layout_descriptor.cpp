@@ -15,6 +15,7 @@ namespace luly::renderer
 
     uint32_t vertex_buffer_layout_entry::get_vertex_buffer_entry_type_size(vertex_buffer_entry_type type)
     {
+        LY_PROFILE_FUNCTION;
         switch (type)
         {
         case vertex_buffer_entry_type::FLOAT:
@@ -46,6 +47,7 @@ namespace luly::renderer
 
     uint32_t vertex_buffer_layout_entry::get_vertex_buffer_entry_count(vertex_buffer_entry_type type)
     {
+        LY_PROFILE_FUNCTION;
         switch (type)
         {
         case vertex_buffer_entry_type::FLOAT:
@@ -77,6 +79,7 @@ namespace luly::renderer
 
     uint32_t vertex_buffer_layout_entry::get_vertex_buffer_entry_to_opengl(vertex_buffer_entry_type type)
     {
+        LY_PROFILE_FUNCTION;
         switch (type)
         {
         case vertex_buffer_entry_type::FLOAT:
@@ -109,6 +112,7 @@ namespace luly::renderer
     vertex_buffer_layout_descriptor::vertex_buffer_layout_descriptor(
         std::initializer_list<vertex_buffer_layout_entry> layout_elements)
     {
+        LY_PROFILE_FUNCTION;
         m_layout_elements = layout_elements;
 
         size_t offset = 0;

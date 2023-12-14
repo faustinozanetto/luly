@@ -24,6 +24,7 @@ namespace luly::renderer
 
     void point_light::set_shadow_map_far_plane(float shadow_map_far_plane)
     {
+        LY_PROFILE_FUNCTION;
         m_shadow_map_far_plane = shadow_map_far_plane;
         m_shadow_map_projection = glm::perspective(glm::radians(90.0f), 1.0f, m_shadow_map_near_plane,
                                                    m_shadow_map_far_plane);
@@ -31,6 +32,7 @@ namespace luly::renderer
 
     void point_light::update_shadow_transforms(const glm::vec3& position)
     {
+        LY_PROFILE_FUNCTION;
         m_shadow_transforms.clear();
 
         m_shadow_transforms.push_back(m_shadow_map_projection *
@@ -55,6 +57,7 @@ namespace luly::renderer
 
     void point_light::create_shadow_fbo()
     {
+        LY_PROFILE_FUNCTION;
         glGenTextures(1, &m_shadow_cubemap);
         glBindTexture(GL_TEXTURE_CUBE_MAP, m_shadow_cubemap);
 

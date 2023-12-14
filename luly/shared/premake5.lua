@@ -4,6 +4,8 @@ project "luly-shared"
     cppdialect "C++20"
     defines { "LULY_SHARED_EXPORTS" }
     targetextension ".dll"
+
+    editandcontinue "Off"
     
     targetdir("%{_WORKING_DIR}/binaries/" .. output_dir .. "/%{prj.name}")
     objdir("%{_WORKING_DIR}/intermediates/" .. output_dir .. "/%{prj.name}")
@@ -23,7 +25,7 @@ project "luly-shared"
     }
     
     filter "configurations:debug"
-        defines "LY_DEBUG"
+        defines {"LY_DEBUG", "TRACY_ENABLE", "TRACY_ON_DEMAND", "LY_PROFILING"}
         runtime "Debug"
         symbols "on"
     

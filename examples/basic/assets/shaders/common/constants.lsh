@@ -1,4 +1,4 @@
-﻿const float PI = 3.14159265359;
+const float PI = 3.14159265359;
 const float PHI = 1.61803398874989484820459;
 const float spot_light_constant = 1.0;
 const float spot_light_linear = 0.09;

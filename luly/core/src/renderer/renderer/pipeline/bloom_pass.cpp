@@ -18,6 +18,7 @@ namespace luly::renderer
 
     void bloom_pass::initialize()
     {
+        LY_PROFILE_FUNCTION;
         // Default params.
         m_samples_count = 6;
         m_filter_radius = 0.005f;
@@ -41,6 +42,7 @@ namespace luly::renderer
 
     void bloom_pass::execute()
     {
+        LY_PROFILE_FUNCTION;
         m_fbo->bind();
 
         perform_down_sample();
@@ -54,6 +56,7 @@ namespace luly::renderer
 
     void bloom_pass::set_outputs()
     {
+        LY_PROFILE_FUNCTION;
         render_pass_output bloom_output;
         bloom_output.name = "bloom_output";
         bloom_output.output = m_fbo->get_attachment_id(0);
@@ -62,6 +65,7 @@ namespace luly::renderer
 
     void bloom_pass::on_resize(const glm::ivec2& dimensions)
     {
+        LY_PROFILE_FUNCTION;
         generate_fbo();
         generate_mips();
         attach_mip_texture();
@@ -69,12 +73,14 @@ namespace luly::renderer
 
     void bloom_pass::generate_fbo()
     {
+        LY_PROFILE_FUNCTION;
         glm::ivec2 viewport_size = renderer::get_viewport_size();
         m_fbo = std::make_shared<frame_buffer>(viewport_size.x, viewport_size.y);
     }
 
     void bloom_pass::generate_mips()
     {
+        LY_PROFILE_FUNCTION;
         glm::ivec2 viewport_size_int = renderer::get_viewport_size();
         glm::vec2 viewport_size = glm::vec2(viewport_size_int);
 
@@ -105,6 +111,7 @@ namespace luly::renderer
 
     void bloom_pass::attach_mip_texture()
     {
+        LY_PROFILE_FUNCTION;
         // Attach first bloom mip texture to rbo.
         m_fbo->attach_texture(m_mips[0].texture, GL_FRAMEBUFFER,
                               render_buffer_attachment_type::color, GL_TEXTURE_2D,
@@ -114,6 +121,7 @@ namespace luly::renderer
 
     void bloom_pass::perform_down_sample()
     {
+        LY_PROFILE_FUNCTION;
         m_down_sample_shader->bind();
 
         const render_pass_input& skybox_pass_input = m_inputs.at("skybox_pass_input");
@@ -152,6 +160,7 @@ namespace luly::renderer
 
     void bloom_pass::perform_up_sample()
     {
+        LY_PROFILE_FUNCTION;
         // Set state for up sample pass.
         renderer::set_state(renderer_state::blend, true);
         glBlendFunc(GL_ONE, GL_ONE);
@@ -182,6 +191,7 @@ namespace luly::renderer
 
     void bloom_pass::perform_composition()
     {
+        LY_PROFILE_FUNCTION;
         m_composition_shader->bind();
 
         const render_pass_input& skybox_pass_input = m_inputs.at("skybox_pass_input");

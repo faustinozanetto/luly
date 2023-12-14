@@ -16,16 +16,19 @@ namespace luly::renderer
 
     void vertex_array_object::bind()
     {
+        LY_PROFILE_FUNCTION;
         glBindVertexArray(m_handle);
     }
 
     void vertex_array_object::un_bind()
     {
+        LY_PROFILE_FUNCTION;
         glBindVertexArray(0);
     }
 
     void vertex_array_object::add_vertex_buffer(const std::shared_ptr<vertex_buffer_object>& vertex_buffer)
     {
+        LY_PROFILE_FUNCTION;
         bind();
         vertex_buffer->bind();
 
@@ -99,6 +102,7 @@ namespace luly::renderer
 
     void vertex_array_object::set_element_buffer(const std::shared_ptr<element_buffer_object>& element_buffer)
     {
+        LY_PROFILE_FUNCTION;
         bind();
         element_buffer->bind();
         m_element_buffer = element_buffer;

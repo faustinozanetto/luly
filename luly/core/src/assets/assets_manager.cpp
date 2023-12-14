@@ -13,17 +13,20 @@ namespace luly::assets
 
     assets_manager& assets_manager::get()
     {
+        LY_PROFILE_FUNCTION;
         LY_ASSERT_MSG(s_instance, "Assets manager instance is null!")
         return *s_instance;
     }
 
     void assets_manager::initialize()
     {
+        LY_PROFILE_FUNCTION;
         s_instance = new assets_manager();
     }
 
     void assets_manager::register_asset(const std::shared_ptr<asset>& asset)
     {
+        LY_PROFILE_FUNCTION;
         LY_ASSERT_MSG(!asset_already_registered(asset->get_metadata().name), "Asset is already registered!")
 
         m_assets_map[asset->get_metadata().type].push_back(asset);
@@ -31,6 +34,7 @@ namespace luly::assets
 
     bool assets_manager::asset_already_registered(const std::string& asset_name)
     {
+        LY_PROFILE_FUNCTION;
         for (const std::pair<const asset_type, std::vector<std::shared_ptr<asset>>>& asset_pair : m_assets_map)
         {
             for (const std::shared_ptr<asset>& asset : asset_pair.second)

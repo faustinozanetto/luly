@@ -19,6 +19,8 @@ namespace luly::renderer
         geometry,
     };
 
+    constexpr shader_type SHADER_TYPES[3] = {shader_type::fragment, shader_type::vertex, shader_type::geometry};
+
     class shader : public bindable_object
     {
     public:

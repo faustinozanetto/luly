@@ -5,6 +5,7 @@ namespace luly::assets
 {
     const char* asset_utils::get_asset_type_to_string(const asset_type type)
     {
+        LY_PROFILE_FUNCTION;
         switch (type)
         {
         case asset_type::shader:

@@ -10,6 +10,7 @@ namespace luly::renderer
 {
     void shadow_manager::render_geometry(const std::shared_ptr<shader>& shader)
     {
+        LY_PROFILE_FUNCTION;
         const std::shared_ptr<scene::scene>& current_scene = scene::scene_manager::get().get_current_scene();
 
         const auto& registry = current_scene->get_registry();

@@ -3,6 +3,7 @@
 #include "asset.h"
 #include "assets_manager.h"
 #include "asset_utils.h"
+#include "utils/profiler.h"
 
 namespace luly::assets
 {
@@ -13,6 +14,7 @@ namespace luly::assets
         static std::shared_ptr<asset> create_asset(const std::string& name, const asset_type type,
                                                    const std::shared_ptr<T>& data)
         {
+            LY_PROFILE_FUNCTION;
             asset_metadata metadata = {type, name};
             // Create asset and set data.
             const std::shared_ptr<asset>& created_asset = std::make_shared<asset>(metadata);

@@ -1,4 +1,4 @@
-﻿struct material {
+struct material {
     vec3 albedo;
     vec3 emissive;
     float roughness;

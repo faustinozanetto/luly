@@ -21,6 +21,7 @@ namespace luly::renderer
 
     void geometry_pass::initialize()
     {
+        LY_PROFILE_FUNCTION;
         // Setup pass frame buffer.
         const glm::ivec2& viewport_size = renderer::get_viewport_size();
 
@@ -79,6 +80,7 @@ namespace luly::renderer
 
     void geometry_pass::execute()
     {
+        LY_PROFILE_FUNCTION;
         renderer::set_state(renderer_state::depth, true);
         m_fbo->bind();
         m_geometry_shader->bind();
@@ -146,6 +148,7 @@ namespace luly::renderer
 
     void geometry_pass::set_outputs()
     {
+        LY_PROFILE_FUNCTION;
         render_pass_output position_output;
         position_output.name = "position_output";
         position_output.output = m_fbo->get_attachment_id(0);
@@ -179,6 +182,7 @@ namespace luly::renderer
 
     void geometry_pass::on_resize(const glm::ivec2& dimensions)
     {
+        LY_PROFILE_FUNCTION;
         m_fbo->resize(dimensions);
     }
 }

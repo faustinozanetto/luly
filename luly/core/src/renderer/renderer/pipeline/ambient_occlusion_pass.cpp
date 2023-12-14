@@ -21,6 +21,7 @@ namespace luly::renderer
 
     void ambient_occlusion_pass::initialize()
     {
+        LY_PROFILE_FUNCTION;
         // Create pass frame buffer.
         const glm::ivec2& viewport_size = renderer::get_viewport_size();
         std::vector<frame_buffer_attachment> fbo_attachments = {
@@ -100,6 +101,7 @@ namespace luly::renderer
 
     void ambient_occlusion_pass::execute()
     {
+        LY_PROFILE_FUNCTION;
         m_fbo->bind();
         glClear(GL_COLOR_BUFFER_BIT);
         m_ssao_shader->bind();
@@ -145,6 +147,7 @@ namespace luly::renderer
 
     void ambient_occlusion_pass::set_outputs()
     {
+        LY_PROFILE_FUNCTION;
         render_pass_output ssao_output;
         ssao_output.name = "ssao_output";
         ssao_output.output = m_fbo->get_attachment_id(0);
@@ -163,6 +166,7 @@ namespace luly::renderer
 
     void ambient_occlusion_pass::on_resize(const glm::ivec2& dimensions)
     {
+        LY_PROFILE_FUNCTION;
         m_fbo->resize(dimensions);
         m_blur_fbo->resize(dimensions);
     }

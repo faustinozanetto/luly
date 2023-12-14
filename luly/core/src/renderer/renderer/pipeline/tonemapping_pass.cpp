@@ -18,6 +18,7 @@ namespace luly::renderer
 
     void tonemapping_pass::initialize()
     {
+        LY_PROFILE_FUNCTION;
         // Setup pass frame buffer.
         const glm::ivec2& viewport_size = renderer::get_viewport_size();
 
@@ -46,6 +47,7 @@ namespace luly::renderer
 
     void tonemapping_pass::execute()
     {
+        LY_PROFILE_FUNCTION;
         m_fbo->bind();
         renderer::clear_screen();
         m_tonemapping_shader->bind();
@@ -67,6 +69,7 @@ namespace luly::renderer
 
     void tonemapping_pass::set_outputs()
     {
+        LY_PROFILE_FUNCTION;
         render_pass_output tonemapping_output;
         tonemapping_output.name = "tonemapping_output";
         tonemapping_output.output = m_fbo->get_attachment_id(0);
@@ -75,27 +78,29 @@ namespace luly::renderer
 
     void tonemapping_pass::on_resize(const glm::ivec2& dimensions)
     {
+        LY_PROFILE_FUNCTION;
         m_fbo->resize(dimensions);
     }
 
     const char* tonemapping_pass::get_tonemapping_type_to_string(tonemapping_type type)
     {
-       switch(type)
-       {
-       case tonemapping_type::linear:
-           return "linear";
-       case tonemapping_type::reinhard:
-           return "reinhard";
-       case tonemapping_type::aces:
-           return "aces";
-       case tonemapping_type::filmic:
-           return "filmic";
-       case tonemapping_type::hable:
-           return "hable";
-       case tonemapping_type::luma:
-           return "luma";
-       }
-       LY_ASSERT_MSG(false, "Unknown tonemapping type!")
-       return nullptr;
+        LY_PROFILE_FUNCTION;
+        switch (type)
+        {
+        case tonemapping_type::linear:
+            return "linear";
+        case tonemapping_type::reinhard:
+            return "reinhard";
+        case tonemapping_type::aces:
+            return "aces";
+        case tonemapping_type::filmic:
+            return "filmic";
+        case tonemapping_type::hable:
+            return "hable";
+        case tonemapping_type::luma:
+            return "luma";
+        }
+        LY_ASSERT_MSG(false, "Unknown tonemapping type!")
+        return nullptr;
     }
 }

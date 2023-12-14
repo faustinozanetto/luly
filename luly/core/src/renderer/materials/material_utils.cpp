@@ -5,6 +5,7 @@ namespace luly::renderer
 {
     const char* material_utils::get_material_texture_type_to_string(material_texture_type texture_type)
     {
+        LY_PROFILE_FUNCTION;
         switch (texture_type)
         {
         case material_texture_type::albedo:
@@ -28,6 +29,7 @@ namespace luly::renderer
 
     const char* material_utils::get_material_texture_bind_location(material_texture_type texture_type)
     {
+        LY_PROFILE_FUNCTION;
         switch (texture_type)
         {
         case material_texture_type::albedo:

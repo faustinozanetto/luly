@@ -17,21 +17,25 @@ namespace luly::renderer
 
     void uniform_buffer_object::bind(uint32_t slot) const
     {
+        LY_PROFILE_FUNCTION;
         glBindBufferBase(GL_UNIFORM_BUFFER, slot, m_handle_id);
     }
 
     void uniform_buffer_object::bind()
     {
+        LY_PROFILE_FUNCTION;
         bind(0);
     }
 
     void uniform_buffer_object::un_bind()
     {
+        LY_PROFILE_FUNCTION;
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
     }
 
     void uniform_buffer_object::set_data(const void* data, uint32_t size, uint32_t offset)
     {
+        LY_PROFILE_FUNCTION;
         glNamedBufferSubData(m_handle_id, offset, size, data);
     }
 }

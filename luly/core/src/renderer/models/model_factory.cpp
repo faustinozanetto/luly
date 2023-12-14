@@ -12,6 +12,7 @@ namespace luly::renderer
 {
     std::shared_ptr<model> model_factory::create_model_from_file(const std::string& file_path)
     {
+        LY_PROFILE_FUNCTION;
         LY_TRACE("Started loading model from file...");
         LY_TRACE("  - File Path: '{0}'", file_path);
 
@@ -23,6 +24,7 @@ namespace luly::renderer
 
     std::shared_ptr<model> model_factory::create_model_from_meshes(const std::vector<std::shared_ptr<mesh>>& meshes)
     {
+        LY_PROFILE_FUNCTION;
         LY_TRACE("Started loading model from meshes...");
 
         const std::shared_ptr<model>& created_model = std::make_shared<model>(meshes);
@@ -33,6 +35,7 @@ namespace luly::renderer
 
     std::shared_ptr<model> model_factory::create_model_using_assimp(const std::string& file_path)
     {
+        LY_PROFILE_FUNCTION;
         Assimp::Importer import;
         const aiScene* assimp_scene = import.ReadFile(
             file_path,
@@ -132,6 +135,7 @@ namespace luly::renderer
                                           std::vector<std::shared_ptr<mesh>>& model_meshes,
                                           const std::string& directory)
     {
+        LY_PROFILE_FUNCTION;
         // Process all the node's meshes (if any)
         for (unsigned int i = 0; i < assimp_node->mNumMeshes; i++)
         {
@@ -148,6 +152,7 @@ namespace luly::renderer
     std::shared_ptr<mesh> model_factory::parse_assimp_mesh(const aiScene* assimp_scene, aiMesh* assimp_mesh,
                                                            const std::string& directory)
     {
+        LY_PROFILE_FUNCTION;
         std::vector<mesh_vertex> vertices;
         std::vector<mesh_index> indices;
 
@@ -215,6 +220,7 @@ namespace luly::renderer
                                                                              std::vector<model_texture>&
                                                                              loaded_textures)
     {
+        LY_PROFILE_FUNCTION;
         std::vector<model_texture> textures;
         for (unsigned int i = 0; i < assimp_material->GetTextureCount(assimp_texture_type); i++)
         {

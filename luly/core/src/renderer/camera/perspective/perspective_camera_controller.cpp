@@ -16,9 +16,10 @@ namespace luly::renderer
 
     void perspective_camera_controller::on_update(float delta_time)
     {
+        LY_PROFILE_FUNCTION;
         // Handle mouse input
-        glm::vec2 mouse_offest = input::input_manager::get_mouse_position() - m_last_mouse_pos;
-        process_mouse_input(mouse_offest.x, mouse_offest.y, delta_time);
+        glm::vec2 mouse_offset = input::input_manager::get_mouse_position() - m_last_mouse_pos;
+        process_mouse_input(mouse_offset.x, mouse_offset.y, delta_time);
         m_last_mouse_pos = input::input_manager::get_mouse_position();
 
         // Handle keyboard input
@@ -30,7 +31,8 @@ namespace luly::renderer
 
     void perspective_camera_controller::process_keyboard_input(float delta_time) const
     {
-        float speed = m_movement_speed * delta_time;
+        LY_PROFILE_FUNCTION;
+        const float speed = m_movement_speed * delta_time;
         glm::vec3 updated_position = m_perspective_camera->get_position();
 
         if (input::input_manager::is_key_pressed(input::key::w))
@@ -57,8 +59,9 @@ namespace luly::renderer
         m_perspective_camera->set_position(updated_position);
     }
 
-    void perspective_camera_controller::process_mouse_input(float x_offset, float y_offset, float delta_time)
+    void perspective_camera_controller::process_mouse_input(float x_offset, float y_offset, float delta_time) const
     {
+        LY_PROFILE_FUNCTION;
         if (input::input_manager::is_mouse_button_pressed(input::mouse_button::button_right))
         {
             x_offset *= m_mouse_speed;

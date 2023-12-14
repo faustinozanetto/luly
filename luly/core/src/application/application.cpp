@@ -42,6 +42,7 @@ namespace luly::core
 
     void application::on_update()
     {
+        LY_PROFILE_FUNCTION;
         const std::shared_ptr<scene::scene>& current_scene = scene::scene_manager::get().get_current_scene();
         if (!current_scene) return;
 
@@ -53,9 +54,11 @@ namespace luly::core
 
     void application::run()
     {
+        LY_PROFILE_FUNCTION;
         float frame_time = 0;
         while (!renderer::renderer::get_should_close())
         {
+            LY_PROFILE_FRAMEMARKER();
             renderer::renderer::clear_screen();
 
             app_time::update_time();
@@ -79,10 +82,12 @@ namespace luly::core
             renderer::renderer::poll_input();
             renderer::renderer::swap_buffers();
         }
+        LY_PROFILE_FRAMEMARKER();
     }
 
     void application::on_event(events::base_event& event)
     {
+        LY_PROFILE_FUNCTION;
         events::event_dispatcher dispatcher(event);
         dispatcher.dispatch<events::window_resize_event>(BIND_EVENT_FN(on_window_resized_event));
 
@@ -92,6 +97,7 @@ namespace luly::core
 
     bool application::on_window_resized_event(const events::window_resize_event& window_resize_event)
     {
+        LY_PROFILE_FUNCTION;
         renderer::renderer::set_viewport_size(window_resize_event.get_size());
         renderer::scene_renderer::on_resize(window_resize_event.get_size());
         scene::scene_manager::get().on_resize(window_resize_event.get_size());

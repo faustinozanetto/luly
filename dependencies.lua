@@ -9,6 +9,7 @@ include_dirs["stb"] = "%{wks.location}/third_party/stb"
 include_dirs["imgui"] = "%{wks.location}/third_party/imgui"
 include_dirs["imguizmo"] = "%{wks.location}/third_party/imguizmo"
 include_dirs["entt"] = "%{wks.location}/third_party/entt/single_include"
+include_dirs["tracy"] = "%{wks.location}/third_party/tracy/public"
 
 library_dirs = {}
 

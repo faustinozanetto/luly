@@ -45,17 +45,20 @@ namespace luly::renderer
 
     void material::set_texture_enabled(material_texture_type texture_type, bool is_enabled)
     {
+        LY_PROFILE_FUNCTION;
         m_material_specification.textures.at(texture_type).is_enabled = is_enabled;
     }
 
     void material::set_texture_channel_mode(material_texture_type texture_type,
                                             material_texture_channel_mode texture_channel)
     {
+        LY_PROFILE_FUNCTION;
         m_texture_type_channels.at(texture_type) = texture_channel;
     }
 
     void material::bind(const std::shared_ptr<shader>& shader)
     {
+        LY_PROFILE_FUNCTION;
         shader->set_vec_float3("u_material.albedo", m_material_specification.albedo);
         shader->set_vec_float3("u_material.emissive", m_material_specification.emissive);
         shader->set_float("u_material.roughness", m_material_specification.roughness);
@@ -88,6 +91,7 @@ namespace luly::renderer
 
     void material::bind_default(const std::shared_ptr<shader>& shader)
     {
+        LY_PROFILE_FUNCTION;
         shader->set_vec_float3("u_material.albedo", {0.85f, 0.85f, 0.85f});
         shader->set_vec_float3("u_material.emissive", {0.0f, 0.0f, 0.0f});
         shader->set_float("u_material.roughness", 0.99f);
@@ -104,6 +108,7 @@ namespace luly::renderer
 
     void material::initialize_textures_map()
     {
+        LY_PROFILE_FUNCTION;
         // Fill in the textures that were not provided in the constructor
         for (material_texture_type type : MATERIAL_TEXTURE_TYPES)
         {
@@ -117,6 +122,7 @@ namespace luly::renderer
 
     void material::initialize_textures_channels_map()
     {
+        LY_PROFILE_FUNCTION;
         for (material_texture_type type : MATERIAL_TEXTURE_TYPES)
         {
             if (MATERIAL_TEXTURE_TYPE_SUPPORTS_CHANNEL_MODE.contains(type))

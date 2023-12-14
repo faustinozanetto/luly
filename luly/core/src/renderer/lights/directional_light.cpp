@@ -28,6 +28,7 @@ namespace luly::renderer
 
     void directional_light::calculate_cascade_splits(const std::shared_ptr<perspective_camera>& perspective_camera)
     {
+        LY_PROFILE_FUNCTION;
         m_shadow_cascade_splits_distances.clear();
         m_shadow_cascade_splits_distances.resize(CASCADES_COUNT);
 
@@ -49,6 +50,7 @@ namespace luly::renderer
 
     void directional_light::set_direction(float azimuth, float elevation)
     {
+        LY_PROFILE_FUNCTION;
         m_direction_angles = {azimuth, elevation};
 
         float az = glm::radians(azimuth);
@@ -63,12 +65,14 @@ namespace luly::renderer
 
     void directional_light::set_shadow_map_dimensions(const glm::ivec2& shadow_map_dimensions)
     {
+        LY_PROFILE_FUNCTION;
         m_shadow_map_dimensions = shadow_map_dimensions;
         create_shadow_fbo();
     }
 
     void directional_light::update_shadow_cascades(const std::shared_ptr<perspective_camera>& perspective_camera)
     {
+        LY_PROFILE_FUNCTION;
         calculate_cascade_splits(perspective_camera);
         const std::vector<cascade_frustum>& cascade_frustums = calculate_shadow_frustums(perspective_camera);
         update_ubos(cascade_frustums);
@@ -76,6 +80,7 @@ namespace luly::renderer
 
     void directional_light::create_shadow_fbo()
     {
+        LY_PROFILE_FUNCTION;
         glDeleteTextures(1, &m_shadow_maps);
 
         glCreateTextures(GL_TEXTURE_2D_ARRAY, 1, &m_shadow_maps);
@@ -99,6 +104,7 @@ namespace luly::renderer
     std::vector<cascade_frustum> directional_light::calculate_shadow_frustums(
         const std::shared_ptr<perspective_camera>& perspective_camera)
     {
+        LY_PROFILE_FUNCTION;
         std::vector<cascade_frustum> cascade_frustums;
 
         const float near_clip = perspective_camera->get_near_clip();
@@ -201,6 +207,7 @@ namespace luly::renderer
 
     void directional_light::update_ubos(const std::vector<cascade_frustum>& cascade_frustums)
     {
+        LY_PROFILE_FUNCTION;
         m_shadow_cascade_splits.clear();
 
         for (uint32_t i = 0; i < CASCADES_COUNT; ++i)

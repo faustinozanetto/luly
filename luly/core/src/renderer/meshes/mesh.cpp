@@ -15,6 +15,7 @@ namespace luly::renderer
 
     void mesh::initialize_buffers()
     {
+        LY_PROFILE_FUNCTION;
         const size_t vertex_buffer_size = m_vertices.size() * sizeof(mesh_vertex);
         const size_t index_buffer_size = m_indices.size() * sizeof(mesh_index);
 

@@ -1,4 +1,4 @@
-﻿#include "common/constants.lsh"
+#include "common/constants.lsh"
 
 layout(binding = CAMERA_UBO_LOCATION) uniform camera_ubo
 {

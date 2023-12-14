@@ -7,6 +7,7 @@ namespace luly::renderer
 {
     std::shared_ptr<mesh> mesh_factory::create_screen_quad_mesh()
     {
+        LY_PROFILE_FUNCTION;
         std::vector<mesh_vertex> vertices = {
             {{-1.0f, -1.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
             {{1.0f, -1.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
@@ -23,6 +24,7 @@ namespace luly::renderer
 
     std::shared_ptr<mesh> mesh_factory::create_cube_mesh()
     {
+        LY_PROFILE_FUNCTION;
         std::vector<mesh_vertex> vertices = {
             // Front face
             {{-0.5f, -0.5f, 0.5f}, {0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
@@ -53,6 +55,7 @@ namespace luly::renderer
 
     std::shared_ptr<mesh> mesh_factory::create_sphere_mesh(int rings, int sectors, float radius)
     {
+        LY_PROFILE_FUNCTION;
         std::vector<mesh_vertex> vertices;
         std::vector<mesh_index> indices;
 

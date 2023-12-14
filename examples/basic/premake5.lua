@@ -2,6 +2,8 @@ project "basic"
     kind "ConsoleApp"
     language "C++"
     cppdialect "C++20"
+
+    editandcontinue "Off"
     
     targetdir("%{_WORKING_DIR}/binaries/" .. output_dir .. "/%{prj.name}")
     objdir("%{_WORKING_DIR}/intermediates/" .. output_dir .. "/%{prj.name}")
@@ -24,6 +26,7 @@ project "basic"
         "%{include_dirs.entt}",
         "%{include_dirs.imgui}",
         "%{include_dirs.imguizmo}",
+        "%{include_dirs.tracy}",
     }
     
     links {
@@ -36,7 +39,7 @@ project "basic"
     }
 
     filter "configurations:debug"
-        defines "LY_DEBUG"
+        defines {"LY_DEBUG", "TRACY_ENABLE", "TRACY_ON_DEMAND", "LY_PROFILING"}
         runtime "Debug"
         symbols "on"
         links {

@@ -1,4 +1,4 @@
-﻿#include "common/constants.lsh"
+#include "common/constants.lsh"
 
 layout (binding = DIRECTIONAL_LIGHT_LIGHT_MATRICES_UBO_LOCATION) uniform directional_light_space_matrices_ubo
 {

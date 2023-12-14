@@ -7,6 +7,7 @@
 #include <unordered_map>
 
 #include <logging/log.h>
+#include <utils/profiler.h>
 
 namespace luly::renderer
 {
@@ -35,9 +36,24 @@ namespace luly::renderer
 
         /* Getters */
         const std::string& get_name() const { return m_name; }
-        const render_pass_output& get_output(const std::string& name) const { return m_outputs.at(name); }
-        const std::unordered_map<std::string, render_pass_output>& get_outputs() const { return m_outputs; }
-        const std::shared_ptr<frame_buffer>& get_fbo() const { return m_fbo; }
+
+        const render_pass_output& get_output(const std::string& name) const
+        {
+            LY_PROFILE_FUNCTION;
+            return m_outputs.at(name);
+        }
+
+        const std::unordered_map<std::string, render_pass_output>& get_outputs() const
+        {
+            LY_PROFILE_FUNCTION;
+            return m_outputs;
+        }
+
+        const std::shared_ptr<frame_buffer>& get_fbo() const
+        {
+            LY_PROFILE_FUNCTION;
+            return m_fbo;
+        }
 
         /* Virtuals */
         virtual void initialize() = 0;
@@ -48,11 +64,13 @@ namespace luly::renderer
         /* Methods */
         void add_input(const render_pass_input& render_pass_input)
         {
+            LY_PROFILE_FUNCTION;
             m_inputs.insert({render_pass_input.name, render_pass_input});
         }
 
         void add_output(const render_pass_output& render_pass_output)
         {
+            LY_PROFILE_FUNCTION;
             if (m_outputs.contains(render_pass_output.name))
             {
                 LY_WARN("Replacing old output pass with name '{0}' to render pass with name '{1}'!",
@@ -62,7 +80,11 @@ namespace luly::renderer
             m_outputs[render_pass_output.name] = render_pass_output;
         }
 
-        void clear_outputs() { m_outputs.clear(); }
+        void clear_outputs()
+        {
+            LY_PROFILE_FUNCTION;
+            m_outputs.clear();
+        }
 
     protected:
         std::string m_name;

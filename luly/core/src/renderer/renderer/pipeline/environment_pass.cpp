@@ -24,16 +24,19 @@ namespace luly::renderer
 
     void environment_pass::initialize()
     {
+        LY_PROFILE_FUNCTION;
         // Setup environment
         setup_environment();
     }
 
     void environment_pass::execute()
     {
+        LY_PROFILE_FUNCTION;
     }
 
     void environment_pass::set_outputs()
     {
+        LY_PROFILE_FUNCTION;
         render_pass_output irradiance_output;
         irradiance_output.name = "irradiance_output";
         irradiance_output.output = m_environment_irradiance_texture->get_handle_id();
@@ -57,10 +60,12 @@ namespace luly::renderer
 
     void environment_pass::on_resize(const glm::ivec2& dimensions)
     {
+        LY_PROFILE_FUNCTION;
     }
 
     void environment_pass::set_environment_map(const std::shared_ptr<texture_2d>& environment_map)
     {
+        LY_PROFILE_FUNCTION;
         m_environment_cubemap_texture.reset();
         m_brdf_texture.reset();
         m_environment_prefilter_texture.reset();
@@ -84,6 +89,7 @@ namespace luly::renderer
 
     void environment_pass::setup_environment()
     {
+        LY_PROFILE_FUNCTION;
         m_irradiance_map_size = 32;
         m_prefilter_map_size = 512;
         m_brdf_map_size = 512;
@@ -101,6 +107,7 @@ namespace luly::renderer
 
     void environment_pass::setup_environment_fbo()
     {
+        LY_PROFILE_FUNCTION;
         glm::ivec2 viewport_size = renderer::get_viewport_size();
         m_environment_capture_fbo = std::make_shared<frame_buffer>(viewport_size.x, viewport_size.y);
         m_environment_capture_rbo = std::make_shared<render_buffer>(
@@ -112,6 +119,7 @@ namespace luly::renderer
 
     void environment_pass::setup_environment_cubemap()
     {
+        LY_PROFILE_FUNCTION;
         texture_specification texture_specification;
         texture_specification.width = m_environment_map_size;
         texture_specification.height = m_environment_map_size;
@@ -124,6 +132,7 @@ namespace luly::renderer
 
     void environment_pass::setup_environment_equirectangular_map()
     {
+        LY_PROFILE_FUNCTION;
         // Skybox texture.
         m_capture_projection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
         m_capture_views =
@@ -163,6 +172,7 @@ namespace luly::renderer
 
     void environment_pass::setup_irradiance_map()
     {
+        LY_PROFILE_FUNCTION;
         texture_specification texture_specification;
         texture_specification.width = m_irradiance_map_size;
         texture_specification.height = m_irradiance_map_size;
@@ -201,6 +211,7 @@ namespace luly::renderer
 
     void environment_pass::setup_prefilter_map()
     {
+        LY_PROFILE_FUNCTION;
         texture_specification texture_specification;
         texture_specification.width = m_prefilter_map_size;
         texture_specification.height = m_prefilter_map_size;
@@ -249,6 +260,7 @@ namespace luly::renderer
 
     void environment_pass::setup_brdf_map()
     {
+        LY_PROFILE_FUNCTION;
         texture_specification texture_specification;
         texture_specification.width = m_brdf_map_size;
         texture_specification.height = m_brdf_map_size;

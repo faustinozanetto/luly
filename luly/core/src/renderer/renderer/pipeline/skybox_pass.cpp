@@ -2,7 +2,6 @@
 #include "skybox_pass.h"
 
 #include "geometry_pass.h"
-#include "lighting_pass.h"
 #include "renderer/meshes/mesh_factory.h"
 #include "renderer/renderer/renderer.h"
 #include "renderer/shaders/shader_factory.h"
@@ -23,6 +22,7 @@ namespace luly::renderer
 
     void skybox_pass::initialize()
     {
+        LY_PROFILE_FUNCTION;
         // Setup pass frame buffer.
         const glm::ivec2& viewport_size = renderer::get_viewport_size();
 
@@ -54,6 +54,7 @@ namespace luly::renderer
 
     void skybox_pass::execute()
     {
+        LY_PROFILE_FUNCTION;
         const render_pass_input& lighting_pass_input = m_inputs.at("lighting_pass_input");
         const render_pass_input& environment_pass_input = m_inputs.at("environment_pass_input");
         const render_pass_output& environment_cubemap_texture = environment_pass_input.render_pass->get_output(
@@ -73,11 +74,13 @@ namespace luly::renderer
         renderer::blit_frame_buffer({0, 0}, {width, height}, {0, 0}, {width, height},
                                     renderer_bit_mask::color | renderer_bit_mask::depth, texture_filtering::nearest);
 
-        const std::shared_ptr<scene::scene_actor>& skybox_actor = scene::scene_manager::get().get_current_scene()->get_skybox_actor();
+        const std::shared_ptr<scene::scene_actor>& skybox_actor = scene::scene_manager::get().get_current_scene()->
+            get_skybox_actor();
 
         // Render skybox cube using the environment cubemap texture.
         m_skybox_shader->bind();
-        m_skybox_shader->set_float("u_lod_level", skybox_actor->get_component<scene::skybox_component>().get_lod_level());
+        m_skybox_shader->set_float("u_lod_level",
+                                   skybox_actor->get_component<scene::skybox_component>().get_lod_level());
         renderer::bind_texture(0, environment_cubemap_texture.output);
         renderer::submit_mesh(m_cube_mesh);
         m_skybox_shader->un_bind();
@@ -88,6 +91,7 @@ namespace luly::renderer
 
     void skybox_pass::set_outputs()
     {
+        LY_PROFILE_FUNCTION;
         render_pass_output skybox_output;
         skybox_output.name = "skybox_output";
         skybox_output.output = m_fbo->get_attachment_id(0);
@@ -96,6 +100,7 @@ namespace luly::renderer
 
     void skybox_pass::on_resize(const glm::ivec2& dimensions)
     {
+        LY_PROFILE_FUNCTION;
         m_fbo->resize(dimensions);
     }
 }

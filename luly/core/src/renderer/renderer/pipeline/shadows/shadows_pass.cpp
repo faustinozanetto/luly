@@ -22,6 +22,7 @@ namespace luly::renderer
 
     void shadows_pass::initialize()
     {
+        LY_PROFILE_FUNCTION;
         m_directional_light_shadows_manager = std::make_shared<directional_light_shadows_manager>();
         m_point_light_shadows_manager = std::make_shared<point_light_shadows_manager>();
 
@@ -30,6 +31,7 @@ namespace luly::renderer
 
     void shadows_pass::execute()
     {
+        LY_PROFILE_FUNCTION;
         const std::shared_ptr<scene::scene>& current_scene = scene::scene_manager::get().get_current_scene();
 
         renderer::set_state(renderer_state::depth, true);
@@ -45,6 +47,7 @@ namespace luly::renderer
 
     void shadows_pass::set_outputs()
     {
+        LY_PROFILE_FUNCTION;
         clear_outputs();
 
         const std::shared_ptr<scene::scene>& current_scene = scene::scene_manager::get().get_current_scene();
@@ -60,10 +63,12 @@ namespace luly::renderer
 
     void shadows_pass::on_resize(const glm::ivec2& dimensions)
     {
+        LY_PROFILE_FUNCTION;
     }
 
     void shadows_pass::bind_uniforms(const std::shared_ptr<shader>& shader) const
     {
+        LY_PROFILE_FUNCTION;
         shader->set_int("u_shadows.soft_shadows", m_shadows_data.soft_shadows);
         shader->set_int("u_shadows.pcf_horizontal_samples", m_shadows_data.pcf_horizontal_samples);
         shader->set_int("u_shadows.pcf_vertical_samples", m_shadows_data.pcf_vertical_samples);
@@ -74,6 +79,7 @@ namespace luly::renderer
 
     void shadows_pass::initialize_shadows_data()
     {
+        LY_PROFILE_FUNCTION;
         m_shadows_data.soft_shadows = true;
         m_shadows_data.pcf_vertical_samples = 4;
         m_shadows_data.pcf_horizontal_samples = 4;

@@ -23,7 +23,7 @@ namespace luly::renderer
         /* Methods */
         void on_update(float delta_time);
         void process_keyboard_input(float delta_time) const;
-        void process_mouse_input(float x_offset, float y_offset, float delta_time);
+        void process_mouse_input(float x_offset, float y_offset, float delta_time) const;
 
     private:
         std::shared_ptr<perspective_camera> m_perspective_camera;

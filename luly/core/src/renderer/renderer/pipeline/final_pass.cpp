@@ -18,6 +18,7 @@ namespace luly::renderer
 
     void final_pass::initialize()
     {
+        LY_PROFILE_FUNCTION;
         // Setup pass frame buffer.
         const glm::ivec2& viewport_size = renderer::get_viewport_size();
 
@@ -48,12 +49,14 @@ namespace luly::renderer
 
     void final_pass::execute()
     {
+        LY_PROFILE_FUNCTION;
         m_fbo->bind();
         renderer::clear_screen();
         m_screen_shader->bind();
 
         const render_pass_input& debanding_pass_input = m_inputs.at("debanding_pass_input");
-        const render_pass_output& debanding_pass_output = debanding_pass_input.render_pass->get_output("debanding_output");
+        const render_pass_output& debanding_pass_output = debanding_pass_input.render_pass->get_output(
+            "debanding_output");
 
         renderer::bind_texture(0, debanding_pass_output.output);
         renderer::submit_mesh(m_screen_mesh);
@@ -64,6 +67,7 @@ namespace luly::renderer
 
     void final_pass::set_outputs()
     {
+        LY_PROFILE_FUNCTION;
         render_pass_output final_output;
         final_output.name = "final_output";
         final_output.output = m_fbo->get_attachment_id(0);
@@ -72,6 +76,7 @@ namespace luly::renderer
 
     void final_pass::on_resize(const glm::ivec2& dimensions)
     {
+        LY_PROFILE_FUNCTION;
         m_fbo->resize(dimensions);
     }
 }

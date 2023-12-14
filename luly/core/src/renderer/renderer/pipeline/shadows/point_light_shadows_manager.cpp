@@ -1,8 +1,9 @@
 #include "lypch.h"
 #include "point_light_shadows_manager.h"
 
-#include "renderer/renderer/pipeline/lighting_pass.h"
+#include "renderer/renderer/renderer.h"
 #include "renderer/shaders/shader_factory.h"
+#include "renderer/renderer/pipeline/lighting/lights_manager.h"
 #include "scene/actor/components/lights/point_light_component.h"
 
 namespace luly::renderer
@@ -14,6 +15,7 @@ namespace luly::renderer
 
     void point_light_shadows_manager::execute(const std::shared_ptr<scene::scene>& current_scene)
     {
+        LY_PROFILE_FUNCTION;
         const std::vector<scene::point_light_component>& point_lights = current_scene->get_point_lights();
         if (point_lights.empty()) return;
 
@@ -39,6 +41,7 @@ namespace luly::renderer
 
     void point_light_shadows_manager::bind_uniforms(const std::shared_ptr<shader>& shader)
     {
+        LY_PROFILE_FUNCTION;
         shader->set_float("u_point_light_shadows.shadow_bias", m_point_light_shadows_data.shadow_bias);
         for (int i = 0; i < MAX_POINT_LIGHTS; i++)
         {
@@ -51,6 +54,7 @@ namespace luly::renderer
 
     void point_light_shadows_manager::initialize()
     {
+        LY_PROFILE_FUNCTION;
         m_point_light_shadows_shader = shader_factory::create_shader_from_file(
             "assets/shaders/shadows/point_light_shadows.lsh");
 
@@ -59,6 +63,7 @@ namespace luly::renderer
 
     void point_light_shadows_manager::initialize_shadows_data()
     {
+        LY_PROFILE_FUNCTION;
         m_point_light_shadows_data.shadow_bias = 0.005f;
         for (int i = 0; i < MAX_POINT_LIGHTS; i++)
         {
@@ -69,6 +74,7 @@ namespace luly::renderer
 
     void point_light_shadows_manager::calculate_point_light_shadow(const std::shared_ptr<point_light>& point_light)
     {
+        LY_PROFILE_FUNCTION;
         // Setup fbo and shader.
         point_light->get_shadow_map_fbo()->bind();
         renderer::set_viewport_size(point_light->get_shadow_map_dimensions());

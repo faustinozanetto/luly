@@ -14,12 +14,14 @@ namespace luly::renderer
 
     void directional_light_shadows_manager::set_debug_cascade_color(int cascade_index, const glm::vec3& color)
     {
+        LY_PROFILE_FUNCTION;
         LY_ASSERT_MSG(cascade_index >= 0 && cascade_index < CASCADES_COUNT, "Cascade index out of range!")
         m_directional_light_shadows_data.cascade_debug_colors[cascade_index] = glm::vec4(color, 1.0);
     }
 
     void directional_light_shadows_manager::execute(const std::shared_ptr<scene::scene>& current_scene)
     {
+        LY_PROFILE_FUNCTION;
         const std::vector<scene::directional_light_component>& directional_lights = current_scene->
             get_directional_light();
         if (directional_lights.empty()) return;
@@ -58,6 +60,7 @@ namespace luly::renderer
 
     void directional_light_shadows_manager::bind_uniforms(const std::shared_ptr<shader>& shader)
     {
+        LY_PROFILE_FUNCTION;
         shader->set_int("u_directional_light_shadows.show_cascades", m_directional_light_shadows_data.show_cascades);
         shader->set_float("u_directional_light_shadows.shadow_bias", m_directional_light_shadows_data.shadow_bias);
         shader->set_int("u_directional_light_shadows.enable_shadows", m_directional_light_shadows_data.enable_shadows);
@@ -72,6 +75,7 @@ namespace luly::renderer
 
     void directional_light_shadows_manager::initialize()
     {
+        LY_PROFILE_FUNCTION;
         m_directional_light_shadows_shader = shader_factory::create_shader_from_file(
             "assets/shaders/shadows/directional_light_shadows.lsh");
 
@@ -80,6 +84,7 @@ namespace luly::renderer
 
     void directional_light_shadows_manager::initialize_shadows_data()
     {
+        LY_PROFILE_FUNCTION;
         m_directional_light_shadows_data.show_cascades = false;
         m_directional_light_shadows_data.enable_shadows = false;
         m_directional_light_shadows_data.shadow_bias = 0.005f;
@@ -94,6 +99,7 @@ namespace luly::renderer
     void directional_light_shadows_manager::update_shadows_cascades_data(
         const std::shared_ptr<directional_light>& directional_light)
     {
+        LY_PROFILE_FUNCTION;
         const std::vector<float>& cascade_splits = directional_light->get_shadow_cascade_splits();
         for (int i = 0; i < CASCADES_COUNT; i++)
         {
