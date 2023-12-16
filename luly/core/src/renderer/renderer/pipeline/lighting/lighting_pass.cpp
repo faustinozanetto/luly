@@ -4,6 +4,7 @@
 #include "application/application.h"
 #include "renderer/meshes/mesh_factory.h"
 #include "renderer/renderer/renderer.h"
+#include "renderer/renderer/pipeline/shadows/shadows_pass.h"
 #include "renderer/shaders/shader_factory.h"
 #include "scene/actor/components/lights/point_light_component.h"
 #include "scene/actor/components/rendering/skybox_component.h"
@@ -121,7 +122,9 @@ namespace luly::renderer
 
         // Update rest of uniforms
         upload_skybox_uniforms();
-        scene_renderer::get_data().shadows_pass->bind_uniforms(m_lighting_shader);
+        const std::shared_ptr<shadows_pass>& shadows_render_pass = scene_renderer::get_render_pass<shadows_pass>(
+            render_pass_type::shadow_pass);
+        shadows_render_pass->bind_uniforms(m_lighting_shader);
 
         // Render screen quad mesh.
         renderer::submit_mesh(m_screen_mesh);

@@ -12,14 +12,15 @@ namespace luly::ui
 
     std::pair<bool, size_t> actor_name_component_panel::get_actor_component_details()
     {
-        bool has_component = engine_ui::get_ui_data().selected_actor->has_component<scene::name_component>();
+        bool has_component = engine_ui::get().get_selected_actor()->has_component<scene::name_component>();
         auto component_hash = typeid(scene::name_component).hash_code();
         return std::make_pair(has_component, component_hash);
     }
 
     void actor_name_component_panel::on_render_component_details()
     {
-        auto& name_component = engine_ui::get_ui_data().selected_actor->get_component<scene::name_component>();
+        scene::name_component& name_component = engine_ui::get().get_selected_actor()->get_component<
+            scene::name_component>();
 
         // Editable name field.
         char buffer[256] = {};
@@ -32,7 +33,7 @@ namespace luly::ui
         // Actor handle
         ImGui::SameLine();
         ImGui::Text("Actor Handle: %s",
-                    std::to_string(static_cast<uint32_t>(engine_ui::get_ui_data().selected_actor->get_handle())).
+                    std::to_string(static_cast<uint32_t>(engine_ui::get().get_selected_actor()->get_handle())).
                     c_str());
     }
 }

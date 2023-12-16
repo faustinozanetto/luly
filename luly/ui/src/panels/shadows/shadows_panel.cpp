@@ -24,9 +24,10 @@ namespace luly::ui
         {
             ui_utils::draw_property("Settings");
             ImGui::Separator();
-       
-            const std::shared_ptr<renderer::shadows_pass>& shadows_pass = renderer::scene_renderer::get_data().
-                shadows_pass;
+
+            const std::shared_ptr<renderer::shadows_pass>& shadows_pass = renderer::scene_renderer::get_render_pass<
+                renderer::shadows_pass>(renderer::render_pass_type::shadow_pass);
+            
             renderer::shadows_data& shadows_data = shadows_pass->
                 get_shadows_data();
 
@@ -76,7 +77,7 @@ namespace luly::ui
                         directional_light_shadows_manager->set_debug_cascade_color(i, cascade_debug_color);
                     }
                 }
-                
+
                 ImGui::TreePop();
             }
 

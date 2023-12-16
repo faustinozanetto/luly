@@ -57,4 +57,14 @@ namespace luly::renderer
         m_far_clip = far_clip;
         update_projection_matrix(renderer::get_viewport_size());
     }
+
+    void camera::set_view_matrix(const glm::mat4& view_matrix)
+    {
+        m_view_matrix = view_matrix;
+    }
+
+    void camera::set_projection_matrix(const glm::mat4& projection_matrix)
+    {
+        m_projection_matrix = projection_matrix;
+    }
 }

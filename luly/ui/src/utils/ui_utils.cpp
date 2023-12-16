@@ -420,7 +420,7 @@ namespace luly::ui
     }
 
     bool ui_utils::draw_drop_down(const std::string& name, const char** options, int32_t option_count,
-	    int32_t* selected)
+                                  int32_t* selected)
     {
         const char* current = options[*selected];
 
@@ -435,11 +435,11 @@ namespace luly::ui
 
         // Content
         ImGui::PushMultiItemsWidths(1, ImGui::CalcItemWidth());
-        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 5 });
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{0, 5});
 
         bool modified = false;
 
-    	const std::string id = "##" + std::string(name);
+        const std::string id = "##" + std::string(name);
         if (ImGui::BeginCombo(id.c_str(), current))
         {
             for (int i = 0; i < option_count; i++)
@@ -493,5 +493,22 @@ namespace luly::ui
         ImGui::PopStyleVar();
 
         return modified;
+    }
+
+    int ui_utils::get_mouse_button_code_to_imgui(input::mouse_button mouse_button)
+    {
+        switch (mouse_button)
+        {
+        case input::mouse_button::button_left:
+            return 0;
+        case input::mouse_button::button_right:
+            return 1;
+        case input::mouse_button::button_middle:
+            return 2;
+        default:
+            return 4;
+        }
+
+        return 4;
     }
 }

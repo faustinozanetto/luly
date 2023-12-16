@@ -29,17 +29,30 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+#include "events/event_dispatcher.h"
 #include "input/input_manager.h"
 #include "panels/editor/editor_panel.h"
 #include "panels/renderer/render_passes_panel.h"
+#include "utils/ui_utils.h"
 
 namespace luly::ui
 {
-    engine_ui_data engine_ui::s_engine_ui_data = {};
+    engine_ui* engine_ui::s_instance = nullptr;
+
+    engine_ui::engine_ui()
+    {
+        initialize();
+    }
+
+    engine_ui::~engine_ui()
+    {
+        shutdown();
+    }
 
     void engine_ui::initialize()
     {
         LY_TRACE("Engine UI initialization started...");
+        s_instance = this;
         initialize_data();
         initialize_imgui();
         initialize_panels();
@@ -54,9 +67,10 @@ namespace luly::ui
         ImGui::DestroyContext();
     }
 
-    engine_ui_data& engine_ui::get_ui_data()
+    engine_ui& engine_ui::get()
     {
-        return s_engine_ui_data;
+        if (!s_instance) s_instance = new engine_ui();
+        return *s_instance;
     }
 
     void engine_ui::set_color_scheme()
@@ -147,27 +161,27 @@ namespace luly::ui
 
     void engine_ui::initialize_data()
     {
-        s_engine_ui_data.use_snap = true;
-        s_engine_ui_data.show_guizmos = true;
-        s_engine_ui_data.snap_value = 0.1f;
-        s_engine_ui_data.guizmos_scale = 0.25f;
-        s_engine_ui_data.selected_guizmo_operation = ImGuizmo::UNIVERSAL;
+        m_use_snap = true;
+        m_show_guizmos = true;
+        m_snap_value = 0.1f;
+        m_guizmos_scale = 0.25f;
+        m_selected_guizmo_operation = ImGuizmo::UNIVERSAL;
     }
 
     void engine_ui::initialize_panels()
     {
-        s_engine_ui_data.panels.push_back(std::make_shared<menubar_panel>());
-        s_engine_ui_data.panels.push_back(std::make_shared<console_panel>());
-        s_engine_ui_data.panels.push_back(std::make_shared<viewport_panel>());
-        s_engine_ui_data.panels.push_back(std::make_shared<profiling_panel>());
-        s_engine_ui_data.panels.push_back(std::make_shared<scene_hierarchy_panel>());
-        s_engine_ui_data.panels.push_back(std::make_shared<actor_details_panel>());
-        s_engine_ui_data.panels.push_back(std::make_shared<camera_panel>());
-        s_engine_ui_data.panels.push_back(std::make_shared<renderer_panel>());
-        s_engine_ui_data.panels.push_back(std::make_shared<assets_panel>());
-        s_engine_ui_data.panels.push_back(std::make_shared<shadows_panel>());
-        s_engine_ui_data.panels.push_back(std::make_shared<editor_panel>());
-        s_engine_ui_data.panels.push_back(std::make_shared<render_passes_panel>());
+        m_panels.push_back(std::make_shared<menubar_panel>());
+        m_panels.push_back(std::make_shared<console_panel>());
+        m_panels.push_back(std::make_shared<viewport_panel>());
+        m_panels.push_back(std::make_shared<profiling_panel>());
+        m_panels.push_back(std::make_shared<scene_hierarchy_panel>());
+        m_panels.push_back(std::make_shared<actor_details_panel>());
+        m_panels.push_back(std::make_shared<camera_panel>());
+        m_panels.push_back(std::make_shared<renderer_panel>());
+        m_panels.push_back(std::make_shared<assets_panel>());
+        m_panels.push_back(std::make_shared<shadows_panel>());
+        m_panels.push_back(std::make_shared<editor_panel>());
+        m_panels.push_back(std::make_shared<render_passes_panel>());
     }
 
     void engine_ui::initialize_log_sink()
@@ -176,14 +190,13 @@ namespace luly::ui
         shared::log::add_sink(imgui_sink);
     }
 
-    void engine_ui::set_render_target(uint32_t render_target)
+    void engine_ui::on_event(events::base_event& base_event)
     {
-        s_engine_ui_data.render_target = render_target;
-    }
-
-    void engine_ui::set_selected_actor(const std::shared_ptr<scene::scene_actor>& selected_actor)
-    {
-        s_engine_ui_data.selected_actor = selected_actor;
+        events::event_dispatcher dispatcher(base_event);
+        dispatcher.dispatch<
+            events::mouse_button_pressed_event>(BIND_EVENT_FN(engine_ui::on_mouse_button_pressed_event));
+        dispatcher.dispatch<
+            events::mouse_button_released_event>(BIND_EVENT_FN(engine_ui::on_mouse_button_released_event));
     }
 
     void engine_ui::on_update()
@@ -191,27 +204,27 @@ namespace luly::ui
         // Check for key press.
         if (input::input_manager::is_key_pressed(input::key::d1))
         {
-            s_engine_ui_data.selected_guizmo_operation = ImGuizmo::UNIVERSAL;
+            m_selected_guizmo_operation = ImGuizmo::UNIVERSAL;
         }
         else if (input::input_manager::is_key_pressed(input::key::d2))
         {
-            s_engine_ui_data.selected_guizmo_operation = ImGuizmo::TRANSLATE;
+            m_selected_guizmo_operation = ImGuizmo::TRANSLATE;
         }
         else if (input::input_manager::is_key_pressed(input::key::d3))
         {
-            s_engine_ui_data.selected_guizmo_operation = ImGuizmo::ROTATE;
+            m_selected_guizmo_operation = ImGuizmo::ROTATE;
         }
         else if (input::input_manager::is_key_pressed(input::key::d4))
         {
-            s_engine_ui_data.selected_guizmo_operation = ImGuizmo::SCALE;
+            m_selected_guizmo_operation = ImGuizmo::SCALE;
         }
         else if (input::input_manager::is_key_pressed(input::key::d5))
         {
-            s_engine_ui_data.use_snap = !s_engine_ui_data.use_snap;
+            m_use_snap = !m_use_snap;
         }
 
         // Render all panels.
-        for (const std::shared_ptr<ui_panel>& ui_panel : s_engine_ui_data.panels)
+        for (const std::shared_ptr<ui_panel>& ui_panel : m_panels)
         {
             ui_panel->on_render_panel();
         }
@@ -287,7 +300,7 @@ namespace luly::ui
             LY_ASSERT(false)
         }
 
-        ImGuizmo::SetGizmoSizeClipSpace(s_engine_ui_data.guizmos_scale / 2.0f);
+        ImGuizmo::SetGizmoSizeClipSpace(m_guizmos_scale / 2.0f);
     }
 
     void engine_ui::begin_dockspace()
@@ -322,5 +335,22 @@ namespace luly::ui
     void engine_ui::end_dockspace()
     {
         ImGui::End();
+    }
+
+    bool engine_ui::on_mouse_button_pressed_event(const events::mouse_button_pressed_event& mouse_button_pressed_event)
+    {
+        ImGuiIO& io = ImGui::GetIO();
+        io.MouseDown[ui_utils::get_mouse_button_code_to_imgui(mouse_button_pressed_event.get_button_code())] = true;
+
+        return false;
+    }
+
+    bool engine_ui::on_mouse_button_released_event(
+        const events::mouse_button_released_event& mouse_button_released_event)
+    {
+        ImGuiIO& io = ImGui::GetIO();
+        io.MouseDown[ui_utils::get_mouse_button_code_to_imgui(mouse_button_released_event.get_button_code())] = false;
+
+        return false;
     }
 }

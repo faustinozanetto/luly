@@ -24,7 +24,7 @@ namespace luly::ui
         if (ImGui::Begin("Scene Hierarchy", &s_show))
         {
             const std::shared_ptr<scene::scene>& current_scene = scene::scene_manager::get().get_current_scene();
-            const std::shared_ptr<scene::scene_actor>& current_actor = engine_ui::get_ui_data().selected_actor;
+            const std::shared_ptr<scene::scene_actor>& current_actor = engine_ui::get().get_selected_actor();
 
             if (current_scene)
             {
@@ -63,7 +63,7 @@ namespace luly::ui
                     // Selection of actor
                     if (ImGui::IsItemClicked())
                     {
-                        engine_ui::set_selected_actor(current_scene->get_actor(actor_handle));
+                        engine_ui::get().set_selected_actor(current_scene->get_actor(actor_handle));
                     }
 
                     if (open)

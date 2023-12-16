@@ -4,7 +4,7 @@
 
 #include <application/application.h>
 
-#include "events/window/window_resize_event.h"
+#include "engine_ui.h"
 
 class basic_application : public luly::core::application
 {
@@ -22,4 +22,5 @@ public:
 
 private:
     void setup_scene();
+    std::shared_ptr<luly::ui::engine_ui> m_engine_ui;
 };

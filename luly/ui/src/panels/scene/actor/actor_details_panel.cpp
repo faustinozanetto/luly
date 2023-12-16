@@ -30,9 +30,9 @@ namespace luly::ui
 
         if (ImGui::Begin("Actor Details", &s_show))
         {
-            if (engine_ui::get_ui_data().selected_actor)
+            if (engine_ui::get().get_selected_actor())
             {
-                for (const auto& component_panel : m_component_panels)
+                for (const std::shared_ptr<actor_component_panel>& component_panel : m_component_panels)
                 {
                     component_panel->on_render_panel();
                 }

@@ -13,14 +13,14 @@ namespace luly::ui
 
     std::pair<bool, size_t> actor_transform_component_panel::get_actor_component_details()
     {
-        bool has_component = engine_ui::get_ui_data().selected_actor->has_component<scene::transform_component>();
+        bool has_component = engine_ui::get().get_selected_actor()->has_component<scene::transform_component>();
         auto component_hash = typeid(scene::transform_component).hash_code();
         return std::make_pair(has_component, component_hash);
     }
 
     void actor_transform_component_panel::on_render_component_details()
     {
-        const scene::transform_component& transform_component = engine_ui::get_ui_data().selected_actor->get_component<
+        const scene::transform_component& transform_component = engine_ui::get().get_selected_actor()->get_component<
             scene::transform_component>();
 
         const std::shared_ptr<math::transform>& transform = transform_component.get_transform();

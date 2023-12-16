@@ -28,7 +28,7 @@ namespace luly::ui
             {
                 ImGui::TreePop();
             }
-            ImGui::Separator();*/
+            ImGui::Separator();
 
             if (draw_render_pass_details(renderer::scene_renderer::get_data().geometry_pass))
             {
@@ -59,7 +59,7 @@ namespace luly::ui
                 {
                     if (ui_utils::draw_property(bloom_mip.texture->get_handle_id(), {90, 90}))
                     {
-                        engine_ui::set_render_target(bloom_mip.texture->get_handle_id());
+                        engine_ui::get().set_render_target(bloom_mip.texture->get_handle_id());
                     }
                     ImGui::NextColumn();
                 }
@@ -84,7 +84,7 @@ namespace luly::ui
             {
                 ImGui::TreePop();
             }
-            ImGui::Separator();
+            ImGui::Separator();*/
 
             ImGui::End();
         }
@@ -129,7 +129,7 @@ namespace luly::ui
         {
             if (ui_utils::draw_property(pair.second.output, {90, 90}))
             {
-                engine_ui::set_render_target(pair.second.output);
+                engine_ui::get().set_render_target(pair.second.output);
             }
             ImGui::NextColumn();
         }

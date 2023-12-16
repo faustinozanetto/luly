@@ -17,6 +17,9 @@ namespace luly::ui
         void set_show_panel(bool show_panel) override;
 
     private:
+        void render_tonemapping_details();
+        void render_bloom_details();
+        
         static bool s_show;
 
         std::vector<const char*> m_tonemapping_names;

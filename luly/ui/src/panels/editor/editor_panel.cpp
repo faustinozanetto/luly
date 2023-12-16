@@ -22,12 +22,24 @@ namespace luly::ui
 
         if (ImGui::Begin("Editor", &s_show))
         {
-            ui_utils::draw_property("Show Guizmos", engine_ui::get_ui_data().show_guizmos);
-            if (ui_utils::draw_property("Guizmos Scale", engine_ui::get_ui_data().guizmos_scale, 0.0f, 2.0f, 0.01f))
+            bool show_guizmos = engine_ui::get().get_show_guizmos();
+            if (ui_utils::draw_property("Show Guizmos", show_guizmos))
             {
-                ImGuizmo::SetGizmoSizeClipSpace(engine_ui::get_ui_data().guizmos_scale / 2.0f);
+                engine_ui::get().set_show_guizmos(show_guizmos);
             }
-            ui_utils::draw_property("Snap Value", engine_ui::get_ui_data().snap_value, 0.0f, 10.0f, 0.05f);
+
+            float guizmos_scale = engine_ui::get().get_guizmos_scale();
+            if (ui_utils::draw_property("Guizmos Scale", guizmos_scale, 0.0f, 2.0f, 0.01f))
+            {
+                engine_ui::get().set_guizmos_scale(guizmos_scale);
+                ImGuizmo::SetGizmoSizeClipSpace(guizmos_scale / 2.0f);
+            }
+
+            float snap_value = engine_ui::get().get_snap_value();
+            if (ui_utils::draw_property("Snap Value", snap_value, 0.0f, 10.0f, 0.05f))
+            {
+                engine_ui::get().set_snap_value(snap_value);
+            }
             ImGui::End();
         }
     }

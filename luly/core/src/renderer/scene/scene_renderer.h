@@ -1,23 +1,27 @@
 ﻿#pragma once
 
-#include "renderer/renderer/pipeline/final_pass.h"
-#include "renderer/renderer/pipeline/geometry_pass.h"
-#include "renderer/buffers/uniform/uniform_buffer_object.h"
 #include "renderer/camera/camera.h"
+#include "renderer/buffers/uniform/uniform_buffer_object.h"
 #include "renderer/renderer/pipeline/ambient_occlusion_pass.h"
-#include "renderer/renderer/pipeline/environment_pass.h"
-#include "renderer/renderer/pipeline/skybox_pass.h"
-#include "renderer/renderer/pipeline/debanding_pass.h"
-#include "renderer/renderer/pipeline/bloom_pass.h"
-#include "renderer/renderer/pipeline/tonemapping_pass.h"
 #include "renderer/renderer/pipeline/shadows/shadows_pass.h"
 
 #include <memory>
 
-#include "renderer/renderer/pipeline/lighting/lighting_pass.h"
-
 namespace luly::renderer
 {
+    enum class render_pass_type
+    {
+        shadow_pass,
+        geometry_pass,
+        environment_pass,
+        lighting_pass,
+        skybox_pass,
+        bloom_pass,
+        tonemapping_pass,
+        debanding_pass,
+        final_pass,
+    };
+
     struct camera_data
     {
         glm::mat4 view_matrix;
@@ -31,16 +35,7 @@ namespace luly::renderer
     struct scene_renderer_data
     {
         /* Passes */
-        std::shared_ptr<shadows_pass> shadows_pass;
-        std::shared_ptr<geometry_pass> geometry_pass;
-        std::shared_ptr<environment_pass> environment_pass;
-        std::shared_ptr<lighting_pass> lighting_pass;
-    //    std::shared_ptr<ambient_occlusion_pass> ambient_occlusion_pass;
-        std::shared_ptr<skybox_pass> skybox_pass;
-        std::shared_ptr<debanding_pass> debanding_pass;
-        std::shared_ptr<bloom_pass> bloom_pass;
-        std::shared_ptr<tonemapping_pass> tonemapping_pass;
-        std::shared_ptr<final_pass> final_pass;
+        std::unordered_map<render_pass_type, std::shared_ptr<render_pass>> passes;
 
         /* Camera */
         camera_data camera_data;
@@ -62,7 +57,17 @@ namespace luly::renderer
         static void on_resize(const glm::ivec2& viewport_size);
 
         /* Getters */
-        static scene_renderer_data& get_data();
+        template <typename T, typename = std::enable_if<std::is_base_of_v<render_pass, T>>>
+        static std::shared_ptr<T> get_render_pass(render_pass_type pass_type)
+        {
+            std::shared_ptr<render_pass> base_pass = s_data.passes.at(pass_type);
+
+            // Attempt the dynamic_cast
+            std::shared_ptr<T> derived_pass = std::dynamic_pointer_cast<T>(base_pass);
+            LY_ASSERT_MSG(derived_pass, "Failed to cast render_pass to the specified type!")
+
+            return derived_pass;
+        }
 
     private:
         static void create_pipeline_passes();

@@ -34,6 +34,8 @@ namespace luly::renderer
         void set_yaw(float yaw) { m_yaw = yaw; }
         void set_near_clip(float near_clip);
         void set_far_clip(float far_clip);
+        void set_view_matrix(const glm::mat4& view_matrix);
+        void set_projection_matrix(const glm::mat4& projection_matrix);
 
         /* Methods */
         void update_vectors();

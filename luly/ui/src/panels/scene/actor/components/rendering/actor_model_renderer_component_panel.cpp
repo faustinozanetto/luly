@@ -15,14 +15,15 @@ namespace luly::ui
 
     std::pair<bool, size_t> actor_model_renderer_component_panel::get_actor_component_details()
     {
-        bool has_component = engine_ui::get_ui_data().selected_actor->has_component<scene::model_renderer_component>();
+        bool has_component = engine_ui::get().get_selected_actor()->has_component<scene::model_renderer_component>();
         auto component_hash = typeid(scene::model_renderer_component).hash_code();
         return std::make_pair(has_component, component_hash);
     }
 
     void actor_model_renderer_component_panel::on_render_component_details()
     {
-        auto& model_renderer_component = engine_ui::get_ui_data().selected_actor->get_component<
+        scene::model_renderer_component& model_renderer_component = engine_ui::get().get_selected_actor()->get_component
+        <
             scene::model_renderer_component>();
 
         if (model_renderer_component.get_model())

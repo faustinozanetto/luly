@@ -29,7 +29,7 @@ namespace luly::ui
             }
             if (ImGui::BeginMenu("Panels"))
             {
-                for (const auto& ui_panel : engine_ui::get_ui_data().panels)
+                for (const std::shared_ptr<ui_panel>& ui_panel : engine_ui::get().get_panels())
                 {
                     // Skip this panel.
                     if (ui_panel->get_name() == "menubar_panel") continue;

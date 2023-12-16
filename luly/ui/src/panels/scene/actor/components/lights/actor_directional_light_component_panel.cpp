@@ -17,7 +17,7 @@ namespace luly::ui
 
     std::pair<bool, size_t> actor_directional_light_component_panel::get_actor_component_details()
     {
-        bool has_component = engine_ui::get_ui_data().selected_actor->has_component<
+        bool has_component = engine_ui::get().get_selected_actor()->has_component<
             scene::directional_light_component>();
         auto component_hash = typeid(scene::directional_light_component).hash_code();
         return std::make_pair(has_component, component_hash);
@@ -25,7 +25,7 @@ namespace luly::ui
 
     void actor_directional_light_component_panel::on_render_component_details()
     {
-        scene::directional_light_component& directional_light_component = engine_ui::get_ui_data().selected_actor
+        scene::directional_light_component& directional_light_component = engine_ui::get().get_selected_actor()
             ->get_component<
                 scene::directional_light_component>();
 
@@ -64,7 +64,7 @@ namespace luly::ui
             {
                 directional_light->set_cascade_split_lambda(cascade_split_lambda);
             }
-            
+
             bool enable_shadows = directional_light_component.get_enable_shadows();
             if (ui_utils::draw_property("Enable Shadows", enable_shadows))
             {

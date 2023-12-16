@@ -35,7 +35,7 @@ namespace luly::ui
         {
             render_toolbar();
             render_scene_viewport();
-            render_transform_guizmo();
+            render_guizmos();
 
             ImGui::End();
         }
@@ -51,7 +51,7 @@ namespace luly::ui
         s_show = show_panel;
     }
 
-    void viewport_panel::render_transform_guizmo() const
+    void viewport_panel::render_guizmos()
     {
         const ImVec2 min_region = ImGui::GetWindowContentRegionMin();
         const ImVec2 max_region = ImGui::GetWindowContentRegionMax();
@@ -65,29 +65,41 @@ namespace luly::ui
         ImGuizmo::SetOrthographic(false);
 
         const std::shared_ptr<scene::scene>& current_scene = scene::scene_manager::get().get_current_scene();
+        if (!current_scene) return;
+
         const std::shared_ptr<renderer::perspective_camera>& perspective_camera = current_scene->
             get_camera_manager()->get_perspective_camera();
 
         glm::mat4 view_matrix = perspective_camera->get_view_matrix();
         glm::mat4 projection_matrix = perspective_camera->get_projection_matrix();
 
-        /*
-        static const float identity_matrix[16] = { 1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f };
-        ImGuizmo::DrawGrid(glm::value_ptr(view_matrix),
-            glm::value_ptr(projection_matrix), identity_matrix, 120.f);
-            */
+        render_transform_guizmo(view_matrix, projection_matrix);
+        render_camera_guizmo(view_matrix, projection_matrix);
 
-        const std::shared_ptr<scene::scene_actor>& selected_actor = engine_ui::get_ui_data().selected_actor;
-        if (selected_actor && engine_ui::get_ui_data().show_guizmos)
+        perspective_camera->set_view_matrix(view_matrix);
+        perspective_camera->set_projection_matrix(projection_matrix);
+    }
+
+    void viewport_panel::render_transform_guizmo(glm::mat4& view_matrix, glm::mat4& projection_matrix)
+    {
+        engine_ui& engine_ui = engine_ui::get();
+
+        const std::shared_ptr<scene::scene_actor>& selected_actor = engine_ui.get_selected_actor();
+        if (selected_actor && engine_ui.get_show_guizmos())
         {
             const scene::transform_component& transform_component = selected_actor->get_component<
                 scene::transform_component>();
             glm::mat4 transform = transform_component.get_transform()->get_transform();
 
-            const float snap_values[3] = { engine_ui::get_ui_data().snap_value, engine_ui::get_ui_data().snap_value, engine_ui::get_ui_data().snap_value };
+            const float snap_values[3] = {
+                engine_ui.get_snap_value(), engine_ui.get_snap_value(),
+                engine_ui.get_snap_value()
+            };
+
             ImGuizmo::Manipulate(glm::value_ptr(view_matrix), glm::value_ptr(projection_matrix),
-                                 engine_ui::get_ui_data().selected_guizmo_operation, ImGuizmo::LOCAL, glm::value_ptr(transform),
-                                 nullptr, engine_ui::get_ui_data().use_snap ? snap_values : nullptr);
+                                 engine_ui.get_selected_operation(), ImGuizmo::LOCAL,
+                                 glm::value_ptr(transform),
+                                 nullptr, engine_ui.get_use_snap() ? snap_values : nullptr);
 
             // Update transform after ImGuizmo usage.
             if (ImGuizmo::IsUsing())
@@ -104,9 +116,24 @@ namespace luly::ui
         }
     }
 
+    void viewport_panel::render_camera_guizmo(glm::mat4& view_matrix, glm::mat4& projection_matrix)
+    {
+        const float window_width = ImGui::GetWindowWidth();
+        const float window_height = ImGui::GetWindowHeight();
+        ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, window_width, window_height);
+        const float view_manipulate_right = ImGui::GetWindowPos().x + window_width;
+        const float view_manipulate_top = ImGui::GetWindowPos().y;
+
+        ImGuizmo::ViewManipulate(glm::value_ptr(view_matrix), 8.0f,
+                                 ImVec2(view_manipulate_right - 128, view_manipulate_top + 32), ImVec2(128, 128),
+                                 0x10101010);
+    }
+
     void viewport_panel::render_toolbar()
     {
-		const ImGuiStyle style = ImGui::GetStyle();
+        engine_ui& engine_ui = engine_ui::get();
+
+        const ImGuiStyle style = ImGui::GetStyle();
         const float text_height = ImGui::CalcTextSize("A").y;
         const ImVec2 option_size = ImVec2{text_height, text_height} * 2.0f;
 
@@ -125,34 +152,30 @@ namespace luly::ui
             ImGui::BeginGroup();
             ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, ImVec2(0.5f, 0.5f));
 
+            for (operation_tool_data& operation_tool_data : m_tool_operations)
             {
-                for (operation_tool_data& operation_tool_data : m_tool_operations)
+                ImGui::PushID(operation_tool_data.operation);
+
+                const bool is_selected = (operation_tool_data.operation == engine_ui.get_selected_operation());
+                if (ImGui::Selectable(operation_tool_data.icon.c_str(), is_selected, option_flags, option_size))
                 {
-                    ImGui::PushID(operation_tool_data.operation);
-
-                    const bool is_selected = (operation_tool_data.operation == engine_ui::get_ui_data().selected_guizmo_operation);
-                    if (ImGui::Selectable(operation_tool_data.icon.c_str(), is_selected, option_flags, option_size))
-                    {
-                        engine_ui::get_ui_data().selected_guizmo_operation = operation_tool_data.operation;
-                    }
-                    ui_utils::draw_tooltip(operation_tool_data.name.c_str());
-
-                    ImGui::PopID();
-
-                    ImGui::SameLine();
-                    ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
-                    ImGui::SameLine();
+                    engine_ui.set_selected_operation(operation_tool_data.operation);
                 }
+                ui_utils::draw_tooltip(operation_tool_data.name.c_str());
+
+                ImGui::PopID();
+
+                ImGui::SameLine();
+                ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
+                ImGui::SameLine();
             }
 
+            if (ImGui::Selectable(ICON_MDI_MAGNET, engine_ui.get_use_snap(), option_flags,
+                                  option_size))
             {
-                if (ImGui::Selectable(ICON_MDI_MAGNET, engine_ui::get_ui_data().use_snap == true, option_flags, option_size))
-                {
-                    engine_ui::get_ui_data().use_snap = !engine_ui::get_ui_data().use_snap;
-                }
-                ui_utils::draw_tooltip("Use Snapping");
+                engine_ui.set_use_snap(!engine_ui.get_use_snap());
             }
-       
+            ui_utils::draw_tooltip("Use Snapping");
 
             ImGui::EndGroup();
             ImGui::PopStyleVar();
@@ -163,10 +186,8 @@ namespace luly::ui
 
     void viewport_panel::render_scene_viewport()
     {
-	    const ImVec2 scene_view_size = ImGui::GetContentRegionAvail();
-
-        const uint32_t render_target = engine_ui::get_ui_data().render_target;
-        ImGui::Image(reinterpret_cast<ImTextureID>(render_target), scene_view_size, ImVec2{0, 1},
-        ImVec2{1, 0});
+        const ImVec2 scene_view_size = ImGui::GetContentRegionAvail();
+        ImGui::Image(reinterpret_cast<ImTextureID>(engine_ui::get().get_render_target()), scene_view_size, ImVec2{0, 1},
+                     ImVec2{1, 0});
     }
 }

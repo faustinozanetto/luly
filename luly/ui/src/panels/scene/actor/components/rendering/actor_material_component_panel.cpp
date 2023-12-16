@@ -18,14 +18,14 @@ namespace luly::ui
 
     std::pair<bool, size_t> actor_material_component_panel::get_actor_component_details()
     {
-        bool has_component = engine_ui::get_ui_data().selected_actor->has_component<scene::material_component>();
+        bool has_component = engine_ui::get().get_selected_actor()->has_component<scene::material_component>();
         auto component_hash = typeid(scene::material_component).hash_code();
         return std::make_pair(has_component, component_hash);
     }
 
     void actor_material_component_panel::on_render_component_details()
     {
-        auto& material_component = engine_ui::get_ui_data().selected_actor->get_component<
+        const scene::material_component& material_component = engine_ui::get().get_selected_actor()->get_component<
             scene::material_component>();
 
         if (material_component.get_material())

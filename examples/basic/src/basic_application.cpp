@@ -16,11 +16,11 @@
 #include "renderer/materials/material.h"
 #include "renderer/materials/material_specification_builder.h"
 #include "renderer/meshes/mesh_factory.h"
+#include "renderer/renderer/pipeline/final_pass.h"
 #include "renderer/scene/scene_renderer.h"
 #include "scene/actor/components/transform_component.h"
 #include "scene/actor/components/lights/directional_light_component.h"
 #include "scene/actor/components/lights/point_light_component.h"
-#include "scene/actor/components/lights/spot_light_component.h"
 #include "scene/actor/components/rendering/material_component.h"
 #include "scene/actor/components/rendering/model_renderer_component.h"
 #include "scene/actor/components/rendering/skybox_component.h"
@@ -28,17 +28,16 @@
 basic_application::basic_application(const luly::renderer::window_specification& window_specification) : application(
     window_specification)
 {
-    luly::ui::engine_ui::initialize();
-
+    m_engine_ui = std::make_shared<luly::ui::engine_ui>();
     setup_scene();
 
-    luly::ui::engine_ui::set_render_target(
-        luly::renderer::scene_renderer::get_data().final_pass->get_output("final_output").output);
+    m_engine_ui->set_render_target(
+        luly::renderer::scene_renderer::get_render_pass<luly::renderer::final_pass>(
+            luly::renderer::render_pass_type::final_pass)->get_output("final_output").output);
 }
 
 basic_application::~basic_application()
 {
-    luly::ui::engine_ui::shutdown();
 }
 
 void basic_application::on_create()
@@ -52,7 +51,7 @@ void basic_application::on_update()
     const std::shared_ptr<luly::scene::scene>& current_scene = luly::scene::scene_manager::get().get_current_scene();
     if (!current_scene) return;
 
-    luly::ui::engine_ui::begin_frame();
+    m_engine_ui->begin_frame();
     /*
         const std::shared_ptr<luly::renderer::directional_light>& directional_light = current_scene->
             get_directional_light();
@@ -67,12 +66,13 @@ void basic_application::on_update()
     luly::renderer::scene_renderer::begin_render(camera);
     luly::renderer::scene_renderer::end_render();
 
-    luly::ui::engine_ui::on_update();
-    luly::ui::engine_ui::end_frame();
+    m_engine_ui->on_update();
+    m_engine_ui->end_frame();
 }
 
 void basic_application::on_handle_event(luly::events::base_event& event)
 {
+    m_engine_ui->on_event(event);
 }
 
 void basic_application::setup_scene()
@@ -93,7 +93,7 @@ void basic_application::setup_scene()
     const std::shared_ptr<luly::renderer::texture_2d>& environment_texture =
         luly::renderer::texture_factory::create_environment_texture_from_file(
             "assets/hdris/blue_photo_studio_4k.hdr");
-	luly::scene::skybox_component& skybox_component = skybox_actor->add_component<luly::scene::skybox_component>(
+    luly::scene::skybox_component& skybox_component = skybox_actor->add_component<luly::scene::skybox_component>(
         environment_texture
     );
     skybox_component.set_intensity(0.1f);
@@ -113,7 +113,7 @@ void basic_application::setup_scene()
         material_specification);
     emissive_cube_actor->add_component<luly::scene::material_component>(emissive_material);
 */
-   
+
     const std::shared_ptr<luly::renderer::mesh>& sphere_mesh = luly::renderer::mesh_factory::create_sphere_mesh(
         10, 10, 0.05f);
     float grid_gap = 0.2f;
@@ -163,8 +163,8 @@ void basic_application::setup_scene()
 
     const std::shared_ptr<luly::scene::scene_actor>& actor = scene->create_actor("SciFi Helmet");
     luly::scene::transform_component& actor_transform = actor->get_component<luly::scene::transform_component>();
-    actor_transform.get_transform()->set_location({ -0.15f, 1.1f, -0.5f });
-    actor_transform.get_transform()->set_scale({ 0.25f,0.25f,0.25f });
+    actor_transform.get_transform()->set_location({-0.15f, 1.1f, -0.5f});
+    actor_transform.get_transform()->set_scale({0.25f, 0.25f, 0.25f});
 
     const std::shared_ptr<luly::renderer::model> sci_fi_helmet_model =
         luly::renderer::model_factory::create_model_from_file(
@@ -259,7 +259,7 @@ void basic_application::setup_scene()
         luly::scene::model_renderer_component>(
         background_model_asset->get_data<luly::renderer::model>());
     background_model_renderer_component.set_casts_shadows(false);
-    background_actor->get_component<luly::scene::transform_component>().get_transform()->set_scale({5,5,5});
+    background_actor->get_component<luly::scene::transform_component>().get_transform()->set_scale({5, 5, 5});
     background_actor->get_component<luly::scene::transform_component>().get_transform()->set_location({0, 0, 0});
 
     luly::scene::scene_manager::get().switch_scene(scene);

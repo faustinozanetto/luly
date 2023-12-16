@@ -15,14 +15,14 @@ namespace luly::ui
 
     std::pair<bool, size_t> actor_skybox_component_panel::get_actor_component_details()
     {
-        bool has_component = engine_ui::get_ui_data().selected_actor->has_component<scene::skybox_component>();
+        bool has_component = engine_ui::get().get_selected_actor()->has_component<scene::skybox_component>();
         auto component_hash = typeid(scene::skybox_component).hash_code();
         return std::make_pair(has_component, component_hash);
     }
 
     void actor_skybox_component_panel::on_render_component_details()
     {
-        auto& skybox_component = engine_ui::get_ui_data().selected_actor->get_component<
+        scene::skybox_component& skybox_component = engine_ui::get().get_selected_actor()->get_component<
             scene::skybox_component>();
 
         if (skybox_component.get_environment_texture())

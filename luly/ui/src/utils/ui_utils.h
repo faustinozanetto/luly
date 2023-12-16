@@ -3,6 +3,7 @@
 #include <functional>
 
 #include "renderer/textures/texture.h"
+#include "input/mouse_codes.h"
 
 #include <imgui.h>
 #include <memory>
@@ -36,5 +37,7 @@ namespace luly::ui
         static bool draw_drop_down(const std::string& name, const char** options, int32_t option_count, int32_t* selected);
         static bool draw_property(uint32_t texture_handle,
                                   const ImVec2& image_size = ImVec2(64, 64), bool flip_image = true);
+
+        static int get_mouse_button_code_to_imgui(input::mouse_button mouse_button);
     };
 }

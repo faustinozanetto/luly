@@ -4,6 +4,7 @@
 
 #include <ImGuizmo.h>
 #include <vector>
+#include <glm/glm.hpp>
 
 namespace luly::ui
 {
@@ -26,7 +27,10 @@ namespace luly::ui
         void set_show_panel(bool show_panel) override;
 
     private:
-        void render_transform_guizmo() const;
+        void render_guizmos();
+        void render_transform_guizmo(glm::mat4& view_matrix, glm::mat4&projection_matrix);
+        void render_camera_guizmo(glm::mat4& view_matrix, glm::mat4&projection_matrix);
+        
         void render_toolbar();
         void render_scene_viewport();
 

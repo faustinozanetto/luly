@@ -15,7 +15,7 @@ namespace luly::ui
 
     std::pair<bool, size_t> actor_spot_light_component_panel::get_actor_component_details()
     {
-        bool has_component = engine_ui::get_ui_data().selected_actor->has_component<
+        bool has_component = engine_ui::get().get_selected_actor()->has_component<
             scene::spot_light_component>();
         auto component_hash = typeid(scene::spot_light_component).hash_code();
         return std::make_pair(has_component, component_hash);
@@ -23,7 +23,7 @@ namespace luly::ui
 
     void actor_spot_light_component_panel::on_render_component_details()
     {
-        const auto& spot_light_component = engine_ui::get_ui_data().selected_actor->get_component<
+        const scene::spot_light_component& spot_light_component = engine_ui::get().get_selected_actor()->get_component<
             scene::spot_light_component>();
 
         if (spot_light_component.get_spot_light())
