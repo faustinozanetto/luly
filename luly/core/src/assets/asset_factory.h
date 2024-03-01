@@ -21,7 +21,8 @@ namespace luly::assets
             created_asset->set_data(data);
 
             // Register asset in manager.
-            assets_manager::get().register_asset(created_asset);
+            if (!assets_manager::get().asset_already_registered(name))
+                assets_manager::get().register_asset(created_asset);
 
             LY_INFO("Created asset with name: '{0}' and type: '{1}'!", name,
                     asset_utils::get_asset_type_to_string(type));

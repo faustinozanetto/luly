@@ -1,5 +1,6 @@
 ﻿#include "basic_application.h"
 
+#include <random>
 #include <application/entry_point.h>
 
 #include "engine_ui.h"
@@ -9,10 +10,17 @@
 #include "scene/scene.h"
 
 #include <events/event_dispatcher.h>
-#include <time/app_time.h>
 
 #include "assets/asset.h"
 #include "assets/asset_factory.h"
+#include "physics/physics_material.h"
+#include "physics/physics_utils.h"
+#include "physics/physics_world.h"
+#include "physics/actors/physics_dynamic_actor.h"
+#include "physics/actors/physics_static_actor.h"
+#include "physics/collision_shapes/physics_box_collision.h"
+#include "physics/collision_shapes/physics_plane_collision.h"
+#include "physics/collision_shapes/physics_sphere_collision.h"
 #include "renderer/materials/material.h"
 #include "renderer/materials/material_specification_builder.h"
 #include "renderer/meshes/mesh_factory.h"
@@ -20,7 +28,10 @@
 #include "renderer/scene/scene_renderer.h"
 #include "scene/actor/components/transform_component.h"
 #include "scene/actor/components/lights/directional_light_component.h"
-#include "scene/actor/components/lights/point_light_component.h"
+#include "scene/actor/components/physics/actors/physics_dynamic_actor_component.h"
+#include "scene/actor/components/physics/physics_material_component.h"
+#include "scene/actor/components/physics/actors/physics_static_actor_component.h"
+#include "scene/actor/components/physics/collision_shapes/physics_box_collision_shape_component.h"
 #include "scene/actor/components/rendering/material_component.h"
 #include "scene/actor/components/rendering/model_renderer_component.h"
 #include "scene/actor/components/rendering/skybox_component.h"
@@ -52,13 +63,6 @@ void basic_application::on_update()
     if (!current_scene) return;
 
     m_engine_ui->begin_frame();
-    /*
-        const std::shared_ptr<luly::renderer::directional_light>& directional_light = current_scene->
-            get_directional_light();
-    
-        glm::vec3 direction = directional_light->get_direction();
-        direction.z = sin(2 * glm::pi<float>() * 0.05f * luly::app_time::get_time());
-        directional_light->set_direction(direction);*/
 
     const std::shared_ptr<luly::renderer::perspective_camera>& camera = current_scene->get_camera_manager()->
         get_perspective_camera();
@@ -72,7 +76,21 @@ void basic_application::on_update()
 
 void basic_application::on_handle_event(luly::events::base_event& event)
 {
+    luly::events::event_dispatcher dispatcher(event);
+    dispatcher.dispatch<luly::events::key_pressed_event>(BIND_EVENT_FN(on_key_pressed_event));
+
     m_engine_ui->on_event(event);
+}
+
+bool basic_application::on_key_pressed_event(const luly::events::key_pressed_event& key_pressed_event)
+{
+    const std::shared_ptr<luly::scene::scene>& current_scene = luly::scene::scene_manager::get().get_current_scene();
+    if (key_pressed_event.get_key_code() == luly::input::key::space)
+    {
+        create_ball(current_scene);
+        return true;
+    }
+    return false;
 }
 
 void basic_application::setup_scene()
@@ -82,6 +100,9 @@ void basic_application::setup_scene()
     luly::scene::scene_manager::get().add_scene(scene);
 
     scene->get_camera_manager()->get_perspective_camera()->set_far_clip(250.0f);
+    scene->get_camera_manager()->get_perspective_camera()->set_position({-5.0f, -45.0f, -17.f});
+    scene->get_camera_manager()->get_perspective_camera()->set_pitch(-4.5f);
+    scene->get_camera_manager()->get_perspective_camera()->set_yaw(-300.5f);
 
     const std::shared_ptr<luly::scene::scene_actor>& dir_light_actor = scene->create_actor("Sun Light");
     const std::shared_ptr<luly::renderer::directional_light>& directional_light = std::make_shared<
@@ -183,6 +204,14 @@ void basic_application::setup_scene()
             }
         }*/
 
+
+    create_floor(scene);
+
+    luly::scene::scene_manager::get().switch_scene(scene);
+}
+
+void basic_application::create_mask(const std::shared_ptr<luly::scene::scene>& scene)
+{
     const std::shared_ptr<luly::scene::scene_actor>& actor = scene->create_actor("Plague Mask");
     const luly::scene::transform_component& actor_transform = actor->get_component<luly::scene::transform_component>();
     actor_transform.get_transform()->set_location({-0.15f, 1.1f, -0.5f});
@@ -267,23 +296,117 @@ void basic_application::setup_scene()
         "plague-mask-material", luly::assets::asset_type::material, plague_mask_material);
 
     actor->add_component<luly::scene::material_component>(tv_material_asset->get_data<luly::renderer::material>());
+}
 
-    // Create background actor
-    const std::shared_ptr<luly::scene::scene_actor>& background_actor = scene->create_actor("Background Actor");
-    const std::shared_ptr<luly::renderer::model> background_model =
+void basic_application::create_floor(const std::shared_ptr<luly::scene::scene>& scene)
+{
+    glm::vec3 floor_size = {25.0f, 1.0f, 25.0f};
+    const std::shared_ptr<luly::scene::scene_actor>& floor_actor = scene->create_actor("Floor");
+    // 1. Load up model.
+    const std::shared_ptr<luly::renderer::model> floor_model =
         luly::renderer::model_factory::create_model_from_file(
-            "assets/models/floor.obj");
-    const std::shared_ptr<luly::assets::asset>& background_model_asset = luly::assets::asset_factory::create_asset<
+            "assets/models/cube.obj");
+    const std::shared_ptr<luly::assets::asset>& floor_model_asset = luly::assets::asset_factory::create_asset<
         luly::renderer::model>(
-        "background-model", luly::assets::asset_type::model, background_model);
-    luly::scene::model_renderer_component& background_model_renderer_component = background_actor->add_component<
+        "floor-model", luly::assets::asset_type::model, floor_model);
+    luly::scene::model_renderer_component& model_renderer_component = floor_actor->add_component<
         luly::scene::model_renderer_component>(
-        background_model_asset->get_data<luly::renderer::model>());
-    background_model_renderer_component.set_casts_shadows(false);
-    background_actor->get_component<luly::scene::transform_component>().get_transform()->set_scale({10, 1, 10});
-    background_actor->get_component<luly::scene::transform_component>().get_transform()->set_location({0, 0, 0});
+        floor_model_asset->get_data<luly::renderer::model>());
+    model_renderer_component.set_casts_shadows(false);
+    // 2. Setup physics.
+    const std::shared_ptr<luly::physics::physics_material>& physics_material = std::make_shared<
+        luly::physics::physics_material>(0.5f, 0.5f, 0.6f);
 
-    luly::scene::scene_manager::get().switch_scene(scene);
+    const luly::scene::transform_component& transform_component = floor_actor->get_component<
+        luly::scene::transform_component>();
+
+    transform_component.get_transform()->set_location({0, -50, 0});
+    transform_component.get_transform()->set_scale(floor_size);
+
+    const std::shared_ptr<luly::physics::physics_box_collision>& floor_collision_shape = std::make_shared<
+        luly::physics::physics_box_collision>(physics_material, floor_size);
+
+    const std::shared_ptr<luly::physics::physics_dynamic_actor>& floor_physics_actor = std::make_shared<
+        luly::physics::physics_dynamic_actor>(transform_component.get_transform()->get_location(),
+                                              transform_component.get_transform()->get_rotation());
+    floor_physics_actor->set_kinematic(true);
+
+    floor_physics_actor->add_collision_shape(floor_collision_shape);
+    floor_physics_actor->initialize();
+
+    floor_actor->add_component<luly::scene::physics_dynamic_actor_component>(floor_physics_actor);
+    floor_actor->add_component<luly::scene::physics_material_component>(physics_material);
+    floor_actor->add_component<luly::scene::physics_box_collision_shape_component>(floor_collision_shape);
+
+    // 3. Setup material
+    const luly::renderer::material_specification& material_specification =
+        std::make_shared<luly::renderer::material_specification_builder>()->with_albedo({0.25f, 0.25f, 0.25f}).build();
+    const std::shared_ptr<luly::renderer::material>& material = std::make_shared<
+        luly::renderer::material>(
+        material_specification);
+    floor_actor->add_component<luly::scene::material_component>(material);
+}
+
+void basic_application::create_ball(const std::shared_ptr<luly::scene::scene>& scene, float radius, float impulse)
+{
+    const std::shared_ptr<luly::scene::scene_actor>& ball_actor = scene->create_actor("Ball");
+    // 1. Load up model.
+    std::shared_ptr<luly::renderer::model> ball_model;
+    if (!luly::assets::assets_manager::get().asset_already_registered("ball-model"))
+    {
+        const std::shared_ptr<luly::renderer::mesh>& mesh = luly::renderer::mesh_factory::create_sphere_mesh();
+        const std::shared_ptr<luly::renderer::model> model =
+            luly::renderer::model_factory::create_model_from_meshes({
+                mesh
+            });
+        const auto& model_asset = luly::assets::asset_factory::create_asset<
+            luly::renderer::model>(
+            "ball-model", luly::assets::asset_type::model, model);
+        ball_model = model_asset->get_data<luly::renderer::model>();
+    }
+    else
+    {
+        ball_model = luly::assets::assets_manager::get().get_asset<
+            luly::assets::asset, luly::assets::asset_type::model>("ball-model")->get_data<luly::renderer::model>();
+    }
+    ball_actor->add_component<luly::scene::model_renderer_component>(ball_model);
+    // 2. Set up transform.
+    const luly::scene::transform_component& transform_component = ball_actor->get_component<
+        luly::scene::transform_component>();
+    const glm::vec3 location = scene->get_camera_manager()->get_perspective_camera()->get_position();
+
+    transform_component.get_transform()->set_location(location);
+    transform_component.get_transform()->set_scale(glm::vec3(radius));
+    // 3. Setup physics.
+    const std::shared_ptr<luly::physics::physics_material>& physics_material = std::make_shared<
+        luly::physics::physics_material>(0.5f, 0.5f, 0.6f);
+    const std::shared_ptr<luly::physics::physics_sphere_collision>& sphere_collision_shape = std::make_shared<
+        luly::physics::physics_sphere_collision>(physics_material, radius);
+
+    const std::shared_ptr<luly::physics::physics_dynamic_actor>& ball_physics_dynamic_actor = std::make_shared<
+        luly::physics::physics_dynamic_actor>(transform_component.get_transform()->get_location(),
+                                              transform_component.get_transform()->get_rotation());
+    const glm::vec3& impulse_force = scene->get_camera_manager()->get_perspective_camera()->get_front() * impulse;
+    ball_physics_dynamic_actor->set_linear_velocity(impulse_force);
+    ball_physics_dynamic_actor->add_collision_shape(sphere_collision_shape);
+    ball_physics_dynamic_actor->initialize();
+
+    ball_actor->add_component<luly::scene::physics_dynamic_actor_component>(ball_physics_dynamic_actor);
+    ball_actor->add_component<luly::scene::physics_material_component>(physics_material);
+
+    // 3. Setup material
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    static std::uniform_real_distribution<float> dis(0.0f, 1.0f);
+
+    const glm::vec3 albedo = glm::vec3(dis(gen), dis(gen), dis(gen));
+
+    const luly::renderer::material_specification& material_specification =
+        std::make_shared<luly::renderer::material_specification_builder>()->with_albedo(albedo).build();
+    const std::shared_ptr<luly::renderer::material>& material = std::make_shared<
+        luly::renderer::material>(
+        material_specification);
+    ball_actor->add_component<luly::scene::material_component>(material);
 }
 
 luly::core::application* luly::core::create_application()

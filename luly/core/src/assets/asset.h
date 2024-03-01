@@ -28,7 +28,7 @@ namespace luly::assets
     class asset
     {
     public:
-        asset(asset_metadata metadata) : m_metadata(metadata)
+        asset(asset_metadata metadata) : m_metadata(std::move(metadata))
         {
         }
 

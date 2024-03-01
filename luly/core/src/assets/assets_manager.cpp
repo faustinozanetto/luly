@@ -32,7 +32,7 @@ namespace luly::assets
         m_assets_map[asset->get_metadata().type].push_back(asset);
     }
 
-    bool assets_manager::asset_already_registered(const std::string& asset_name)
+    bool assets_manager::asset_already_registered(const std::string& asset_name) const
     {
         LY_PROFILE_FUNCTION;
         for (const std::pair<const asset_type, std::vector<std::shared_ptr<asset>>>& asset_pair : m_assets_map)

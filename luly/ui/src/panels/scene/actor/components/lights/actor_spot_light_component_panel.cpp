@@ -9,7 +9,7 @@
 namespace luly::ui
 {
     actor_spot_light_component_panel::actor_spot_light_component_panel() : actor_component_panel(
-        "spot Light Component")
+        "Spot Light Component")
     {
     }
 

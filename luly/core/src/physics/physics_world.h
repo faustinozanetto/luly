@@ -18,6 +18,13 @@ namespace luly::physics
         /* Getters */
         physx::PxPhysics* get_physics() { return m_physics; }
         physx::PxScene* get_scene() { return m_scene; }
+        const glm::vec3& get_gravity() const { return m_gravity; }
+
+        /* Setters */
+        void set_gravity(const glm::vec3& gravity);
+
+        void on_update() const;
+        void sync_transforms();
 
     private:
         void initialize_physx();

@@ -44,7 +44,7 @@ namespace luly::assets
         /* Methods */
         static void initialize();
         void register_asset(const std::shared_ptr<asset>& asset);
-        bool asset_already_registered(const std::string& asset_name);
+        bool asset_already_registered(const std::string& asset_name) const;
 
     private:
         std::unordered_map<asset_type, std::vector<std::shared_ptr<asset>>> m_assets_map;

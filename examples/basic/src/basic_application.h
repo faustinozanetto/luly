@@ -22,5 +22,9 @@ public:
 
 private:
     void setup_scene();
+    void create_mask(const std::shared_ptr<luly::scene::scene>& scene);
+    void create_floor(const std::shared_ptr<luly::scene::scene>& scene);
+    void create_ball(const std::shared_ptr<luly::scene::scene>& scene, float radius = 0.5f, float impulse = 10.0f);
+    
     std::shared_ptr<luly::ui::engine_ui> m_engine_ui;
 };

@@ -7,6 +7,12 @@
 #include "components/lights/actor_directional_light_component_panel.h"
 #include "components/lights/actor_point_light_component_panel.h"
 #include "components/lights/actor_spot_light_component_panel.h"
+#include "components/physics/actors/actor_physics_dynamic_actor_component_panel.h"
+#include "components/physics/actor_physics_material_component_panel.h"
+#include "components/physics/actors/actor_physics_static_actor_component_panel.h"
+#include "components/physics/collision_shapes/actor_physics_box_collision_component_panel.h"
+#include "components/physics/collision_shapes/actor_physics_plane_collision_component_panel.h"
+#include "components/physics/collision_shapes/actor_physics_sphere_collision_component_panel.h"
 #include "components/rendering/actor_material_component_panel.h"
 #include "components/rendering/actor_model_renderer_component_panel.h"
 #include "components/rendering/actor_skybox_component_panel.h"
@@ -47,17 +53,24 @@ namespace luly::ui
 
     void actor_details_panel::initialize_component_panels()
     {
-        /* Common Components */
-        m_component_panels.push_back(std::make_shared<actor_name_component_panel>());
-        m_component_panels.push_back(std::make_shared<actor_transform_component_panel>());
+        // Adding component panels
+        ADD_COMPONENT_PANEL(actor_name_component_panel)
+        ADD_COMPONENT_PANEL(actor_transform_component_panel)
         /* Rendering Components */
-        m_component_panels.push_back(std::make_shared<actor_model_renderer_component_panel>());
-        m_component_panels.push_back(std::make_shared<actor_material_component_panel>());
-        m_component_panels.push_back(std::make_shared<actor_skybox_component_panel>());
+        ADD_COMPONENT_PANEL(actor_model_renderer_component_panel)
+        ADD_COMPONENT_PANEL(actor_material_component_panel)
+        ADD_COMPONENT_PANEL(actor_skybox_component_panel)
         /* Lights Components */
-        m_component_panels.push_back(std::make_shared<actor_directional_light_component_panel>());
-        m_component_panels.push_back(std::make_shared<actor_point_light_component_panel>());
-        m_component_panels.push_back(std::make_shared<actor_spot_light_component_panel>());
+        ADD_COMPONENT_PANEL(actor_directional_light_component_panel)
+        ADD_COMPONENT_PANEL(actor_point_light_component_panel)
+        ADD_COMPONENT_PANEL(actor_spot_light_component_panel)
+        /* Physics Components */
+        ADD_COMPONENT_PANEL(actor_physics_material_component_panel)
+        ADD_COMPONENT_PANEL(actor_physics_static_actor_component_panel)
+        ADD_COMPONENT_PANEL(actor_physics_dynamic_actor_component_panel)
+        ADD_COMPONENT_PANEL(actor_physics_box_collision_component_panel)
+        ADD_COMPONENT_PANEL(actor_physics_sphere_collision_component_panel)
+        ADD_COMPONENT_PANEL(actor_physics_plane_collision_component_panel)
     }
 
     bool actor_details_panel::get_show_panel()

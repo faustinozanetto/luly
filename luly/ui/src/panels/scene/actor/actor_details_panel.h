@@ -7,6 +7,8 @@
 
 #include "components/actor_component_panel.h"
 
+#define ADD_COMPONENT_PANEL(type) m_component_panels.push_back(std::make_shared<type>());
+
 namespace luly::ui
 {
     class actor_details_panel : public ui_panel

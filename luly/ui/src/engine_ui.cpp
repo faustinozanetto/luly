@@ -17,6 +17,13 @@
 #include "application/application.h"
 #include "utils/IconsMaterialDesignIcons.h"
 
+#include "events/event_dispatcher.h"
+#include "input/input_manager.h"
+#include "panels/editor/editor_panel.h"
+#include "panels/physics/physics_panel.h"
+#include "panels/renderer/render_passes_panel.h"
+#include "utils/ui_utils.h"
+
 #include <logging/log.h>
 #include <utils/assert.h>
 
@@ -28,12 +35,6 @@
 #include <backends/imgui_impl_glfw.h>
 
 #include <glm/gtc/type_ptr.hpp>
-
-#include "events/event_dispatcher.h"
-#include "input/input_manager.h"
-#include "panels/editor/editor_panel.h"
-#include "panels/renderer/render_passes_panel.h"
-#include "utils/ui_utils.h"
 
 namespace luly::ui
 {
@@ -181,6 +182,7 @@ namespace luly::ui
         m_panels.push_back(std::make_shared<assets_panel>());
         m_panels.push_back(std::make_shared<shadows_panel>());
         m_panels.push_back(std::make_shared<editor_panel>());
+        m_panels.push_back(std::make_shared<physics_panel>());
         m_panels.push_back(std::make_shared<render_passes_panel>());
     }
 

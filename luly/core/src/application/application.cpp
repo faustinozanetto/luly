@@ -46,6 +46,7 @@ namespace luly::core
         current_scene->get_camera_manager()->get_perspective_camera_controller()->on_update(
             app_time::get_delta_time());
 
+        physics::physics_world::get().on_update();
         scene::scene_manager::get().on_update(app_time::get_delta_time());
     }
 
@@ -74,6 +75,7 @@ namespace luly::core
                 }
             }
 
+            physics::physics_world::get().sync_transforms();
             on_update();
 
             renderer::renderer::poll_input();
