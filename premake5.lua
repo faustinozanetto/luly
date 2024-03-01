@@ -32,4 +32,5 @@ group ""
 
 group "examples"
     include "examples/basic"
+    include "examples/space-shooter"
 group ""

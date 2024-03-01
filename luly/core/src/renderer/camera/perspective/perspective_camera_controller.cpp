@@ -9,7 +9,7 @@ namespace luly::renderer
         const std::shared_ptr<perspective_camera>& perspective_camera)
     {
         m_perspective_camera = perspective_camera;
-        m_movement_speed = 3.0f;
+        m_movement_speed = 15.0f;
         m_mouse_speed = 15.0f;
         m_last_mouse_pos = glm::vec2(0, 0);
     }
@@ -17,12 +17,10 @@ namespace luly::renderer
     void perspective_camera_controller::on_update(float delta_time)
     {
         LY_PROFILE_FUNCTION;
-        // Handle mouse input
-        glm::vec2 mouse_offset = input::input_manager::get_mouse_position() - m_last_mouse_pos;
+        const glm::vec2 mouse_offset = input::input_manager::get_mouse_position() - m_last_mouse_pos;
         process_mouse_input(mouse_offset.x, mouse_offset.y, delta_time);
         m_last_mouse_pos = input::input_manager::get_mouse_position();
 
-        // Handle keyboard input
         process_keyboard_input(delta_time);
 
         m_perspective_camera->update_vectors();
@@ -37,22 +35,22 @@ namespace luly::renderer
 
         if (input::input_manager::is_key_pressed(input::key::w))
         {
-            glm::vec3 movement = m_perspective_camera->get_front() * speed;
+            const glm::vec3 movement = m_perspective_camera->get_front() * speed;
             updated_position += movement;
         }
         if (input::input_manager::is_key_pressed(input::key::s))
         {
-            glm::vec3 movement = m_perspective_camera->get_front() * speed;
+            const glm::vec3 movement = m_perspective_camera->get_front() * speed;
             updated_position -= movement;
         }
         if (input::input_manager::is_key_pressed(input::key::a))
         {
-            glm::vec3 movement = m_perspective_camera->get_right() * speed;
+            const glm::vec3 movement = m_perspective_camera->get_right() * speed;
             updated_position -= movement;
         }
         if (input::input_manager::is_key_pressed(input::key::d))
         {
-            glm::vec3 movement = m_perspective_camera->get_right() * speed;
+            const glm::vec3 movement = m_perspective_camera->get_right() * speed;
             updated_position += movement;
         }
 

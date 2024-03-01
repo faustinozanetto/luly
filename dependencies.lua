@@ -10,8 +10,28 @@ include_dirs["imgui"] = "%{wks.location}/third_party/imgui"
 include_dirs["imguizmo"] = "%{wks.location}/third_party/imguizmo"
 include_dirs["entt"] = "%{wks.location}/third_party/entt/single_include"
 include_dirs["tracy"] = "%{wks.location}/third_party/tracy/public"
+include_dirs["physx"] = "%{wks.location}/third_party/physx/physx/include"
+include_dirs["physx_omnipvd"] = "%{wks.location}/third_party/physx/physx/pvdruntime/include"
 
 library_dirs = {}
 
 library_dirs["assimp_debug"] = "%{wks.location}/third_party/assimp/build/lib/Debug/assimp-vc143-mtd.lib"
 library_dirs["assimp_release"] = "%{wks.location}/third_party/assimp/build/lib/Release/assimp-vc143-mt.lib"
+
+library_dirs["physx_debug"] = "%{wks.location}/third_party/physx/physx/bin/win.x86_64.vc143.mt/debug/PhysX_64.lib"
+library_dirs["physx_release"] = "%{wks.location}/third_party/physx/physx/bin/win.x86_64.vc143.mt/release/PhysX_64.lib"
+
+library_dirs["physx_common_debug"] = "%{wks.location}/third_party/physx/physx/bin/win.x86_64.vc143.mt/debug/PhysXCommon_64.lib"
+library_dirs["physx_common_release"] = "%{wks.location}/third_party/physx/physx/bin/win.x86_64.vc143.mt/release/PhysXCommon_64.lib"
+
+library_dirs["physx_foundation_debug"] = "%{wks.location}/third_party/physx/physx/bin/win.x86_64.vc143.mt/debug/PhysXFoundation_64.lib"
+library_dirs["physx_foundation_release"] = "%{wks.location}/third_party/physx/physx/bin/win.x86_64.vc143.mt/release/PhysXFoundation_64.lib"
+
+library_dirs["physx_extensions_debug"] = "%{wks.location}/third_party/physx/physx/bin/win.x86_64.vc143.mt/debug/PhysXExtensions_static_64.lib"
+library_dirs["physx_extensions_release"] = "%{wks.location}/third_party/physx/physx/bin/win.x86_64.vc143.mt/release/PhysXExtensions_static_64.lib"
+
+library_dirs["physx_pvd_runtime_debug"] = "%{wks.location}/third_party/physx/physx/bin/win.x86_64.vc143.mt/debug/PVDRuntime_64.lib"
+library_dirs["physx_pvd_runtime_release"] = "%{wks.location}/third_party/physx/physx/bin/win.x86_64.vc143.mt/release/PVDRuntime_64.lib"
+
+library_dirs["physx_pvd_sdk_debug"] = "%{wks.location}/third_party/physx/physx/bin/win.x86_64.vc143.mt/debug/PhysXPvdSDK_static_64.lib"
+library_dirs["physx_pvd_sdk_release"] = "%{wks.location}/third_party/physx/physx/bin/win.x86_64.vc143.mt/release/PhysXPvdSDK_static_64.lib"

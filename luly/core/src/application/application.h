@@ -27,7 +27,7 @@ namespace luly::core
         std::shared_ptr<renderer::window>& get_window() { return m_window; }
 
         /* Virtual Methods */
-        virtual void on_create();
+        virtual void on_create() = 0;
         virtual void on_update();
 
         virtual void on_handle_event(events::base_event& event) = 0;

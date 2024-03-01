@@ -1,4 +1,4 @@
-project "basic"
+project "space-shooter"
     kind "ConsoleApp"
     language "C++"
     cppdialect "C++20"
@@ -27,8 +27,6 @@ project "basic"
         "%{include_dirs.imgui}",
         "%{include_dirs.imguizmo}",
         "%{include_dirs.tracy}",
-        "%{include_dirs.physx}",
-        "%{include_dirs.physx_omnipvd}",
     }
     
     links {
@@ -40,15 +38,18 @@ project "basic"
         "stb",
     }
 
-    filter "system:windows"
-        staticruntime "off"
-        systemversion "latest"
-    
     filter "configurations:debug"
+        defines {"LY_DEBUG", "TRACY_ENABLE", "TRACY_ON_DEMAND", "LY_PROFILING"}
         runtime "Debug"
         symbols "on"
+        links {
+            "%{library_dirs.assimp_debug}"
+        }
     
     filter "configurations:release"
-        defines "NDEBUG"
+        defines "LY_RELEASE;NDEBUG"
         runtime "Release"
         optimize "on"
+        links {
+            "%{library_dirs.assimp_release}"
+        } 

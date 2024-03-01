@@ -28,6 +28,8 @@ project "luly-core"
         "%{include_dirs.entt}",
         "%{include_dirs.stb}",
         "%{include_dirs.tracy}",
+        "%{include_dirs.physx}",
+        "%{include_dirs.physx_omnipvd}",
     }
     
     links {
@@ -42,7 +44,13 @@ project "luly-core"
         runtime "Debug"
         symbols "on"
         links {
-            "%{library_dirs.assimp_debug}"
+            "%{library_dirs.assimp_debug}",
+            "%{library_dirs.physx_debug}",
+            "%{library_dirs.physx_common_debug}",
+            "%{library_dirs.physx_foundation_debug}",
+            "%{library_dirs.physx_extensions_debug}",
+            "%{library_dirs.physx_pvd_runtime_debug}",
+            "%{library_dirs.physx_pvd_sdk_debug}",
         }
     
     filter "configurations:release"
@@ -50,5 +58,11 @@ project "luly-core"
         runtime "Release"
         optimize "on"
         links {
-            "%{library_dirs.assimp_release}"
+            "%{library_dirs.assimp_release}",
+            "%{library_dirs.physx_release}",
+            "%{library_dirs.physx_common_release}",
+            "%{library_dirs.physx_foundation_release}",
+            "%{library_dirs.physx_extensions_release}",
+            "%{library_dirs.physx_pvd_runtime_release}",
+            "%{library_dirs.physx_pvd_sdk_release}",
         } 

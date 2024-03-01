@@ -1,0 +1,15 @@
+const float PI = 3.14159265359;
+const float PHI = 1.61803398874989484820459;
+const float spot_light_constant = 1.0;
+const float spot_light_linear = 0.09;
+const float spot_light_quadratic = 0.032;
+const vec2 inv_atan = vec2(0.1591, 0.3183);
+
+#define CASCADES_COUNT 3
+#define MAX_POINT_LIGHTS 6
+#define MAX_SPOT_LIGHTS 6
+
+#define CAMERA_UBO_LOCATION 0
+#define LIGHTS_UBO_LOCATION 1
+#define DIRECTIONAL_LIGHT_LIGHT_MATRICES_UBO_LOCATION 2
+#define DIRECTIONAL_LIGHT_FRUSTUM_PLANES_UBO_LOCATION 3

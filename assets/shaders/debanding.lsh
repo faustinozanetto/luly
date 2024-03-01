@@ -1,0 +1,42 @@
+#shader vertex
+#version 450
+
+layout (location = 0) in vec3 a_pos;
+layout (location = 1) in vec2 a_tex_coord;
+
+layout (location = 0) out vec2 o_tex_coord;
+
+void main() {
+    o_tex_coord = a_tex_coord;
+    gl_Position = vec4(a_pos, 1.0);
+}
+
+#shader fragment
+#version 450
+
+layout (location = 0) out vec4 frag_color;
+
+layout (location = 0) in vec2 o_tex_coord;
+
+layout (binding = 0) uniform sampler2D u_texture;
+
+uniform float u_intensity;
+uniform float u_threshold;
+
+vec3 screen_space_dither(vec2 frag_coord) {
+    // Iestyn's RGB dither modified for GLSL
+    vec3 dither = vec3(dot(vec2(171.0, 231.0), frag_coord));
+    dither.rgb = fract(dither.rgb / vec3(103.0, 71.0, 97.0));
+
+    // Subtract 0.5 to avoid slightly brightening the whole viewport.
+    return (dither.rgb - 0.5) / 255.0;
+}
+
+void main() {
+    vec3 color = texture(u_texture, o_tex_coord).rgb;
+
+    // Apply screen space dither
+    color += screen_space_dither(gl_FragCoord.xy);
+
+    frag_color = vec4(color, 1.0);
+}

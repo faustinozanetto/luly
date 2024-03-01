@@ -8,6 +8,8 @@
 #include <events/event_dispatcher.h>
 #include <time/app_time.h>
 
+#include "physics/physics_world.h"
+
 namespace luly::core
 {
     application* application::s_instance = nullptr;
@@ -25,18 +27,13 @@ namespace luly::core
 
         renderer::renderer::initialize(m_window);
         renderer::scene_renderer::initialize();
+        physics::physics_world::initialize();
         scene::scene_manager::initialize();
 
         app_time::update_time();
-
-        application::on_create();
     }
 
     application::~application()
-    {
-    }
-
-    void application::on_create()
     {
     }
 

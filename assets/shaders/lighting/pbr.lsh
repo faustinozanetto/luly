@@ -1,0 +1,130 @@
+﻿#include "common/constants.lsh"
+#include "lighting/lights.lsh"
+
+vec3 fresnel_schlick(float cosTheta, vec3 F0) {
+    return F0 + (vec3(1.0) - F0) * pow(vec3(1.0) - cosTheta, vec3(5.0));
+}
+
+vec3 fresnel_schlick_roughness(float LdotV, vec3 F0, float roughness) {
+    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - LdotV, 5.0);
+}
+
+float distribution_ggx(vec3 N, vec3 H, float roughness)
+{
+    float a = roughness * roughness;
+    float a2 = a * a;
+    float NdotH = max(dot(N, H), 0.0);
+    float NdotH2 = NdotH * NdotH;
+    float num = a2;
+    float denom = (NdotH2 * (a2 - 1.0) + 1.0);
+    denom = PI * denom * denom;
+    return num / denom;
+}
+
+float geometry_schlick_ggx(float NdotV, float roughness)
+{
+    float r = (roughness + 1.0);
+    float k = (r * r) / 8.0;
+    float num = NdotV;
+    float denom = NdotV * (1.0 - k) + k;
+    return num / denom;
+}
+
+float geometry_smith(vec3 N, vec3 V, vec3 L, float roughness)
+{
+    float NdotV = max(dot(N, V), 0.0);
+    float NdotL = max(dot(N, L), 0.0);
+    float ggx2 = geometry_schlick_ggx(NdotV, roughness);
+    float ggx1 = geometry_schlick_ggx(NdotL, roughness);
+    return ggx1 * ggx2;
+}
+
+vec3 cook_torrance_brdf(vec3 normal, vec3 view_dir, vec3 light_dir, float roughness, vec3 F0) {
+    // Microfacet distribution function (GGX/Trowbridge-Reitz)
+    float D = distribution_ggx(normal, normalize(light_dir + view_dir), roughness);
+
+    // Fresnel-Schlick approximation for specular reflection
+    vec3 F = fresnel_schlick(max(dot(normalize(view_dir), normalize(light_dir)), 0.0), F0);
+
+    // Geometry attenuation (Smith's method)
+    float G = geometry_schlick_ggx(max(dot(normal, view_dir), 0.0), roughness) *
+    geometry_schlick_ggx(max(dot(normal, light_dir), 0.0), roughness);
+
+    // Final reflection term
+    return D * F * G / (4.0 * max(dot(normal, view_dir), 0.001) * max(dot(normal, light_dir), 0.001));
+}
+
+/*
+vec3 calculate_directional_light_luminance(directional_light dir_light, vec3 normal, vec3 view_dir, vec3 albedo, vec3 F0, float roughness, float metallic) {
+    // Lambertian diffuse reflection
+    float NdotL = max(dot(normalize(normal), normalize(-dir_light.direction.xyz)), 0.0);
+    vec3 diffuse = albedo / PI;
+
+    // Cook-Torrance specular reflection
+    vec3 specular = cook_torrance_brdf(normalize(normal), view_dir, normalize(-dir_light.direction.xyz), roughness, F0);
+
+    // Final lighting equation
+    float intensity = dir_light.color.a;
+    vec3 luminance = NdotL * max(diffuse + specular, vec3(0.0)) * dir_light.color.rgb * intensity;
+
+    return luminance;
+}
+
+/*
+vec3 calculate_point_light_luminance(point_light point_light, vec3 normal, vec3 view_dir, vec3 frag_pos, vec3 albedo, vec3 F0, float roughness, float metallic) {
+    // Lambertian diffuse reflection
+    vec3 light_dir = normalize(point_light.position.xyz - frag_pos);
+    
+    float distance = length(point_light.position.xyz - frag_pos);
+    float attenuation = 1.0 / (point_light_constant + point_light_linear * distance + point_light_quadratic * (distance * distance));
+    float NdotL = max(dot(normalize(normal), light_dir), 0.0);
+    
+    vec3 diffuse = albedo / PI;
+
+    // Cook-Torrance specular reflection
+    vec3 specular = cook_torrance_brdf(normalize(normal), view_dir, light_dir, roughness, F0);
+
+    // Final lighting equation with attenuation
+    float intensity = point_light.color.a;
+    vec3 luminance = attenuation * NdotL * max(diffuse + specular, vec3(0.0)) * point_light.color.rgb * intensity;
+
+    return luminance;
+}
+*/
+
+vec3 calculate_spot_light_luminance(spot_light spot_light, vec3 normal, vec3 view_dir, vec3 frag_pos, vec3 albedo, vec3 F0, float roughness, float metallic) {
+    // Lambertian diffuse reflection
+    vec3 light_dir = normalize(spot_light.position.xyz - frag_pos);
+    float distance = length(spot_light.position.xyz - frag_pos);
+    float attenuation = 1.0 / (spot_light_constant + spot_light_linear * distance + spot_light_quadratic * (distance * distance));
+    float NdotL = max(dot(normalize(normal), light_dir), 0.0);
+
+    // Check if the fragment is within the spot light cone
+    float inner_angle = spot_light.parameters.x;
+    float outer_angle = spot_light.parameters.y;
+    float spot_angle = dot(normalize(-light_dir), normalize(spot_light.direction.xyz));
+    float spot_factor = smoothstep(cos(radians(outer_angle)), cos(radians(inner_angle)), spot_angle);
+
+    vec3 diffuse = albedo / PI;
+
+    // Cook-Torrance specular reflection
+    vec3 specular = cook_torrance_brdf(normalize(normal), view_dir, light_dir, roughness, F0);
+
+    // Final lighting equation with attenuation and spotlight factor
+    vec3 luminance = attenuation * spot_factor * NdotL * max(diffuse + specular, vec3(0.0)) * spot_light.color.rgb * spot_light.parameters.y;
+
+    return luminance;
+}
+
+vec3 calculate_ambient_ibl(vec3 albedo, vec3 normal, vec3 view_dir, vec3 irradiance, vec3 prefilter, vec2 brdf_lut, vec3 F0, float roughness, float metallic, float ambient_occlusion) {
+    vec3 F = fresnel_schlick_roughness(clamp(dot(normal, view_dir), 0.0, 1.0), F0, roughness);
+
+    vec3 kS = F;
+    vec3 kD = 1.0 - kS;
+    kD *= 1.0 - metallic;
+
+    vec3 diffuse = kD * irradiance * albedo;
+    vec3 specular = prefilter * (F * brdf_lut.x + brdf_lut.y);
+
+    return (diffuse + specular) * ambient_occlusion;
+}

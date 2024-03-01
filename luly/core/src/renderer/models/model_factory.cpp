@@ -39,7 +39,7 @@ namespace luly::renderer
         Assimp::Importer import;
         const aiScene* assimp_scene = import.ReadFile(
             file_path,
-            aiProcessPreset_TargetRealtime_Fast | aiProcess_ConvertToLeftHanded);
+            aiProcessPreset_TargetRealtime_Fast);
 
         // Check for loading errors.
         if (!assimp_scene || assimp_scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !assimp_scene->mRootNode)
@@ -52,7 +52,6 @@ namespace luly::renderer
         std::vector<std::shared_ptr<mesh>> model_meshes;
         parse_assimp_node(assimp_scene, assimp_scene->mRootNode, model_meshes, directory);
 
-        /*
         // Process materials.
         std::vector<std::shared_ptr<material>> model_materials;
         if (assimp_scene->HasMaterials())
@@ -126,9 +125,17 @@ namespace luly::renderer
                 const std::shared_ptr<material>& model_material = std::make_shared<material>(material_specification);
                 model_materials.push_back(model_material);
             }
-        }*/
+        }
 
-        return std::make_shared<model>(model_meshes);
+        // Create the model map for mesh name to material from the previously loaded materials from the assimp scene.
+        std::unordered_map<std::string, std::shared_ptr<material>> materials;
+        for (std::shared_ptr<mesh>& mesh : model_meshes)
+        {
+            const std::shared_ptr<material> mesh_material = model_materials[mesh->get_material_index()];
+            materials.insert({mesh->get_name(), mesh_material});
+        }
+
+        return std::make_shared<model>(model_meshes, materials);
     }
 
     void model_factory::parse_assimp_node(const aiScene* assimp_scene, const aiNode* assimp_node,
@@ -172,10 +179,10 @@ namespace luly::renderer
             vertex.normals.z = assimp_mesh->mNormals[i].z;
 
             // Tex coords
-            if (assimp_mesh->mTextureCoords[0])
+            if (assimp_mesh->HasTextureCoords(0))
             {
                 vertex.tex_coords = glm::vec2(assimp_mesh->mTextureCoords[0][i].x,
-                                              1 - assimp_mesh->mTextureCoords[0][i].y);
+                                              assimp_mesh->mTextureCoords[0][i].y);
             }
             else
             {
@@ -183,14 +190,25 @@ namespace luly::renderer
             }
 
             // Tangent
-            vertex.tangent.x = assimp_mesh->mTangents[i].x;
-            vertex.tangent.y = assimp_mesh->mTangents[i].y;
-            vertex.tangent.z = assimp_mesh->mTangents[i].z;
+            glm::vec3 tangent = glm::vec3(0.0f);
+            if (assimp_mesh->mTangents)
+            {
+                tangent.x = assimp_mesh->mTangents[i].x;
+                tangent.y = assimp_mesh->mTangents[i].y;
+                tangent.z = assimp_mesh->mTangents[i].z;
+            }
+            vertex.tangent = tangent;
 
             // Bi tangent
-            vertex.bi_tangent.x = assimp_mesh->mBitangents[i].x;
-            vertex.bi_tangent.y = assimp_mesh->mBitangents[i].y;
-            vertex.bi_tangent.z = assimp_mesh->mBitangents[i].z;
+            glm::vec3 bi_tangent = glm::vec3(0.0f);
+            if (assimp_mesh->mBitangents)
+            {
+                bi_tangent.x = assimp_mesh->mBitangents[i].x;
+                bi_tangent.y = assimp_mesh->mBitangents[i].y;
+                bi_tangent.z = assimp_mesh->mBitangents[i].z;
+            }
+            vertex.bi_tangent = bi_tangent;
+
             vertices.push_back(vertex);
         }
 
@@ -198,11 +216,9 @@ namespace luly::renderer
         for (unsigned int i = 0; i < assimp_mesh->mNumFaces; i++)
         {
             aiFace face = assimp_mesh->mFaces[i];
-            // Retrieve all indices of the face and store them in the indices vector.
-            for (unsigned int j = 0; j < face.mNumIndices; j++)
-            {
-                indices.push_back(face.mIndices[j]);
-            }
+            indices.emplace_back(face.mIndices[0]);
+            indices.emplace_back(face.mIndices[1]);
+            indices.emplace_back(face.mIndices[2]);
         }
 
         LY_TRACE("Parsed model mesh: ");

@@ -1,0 +1,85 @@
+#shader vertex
+#version 450
+
+layout (location = 0) in vec3 a_pos;
+layout (location = 1) in vec2 a_tex_coord;
+
+layout (location = 0) out vec2 o_tex_coord;
+
+void main() {
+    o_tex_coord = a_tex_coord;
+    gl_Position = vec4(a_pos, 1.0);
+}
+
+#shader fragment
+#version 450
+
+layout (location = 0) out vec4 frag_color;
+
+layout (location = 0) in vec2 o_tex_coord;
+
+layout (binding = 0) uniform sampler2D u_texture;
+
+uniform float u_exposure;
+uniform float u_gamma;
+uniform int u_type;
+
+void main()
+{
+    vec3 color = texture(u_texture, o_tex_coord).rgb;
+    
+    // Apply exposure and gamma correction.
+    color = vec3(1.0) - exp(-color * u_exposure);
+    color = pow(color, vec3(1.0 / u_gamma));
+
+    // Apply tonemapping based on u_type
+    switch (u_type) {
+        case 0: {
+            // Simple linear tonemapping
+            frag_color = vec4(color, 1.0);
+            break;
+        }
+        case 1: {
+            // Reinhard tonemapping
+            frag_color = vec4((color * (1.0 + color)) / (1.0 + color * color), 1.0);
+            break;
+        }
+        case 2: {
+            // ACES tonemapping curve
+            float a = 2.51;
+            float b = 0.03;
+            float c = 2.43;
+            float d = 0.59;
+            float e = 0.14;
+            frag_color = vec4(clamp((color * (a * color + b)) / (color * (c * color + d) + e), 0.0, 1.0), 1.0);
+            break;
+        }
+        case 3: {
+            // Filmic tonemapping
+            float a = 0.15;
+            float b = 0.5;
+            float c = 0.6;
+            float d = 0.22;
+            color = (color * (a * color + b)) / (color * (c * color + d) + 1.0);
+            frag_color = vec4(color, 1.0);
+            break;
+        }
+        case 4: {
+            // Hable tonemapping
+            color = color / (1.0 + color);
+            frag_color = vec4(color, 1.0);
+            break;
+        }
+        case 5: {
+            // Luma-based tonemapping
+            float luma = dot(color, vec3(0.2126, 0.7152, 0.0722));
+            float adjusted_luma = luma * (1.0 + luma);
+            color = color * adjusted_luma / luma;
+            frag_color = vec4(color, 1.0);
+            break;
+        }
+        default:
+            // Fallback to none
+            frag_color = vec4(color, 1.0);
+    }
+}

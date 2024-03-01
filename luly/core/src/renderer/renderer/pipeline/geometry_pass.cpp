@@ -102,6 +102,11 @@ namespace luly::renderer
                 scene::model_renderer_component>(actor);
             const std::shared_ptr<model>& model = model_renderer_component.get_model();
 
+
+            glm::mat3 normal_matrix = glm::transpose(glm::inverse(glm::mat3(transform->get_transform())));
+            m_geometry_shader->set_mat3("u_normal_matrix", normal_matrix);
+            m_geometry_shader->set_mat4("u_transform_matrix", transform->get_transform());
+
             // Check if has material_component
             const bool has_material_component = registry->any_of<scene::material_component>(actor);
             if (has_material_component)
@@ -110,35 +115,44 @@ namespace luly::renderer
                 const std::shared_ptr<material>& material = material_component.get_material();
 
                 material->bind(m_geometry_shader);
+                renderer::submit_model(model);
             }
+
+            // Check if model has no materials embedded.
             else if (model->get_materials().empty())
             {
                 material::bind_default(m_geometry_shader);
+                renderer::submit_model(model);
             }
-
-            glm::mat3 normal_matrix = glm::transpose(glm::inverse(glm::mat3(transform->get_transform())));
-            m_geometry_shader->set_mat3("u_normal_matrix", normal_matrix);
-            m_geometry_shader->set_mat4("u_transform_matrix", transform->get_transform());
-
-            renderer::submit_model(model);
-            /*
-            // If model has no embedded materials render as usual.
-            if (model->get_materials().empty() && has_material_component)
+            else
             {
-                continue;
-            }
-            
-            for (const std::shared_ptr<mesh>&model_mesh : model->get_meshes())
-            {
-                // Check if mesh material index is in range.
-                const int material_index = model_mesh->get_material_index();
-                if (material_index <= model->get_materials().size())
+                // Render model with embedded materials for the meshes.
+                for (const std::shared_ptr<mesh>& model_mesh : model->get_meshes())
                 {
-                    model->get_materials().at(material_index)->bind(m_geometry_shader);
+                    const std::shared_ptr<material>& mesh_material = model->get_materials().at(model_mesh->get_name());
+                    mesh_material->bind(m_geometry_shader);
+                    renderer::submit_mesh(model_mesh);
                 }
-                renderer::submit_mesh(model_mesh);
-            }*/
+            }
         }
+
+        /*
+        // If model has no embedded materials render as usual.
+        if (model->get_materials().empty() && has_material_component)
+        {
+            continue;
+        }
+        
+        for (const std::shared_ptr<mesh>&model_mesh : model->get_meshes())
+        {
+            // Check if mesh material index is in range.
+            const int material_index = model_mesh->get_material_index();
+            if (material_index <= model->get_materials().size())
+            {
+                model->get_materials().at(material_index)->bind(m_geometry_shader);
+            }
+            renderer::submit_mesh(model_mesh);
+        }*/
 
         m_geometry_shader->un_bind();
         m_fbo->un_bind();

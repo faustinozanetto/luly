@@ -1,0 +1,34 @@
+#include "common/constants.lsh"
+
+layout (binding = DIRECTIONAL_LIGHT_LIGHT_MATRICES_UBO_LOCATION) uniform directional_light_space_matrices_ubo
+{
+    mat4 light_space_matrices[CASCADES_COUNT];
+} u_directional_light_space_matrices;
+
+layout (binding = DIRECTIONAL_LIGHT_FRUSTUM_PLANES_UBO_LOCATION) uniform directional_light_frustum_planes_ubo
+{
+    vec2 light_frustum_planes[CASCADES_COUNT];
+} u_directional_light_frustum_planes;
+
+struct shadows
+{
+    int soft_shadows;
+    int pcf_horizontal_samples;
+    int pcf_vertical_samples;
+};
+
+struct directional_light_shadows
+{
+    int show_cascades;
+    float shadow_bias;
+    float cascade_plane_distances[CASCADES_COUNT];
+    vec4 cascade_debug_colors[CASCADES_COUNT];
+    bool enable_shadows;
+};
+
+struct point_light_shadows
+{
+    float shadow_bias;
+    float far_planes[MAX_POINT_LIGHTS];
+    bool enable_shadows[MAX_POINT_LIGHTS];
+};

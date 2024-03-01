@@ -1,0 +1,36 @@
+﻿#include "common/constants.lsh"
+
+struct point_light
+{
+    vec4 color;
+    vec4 position;
+    vec4 parameters; // intensity, constant-factor, linear-factor, quadratic-factor
+};
+
+struct spot_light
+{
+    vec4 color;
+    vec4 position;
+    vec4 direction;
+    vec4 parameters; // angles, intensity, unused, unused
+};
+
+struct directional_light
+{
+    vec4 color;
+    vec4 direction;
+    vec4 parameters; // intensity, unused, unused, unused
+};
+
+struct lights_data
+{
+    ivec4 parameters; // point light count, spot light count, unused , unused.
+};
+
+layout (std140, binding = LIGHTS_UBO_LOCATION) uniform lights_ubo
+{
+    point_light point_lights[MAX_POINT_LIGHTS];
+    spot_light spot_lights[MAX_SPOT_LIGHTS];
+    directional_light directional_light;
+    lights_data lights;
+} u_lights;
