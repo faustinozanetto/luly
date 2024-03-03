@@ -26,22 +26,22 @@ uniform int u_type;
 
 void main()
 {
-    vec3 color = texture(u_texture, o_tex_coord).rgb;
+    vec4 color = texture(u_texture, o_tex_coord);
     
     // Apply exposure and gamma correction.
-    color = vec3(1.0) - exp(-color * u_exposure);
-    color = pow(color, vec3(1.0 / u_gamma));
+    color = vec4(1.0) - exp(-color * u_exposure);
+    color = pow(color, vec4(1.0 / u_gamma));
 
     // Apply tonemapping based on u_type
     switch (u_type) {
         case 0: {
             // Simple linear tonemapping
-            frag_color = vec4(color, 1.0);
+            frag_color = color;
             break;
         }
         case 1: {
             // Reinhard tonemapping
-            frag_color = vec4((color * (1.0 + color)) / (1.0 + color * color), 1.0);
+            frag_color = (color * (1.0 + color)) / (1.0 + color * color);
             break;
         }
         case 2: {
@@ -51,7 +51,7 @@ void main()
             float c = 2.43;
             float d = 0.59;
             float e = 0.14;
-            frag_color = vec4(clamp((color * (a * color + b)) / (color * (c * color + d) + e), 0.0, 1.0), 1.0);
+            frag_color = clamp((color * (a * color + b)) / (color * (c * color + d) + e), 0.0, 1.0);
             break;
         }
         case 3: {
@@ -61,25 +61,25 @@ void main()
             float c = 0.6;
             float d = 0.22;
             color = (color * (a * color + b)) / (color * (c * color + d) + 1.0);
-            frag_color = vec4(color, 1.0);
+            frag_color = color;
             break;
         }
         case 4: {
             // Hable tonemapping
             color = color / (1.0 + color);
-            frag_color = vec4(color, 1.0);
+            frag_color = color;
             break;
         }
         case 5: {
             // Luma-based tonemapping
-            float luma = dot(color, vec3(0.2126, 0.7152, 0.0722));
+            float luma = dot(color.rgb, vec3(0.2126, 0.7152, 0.0722));
             float adjusted_luma = luma * (1.0 + luma);
             color = color * adjusted_luma / luma;
-            frag_color = vec4(color, 1.0);
+            frag_color = color;
             break;
         }
         default:
             // Fallback to none
-            frag_color = vec4(color, 1.0);
+            frag_color = color;
     }
 }

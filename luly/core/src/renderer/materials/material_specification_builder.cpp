@@ -8,14 +8,14 @@ namespace luly::renderer
         m_material_specification = {};
     }
 
-    material_specification_builder& material_specification_builder::with_albedo(const glm::vec3& value)
+    material_specification_builder& material_specification_builder::with_albedo(const glm::vec4& value)
     {
         LY_PROFILE_FUNCTION;
         m_material_specification.albedo = value;
         return *this;
     }
 
-    material_specification_builder& material_specification_builder::with_emissive(const glm::vec3& value)
+    material_specification_builder& material_specification_builder::with_emissive(const glm::vec4& value)
     {
         LY_PROFILE_FUNCTION;
         m_material_specification.emissive = value;

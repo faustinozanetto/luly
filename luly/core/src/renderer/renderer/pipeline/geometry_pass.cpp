@@ -108,8 +108,7 @@ namespace luly::renderer
             m_geometry_shader->set_mat4("u_transform_matrix", transform->get_transform());
 
             // Check if has material_component
-            const bool has_material_component = registry->any_of<scene::material_component>(actor);
-            if (has_material_component)
+            if (registry->any_of<scene::material_component>(actor))
             {
                 scene::material_component& material_component = registry->get<scene::material_component>(actor);
                 const std::shared_ptr<material>& material = material_component.get_material();

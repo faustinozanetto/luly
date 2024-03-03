@@ -9,8 +9,8 @@ namespace luly::renderer
         material_specification_builder();
 
         /* Methods */
-        material_specification_builder& with_albedo(const glm::vec3& value);
-        material_specification_builder& with_emissive(const glm::vec3& value);
+        material_specification_builder& with_albedo(const glm::vec4& value);
+        material_specification_builder& with_emissive(const glm::vec4& value);
         material_specification_builder& with_roughness(float value);
         material_specification_builder& with_metallic(float value);
         material_specification_builder& with_ambient_occlusion(float value);

@@ -1,6 +1,6 @@
 struct material {
-    vec3 albedo;
-    vec3 emissive;
+    vec4 albedo;
+    vec4 emissive;
     float roughness;
     float metallic;
     float ambient_occlusion;

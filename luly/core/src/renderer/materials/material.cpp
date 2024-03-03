@@ -21,7 +21,7 @@ namespace luly::renderer
         this->is_enabled = is_enabled;
     }
 
-    material_specification::material_specification(const glm::vec3& albedo, const glm::vec3& emissive, float roughness,
+    material_specification::material_specification(const glm::vec4& albedo, const glm::vec4& emissive, float roughness,
                                                    float metallic, float ambient_occlusion, float tilling,
                                                    float emissive_strength,
                                                    const std::map<material_texture_type, material_texture>& textures)
@@ -59,8 +59,8 @@ namespace luly::renderer
     void material::bind(const std::shared_ptr<shader>& shader)
     {
         LY_PROFILE_FUNCTION;
-        shader->set_vec_float3("u_material.albedo", m_material_specification.albedo);
-        shader->set_vec_float3("u_material.emissive", m_material_specification.emissive);
+        shader->set_vec_float4("u_material.albedo", m_material_specification.albedo);
+        shader->set_vec_float4("u_material.emissive", m_material_specification.emissive);
         shader->set_float("u_material.roughness", m_material_specification.roughness);
         shader->set_float("u_material.metallic", m_material_specification.metallic);
         shader->set_float("u_material.ambient_occlusion", m_material_specification.ambient_occlusion);
@@ -92,8 +92,8 @@ namespace luly::renderer
     void material::bind_default(const std::shared_ptr<shader>& shader)
     {
         LY_PROFILE_FUNCTION;
-        shader->set_vec_float3("u_material.albedo", {0.85f, 0.85f, 0.85f});
-        shader->set_vec_float3("u_material.emissive", {0.0f, 0.0f, 0.0f});
+        shader->set_vec_float4("u_material.albedo", {0.85f, 0.85f, 0.85f, 1.0f});
+        shader->set_vec_float4("u_material.emissive", {0.0f, 0.0f, 0.0f, 1.0f});
         shader->set_float("u_material.roughness", 0.99f);
         shader->set_float("u_material.metallic", 0.01f);
         shader->set_float("u_material.ambient_occlusion", 1.0f);

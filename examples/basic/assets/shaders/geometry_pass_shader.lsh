@@ -5,7 +5,7 @@
 
 layout (location = 0) in vec3 a_pos;
 layout (location = 1) in vec2 a_tex_coord;
-layout (location = 2) in vec3 a_normals;
+layout (location = 2) in vec3 a_normal;
 layout (location = 3) in vec3 a_tangent;
 layout (location = 4) in vec3 a_bi_tangent;
 
@@ -23,10 +23,10 @@ layout (location = 0) out geometry_out o_geometry;
 
 void main() {
     vec3 T = normalize(u_normal_matrix * a_tangent);
-    vec3 N = normalize(u_normal_matrix * a_normals);
+    vec3 N = normalize(u_normal_matrix * a_normal);
     T = normalize(T - dot(T, N) * N);
     vec3 B = cross(N, T);
-
+    
     o_geometry.tbn = mat3(T, B, N);
     o_geometry.normal = N;
     o_geometry.tex_coords = a_tex_coord;
@@ -86,14 +86,16 @@ float extract_data_from_packed_texture(sampler2D texture_map, vec2 tex_coords, f
 void main() {
     g_position = o_geometry.frag_pos;
 
-    vec4 sampled_albedo_map = texture(u_albedo_map, o_geometry.tex_coords * u_material.tilling);
-    vec3 albedo = u_material.albedo;
-    if (u_material.albedo_map_enabled == 1)
-    albedo *= sampled_albedo_map.rgb;
+    vec4 sampled_albedo = u_material.albedo;
+    vec3 albedo = sampled_albedo.rgb;
+    if (u_material.albedo_map_enabled == 1) {
+        vec4 sampled_albedo_map = texture(u_albedo_map, o_geometry.tex_coords * u_material.tilling);
+        albedo *= sampled_albedo_map.rgb;
+    }
 
-    float opacity = sampled_albedo_map.a;
+    float opacity = sampled_albedo.a;
     if (u_material.opacity_map_enabled == 1)
-    opacity = texture(u_opacity_map, o_geometry.tex_coords * u_material.tilling).r;
+        opacity = texture(u_opacity_map, o_geometry.tex_coords * u_material.tilling).r;
 
     g_albedo_opacity = vec4(albedo, opacity);
 
@@ -116,9 +118,9 @@ void main() {
     
     g_roughmetalao = vec3(roughness, metallic, ambient_occlusion);
 
-    vec3 emissive = u_material.emissive * u_material.emissive_strength;
+    vec3 emissive = u_material.emissive.rgb * u_material.emissive_strength;
     if (u_material.emissive_map_enabled == 1)
-    emissive *= texture(u_emissive_map, o_geometry.tex_coords * u_material.tilling).rgb * u_material.emissive_strength;
+        emissive *= texture(u_emissive_map, o_geometry.tex_coords * u_material.tilling).rgb * u_material.emissive_strength;
 
     g_emissive = emissive;
 }

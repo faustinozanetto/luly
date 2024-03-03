@@ -40,8 +40,8 @@ namespace luly::renderer
 
     struct material_specification
     {
-        glm::vec3 albedo;
-        glm::vec3 emissive;
+        glm::vec4 albedo;
+        glm::vec4 emissive;
         float roughness;
         float metallic;
         float ambient_occlusion;
@@ -49,7 +49,7 @@ namespace luly::renderer
         float emissive_strength;
         std::map<material_texture_type, material_texture> textures;
 
-        material_specification(const glm::vec3& albedo = glm::vec3(1.0f), const glm::vec3& emissive = glm::vec3(0.0f),
+        material_specification(const glm::vec4& albedo = glm::vec4(1.0f), const glm::vec4& emissive = glm::vec4(0.0f),
                                float roughness = 1.0f,
                                float metallic = 0.0f,
                                float ambient_occlusion = 1.0f,
@@ -95,8 +95,8 @@ namespace luly::renderer
         ~material();
 
         /* Getters */
-        const glm::vec3& get_albedo() const { return m_material_specification.albedo; }
-        const glm::vec3& get_emissive() const { return m_material_specification.emissive; }
+        const glm::vec4& get_albedo() const { return m_material_specification.albedo; }
+        const glm::vec4& get_emissive() const { return m_material_specification.emissive; }
         float get_ambient_occlusion() const { return m_material_specification.ambient_occlusion; }
         float get_tilling() const { return m_material_specification.tilling; }
         float get_roughness() const { return m_material_specification.roughness; }
@@ -117,8 +117,8 @@ namespace luly::renderer
         void set_texture_enabled(material_texture_type texture_type, bool is_enabled);
         void set_texture_channel_mode(material_texture_type texture_type,
                                       material_texture_channel_mode texture_channel);
-        void set_albedo(const glm::vec3& albedo) { m_material_specification.albedo = albedo; }
-        void set_emissive(const glm::vec3& emissive) { m_material_specification.emissive = emissive; }
+        void set_albedo(const glm::vec4& albedo) { m_material_specification.albedo = albedo; }
+        void set_emissive(const glm::vec4& emissive) { m_material_specification.emissive = emissive; }
 
         void set_ambient_occlusion(float ambient_occlusion)
         {

@@ -330,8 +330,10 @@ void basic_application::create_floor(const std::shared_ptr<luly::scene::scene>& 
     transform_component.get_transform()->set_location({0, 0, 0});
     transform_component.get_transform()->set_scale(floor_size);
 
+    glm::vec3 half_extends = {floor_size.x / 2, floor_size.y / 2, floor_size.z / 2};
+
     const std::shared_ptr<luly::physics::physics_box_collision>& floor_collision_shape = std::make_shared<
-        luly::physics::physics_box_collision>(physics_material, floor_size);
+        luly::physics::physics_box_collision>(physics_material, half_extends);
 
     const std::shared_ptr<luly::physics::physics_dynamic_actor>& floor_physics_actor = std::make_shared<
         luly::physics::physics_dynamic_actor>(transform_component.get_transform()->get_location(),
@@ -347,7 +349,7 @@ void basic_application::create_floor(const std::shared_ptr<luly::scene::scene>& 
 
     // 3. Setup material
     const luly::renderer::material_specification& material_specification =
-        std::make_shared<luly::renderer::material_specification_builder>()->with_albedo({0.25f, 0.25f, 0.25f}).build();
+        std::make_shared<luly::renderer::material_specification_builder>()->with_albedo({1.0f,1.0f,1.0f, 1.0f}).build();
     const std::shared_ptr<luly::renderer::material>& material = std::make_shared<
         luly::renderer::material>(
         material_specification);
@@ -407,7 +409,7 @@ void basic_application::create_ball(const std::shared_ptr<luly::scene::scene>& s
     static std::mt19937 gen(rd());
     static std::uniform_real_distribution<float> dis(0.0f, 1.0f);
 
-    const glm::vec3 albedo = glm::vec3(dis(gen), dis(gen), dis(gen));
+    const glm::vec4 albedo = glm::vec4(dis(gen), dis(gen), dis(gen), 1.0f);
 
     const luly::renderer::material_specification& material_specification =
         std::make_shared<luly::renderer::material_specification_builder>()->with_albedo(albedo).build();
@@ -427,11 +429,8 @@ void basic_application::create_cube(const std::shared_ptr<luly::scene::scene>& s
     std::shared_ptr<luly::renderer::model> cube_model;
     if (!luly::assets::assets_manager::get().asset_already_registered("cube-model"))
     {
-        const std::shared_ptr<luly::renderer::mesh>& mesh = luly::renderer::mesh_factory::create_cube_mesh();
         const std::shared_ptr<luly::renderer::model> model =
-            luly::renderer::model_factory::create_model_from_meshes({
-                mesh
-            });
+            luly::renderer::model_factory::create_model_from_file("assets/models/cube.obj");
         const auto& model_asset = luly::assets::asset_factory::create_asset<
             luly::renderer::model>(
             "cube-model", luly::assets::asset_type::model, model);
@@ -472,7 +471,7 @@ void basic_application::create_cube(const std::shared_ptr<luly::scene::scene>& s
     static std::mt19937 gen(rd());
     static std::uniform_real_distribution<float> dis(0.0f, 1.0f);
 
-    const glm::vec3 albedo = glm::vec3(dis(gen), dis(gen), dis(gen));
+    const glm::vec4 albedo = glm::vec4(dis(gen), dis(gen), dis(gen), 1.0f);
 
     const luly::renderer::material_specification& material_specification =
         std::make_shared<luly::renderer::material_specification_builder>()->with_albedo(albedo).build();
@@ -491,11 +490,11 @@ void basic_application::create_cubes_pyramid(const std::shared_ptr<luly::scene::
     for (int i = 0; i < levels; i++)
     {
         int cubes_count = levels - i;
-        float half_cube_width = 0.5f; // Half of the cube width
+        float half_cube_width = 0.5f;
         for (int j = 0; j < cubes_count; j++)
         {
             // Adjust cube position based on current level and cube index
-            glm::vec3 cube_pos = {start_pos.x + j - (cubes_count - 1) * 0.5f + half_cube_width, start_pos.y + i, 0};
+            const glm::vec3 cube_pos = {start_pos.x + j - (cubes_count - 1) * 0.5f + half_cube_width, start_pos.y + i, 0};
             create_cube(scene, glm::vec3(1.0f), cube_pos);
         }
     }

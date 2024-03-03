@@ -34,13 +34,13 @@ namespace luly::ui
             ui_utils::draw_property("Parameters");
             ImGui::Separator();
 
-            glm::vec3 albedo = material->get_albedo();
+            glm::vec4 albedo = material->get_albedo();
             if (ui_utils::draw_property("Albedo", albedo, true))
             {
                 material->set_albedo(albedo);
             }
 
-            glm::vec3 emissive = material->get_emissive();
+            glm::vec4 emissive = material->get_emissive();
             if (ui_utils::draw_property("Emissive", emissive, true))
             {
                 material->set_emissive(emissive);
