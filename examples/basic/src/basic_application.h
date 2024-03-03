@@ -22,11 +22,7 @@ public:
 
 private:
     void setup_scene();
-    void create_mask(const std::shared_ptr<luly::scene::scene>& scene);
-    void create_floor(const std::shared_ptr<luly::scene::scene>& scene);
     void create_ball(const std::shared_ptr<luly::scene::scene>& scene, float radius = 0.5f, float impulse = 10.0f);
-    void create_cube(const std::shared_ptr<luly::scene::scene>& scene, glm::vec3 size, glm::vec3 pos);
-    void create_cubes_pyramid(const std::shared_ptr<luly::scene::scene>& scene);
     
     std::shared_ptr<luly::ui::engine_ui> m_engine_ui;
 };
