@@ -5,10 +5,13 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+#include "shader_factory.h"
+
 namespace luly::renderer
 {
-    shader::shader(const std::unordered_map<shader_type, std::string>& shader_contents)
+    shader::shader(const std::unordered_map<shader_type, std::string>& shader_contents, const std::string& file_path)
     {
+        m_file_path = file_path;
         m_contents = shader_contents;
         initialize();
     }
@@ -28,6 +31,12 @@ namespace luly::renderer
         return location;
     }
 
+    std::string shader::get_name() const
+    {
+        const std::filesystem::path parsed_path(m_file_path);
+        return parsed_path.stem().string();
+    }
+
     void shader::bind()
     {
         glUseProgram(m_handle);
@@ -36,6 +45,18 @@ namespace luly::renderer
     void shader::un_bind()
     {
         glUseProgram(0);
+    }
+
+    void shader::recompile()
+    {
+        LY_TRACE("Started recompiling shader: '{}'...", get_name());
+
+        // Clear actual content and re extract using factory.
+        m_contents.clear();
+        m_contents = shader_factory::extract_shader_contents(m_file_path);
+        initialize();
+
+        LY_TRACE("Shader recompiled successfully!");
     }
 
     void shader::set_int(const std::string& uniform_name, int value)

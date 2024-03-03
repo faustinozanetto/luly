@@ -1,15 +1,5 @@
 #include "common/constants.lsh"
 
-layout (binding = DIRECTIONAL_LIGHT_LIGHT_MATRICES_UBO_LOCATION) uniform directional_light_space_matrices_ubo
-{
-    mat4 light_space_matrices[CASCADES_COUNT];
-} u_directional_light_space_matrices;
-
-layout (binding = DIRECTIONAL_LIGHT_FRUSTUM_PLANES_UBO_LOCATION) uniform directional_light_frustum_planes_ubo
-{
-    vec2 light_frustum_planes[CASCADES_COUNT];
-} u_directional_light_frustum_planes;
-
 struct shadows
 {
     int soft_shadows;

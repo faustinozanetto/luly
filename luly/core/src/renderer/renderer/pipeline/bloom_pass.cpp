@@ -1,6 +1,7 @@
 ﻿#include "lypch.h"
 #include "bloom_pass.h"
 
+#include "assets/asset_factory.h"
 #include "renderer/meshes/mesh_factory.h"
 #include "renderer/renderer/renderer.h"
 #include "renderer/shaders/shader_factory.h"
@@ -31,10 +32,15 @@ namespace luly::renderer
         // Load shaders
         m_down_sample_shader = shader_factory::create_shader_from_file(
             "assets/shaders/bloom/bloom_down_sample.lsh");
+        assets::asset_factory::create_asset("bloom_down_sample-shader", assets::asset_type::shader,  m_down_sample_shader);
+        
         m_up_sample_shader = shader_factory::create_shader_from_file(
             "assets/shaders/bloom/bloom_up_sample.lsh");
+        assets::asset_factory::create_asset("bloom_up_sample-shader", assets::asset_type::shader, m_up_sample_shader);
+        
         m_composition_shader = shader_factory::create_shader_from_file(
             "assets/shaders/bloom/bloom_composition.lsh");
+        assets::asset_factory::create_asset("bloom_composition-shader", assets::asset_type::shader,  m_composition_shader);
 
         // Create screen quad
         m_screen_mesh = mesh_factory::create_screen_quad_mesh();

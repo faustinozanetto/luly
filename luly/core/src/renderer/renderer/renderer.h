@@ -14,10 +14,8 @@
 
 namespace luly::renderer
 {
-
 #define CAMERA_UBO_LOCATION 0
 #define LIGHTS_UBO_LOCATION 1
-#define DIRECTIONAL_LIGHT_LIGHT_MATRICES_UBO_LOCATION 2
 #define DIRECTIONAL_LIGHT_FRUSTUM_PLANES_UBO_LOCATION 3
 
     struct renderer_data

@@ -44,7 +44,7 @@ namespace luly::renderer
     private:
         void initialize();
         void initialize_shadows_data();
-        
+
         void update_shadows_cascades_data(const std::shared_ptr<directional_light>& directional_light);
 
         std::shared_ptr<shader> m_directional_light_shadows_shader;

@@ -2,10 +2,12 @@
 #include "lighting_pass.h"
 
 #include "application/application.h"
+#include "assets/asset_factory.h"
 #include "renderer/meshes/mesh_factory.h"
 #include "renderer/renderer/renderer.h"
 #include "renderer/renderer/pipeline/shadows/shadows_pass.h"
 #include "renderer/shaders/shader_factory.h"
+#include "scene/actor/components/lights/directional_light_component.h"
 #include "scene/actor/components/lights/point_light_component.h"
 #include "scene/actor/components/rendering/skybox_component.h"
 #include "utils/PoissonGenerator.h"
@@ -51,6 +53,8 @@ namespace luly::renderer
 
         // Load shader.
         m_lighting_shader = shader_factory::create_shader_from_file("assets/shaders/lighting_pass_shader.lsh");
+        assets::asset_factory::create_asset("lighting_pass_shader-shader", assets::asset_type::shader,
+                                            m_lighting_shader);
 
         m_screen_mesh = mesh_factory::create_screen_quad_mesh();
     }
@@ -125,6 +129,15 @@ namespace luly::renderer
         const std::shared_ptr<shadows_pass>& shadows_render_pass = scene_renderer::get_render_pass<shadows_pass>(
             render_pass_type::shadow_pass);
         shadows_render_pass->bind_uniforms(m_lighting_shader);
+
+        // Upload directional light space matrices.
+        const std::vector<scene::directional_light_component>& directional_light_components =
+            scene::scene_manager::get().get_current_scene()->get_directional_light();
+        if (!directional_light_components.empty())
+        {
+            directional_light_components.front().get_directional_light()->
+                                         upload_light_space_matrices(m_lighting_shader);
+        }
 
         // Render screen quad mesh.
         renderer::submit_mesh(m_screen_mesh);

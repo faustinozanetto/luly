@@ -4,13 +4,14 @@
 #include "renderer/buffers/uniform/uniform_buffer_object.h"
 #include "renderer/camera/perspective/perspective_camera.h"
 #include "renderer/framebuffer/frame_buffer.h"
+#include "renderer/shaders/shader.h"
 
 namespace luly::renderer
 {
     struct cascade_frustum
     {
         glm::mat4 light_view_matrix;
-        glm::mat4 light_view_projection_matrix;
+        glm::mat4 light_space_matrices;
         glm::vec2 frustum_planes;
         float split_depth;
     };
@@ -29,7 +30,6 @@ namespace luly::renderer
         uint32_t get_shadow_maps() const { return m_shadow_maps; }
         float get_cascade_split_lambda() const { return m_cascade_split_lambda; }
         const glm::ivec2& get_shadow_map_dimensions() const { return m_shadow_map_dimensions; }
-        const std::shared_ptr<uniform_buffer_object>& get_light_matrices_ubo() const { return m_light_matrices_ubo; }
 
         /* Setters */
         void set_direction(float azimuth, float elevation);
@@ -37,20 +37,22 @@ namespace luly::renderer
         void set_cascade_split_lambda(float cascade_split_lambda) { m_cascade_split_lambda = cascade_split_lambda; }
 
         /* Methods */
-        void update_shadow_cascades(const std::shared_ptr<perspective_camera>& perspective_camera);
+        void update_shadow_cascades(const std::shared_ptr<shader>& directional_light_shadows_shader,
+                                    const std::shared_ptr<perspective_camera>& perspective_camera);
+        void upload_light_space_matrices(const std::shared_ptr<shader>& shader);
 
     private:
         void create_shadow_fbo();
         void calculate_cascade_splits(const std::shared_ptr<perspective_camera>& perspective_camera);
         std::vector<cascade_frustum> calculate_shadow_frustums(
             const std::shared_ptr<perspective_camera>& perspective_camera);
-        void update_ubos(const std::vector<cascade_frustum>& cascade_frustums);
 
         // Parameters
         glm::vec3 m_direction;
         glm::vec2 m_direction_angles;
 
         // Cascaded shadows
+        std::vector<cascade_frustum> m_cascade_frustums;
         std::vector<float> m_shadow_cascade_splits_distances;
         std::vector<float> m_shadow_cascade_splits;
         float m_cascade_split_lambda;
@@ -58,7 +60,6 @@ namespace luly::renderer
         glm::ivec2 m_shadow_map_dimensions;
         std::shared_ptr<frame_buffer> m_shadow_map_fbo;
         uint32_t m_shadow_maps;
-        std::shared_ptr<uniform_buffer_object> m_light_matrices_ubo;
         std::shared_ptr<uniform_buffer_object> m_frustum_planes_ubo;
     };
 }

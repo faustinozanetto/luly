@@ -1,6 +1,7 @@
 ﻿#include "lypch.h"
 #include "debanding_pass.h"
 
+#include "assets/asset_factory.h"
 #include "renderer/meshes/mesh_factory.h"
 #include "renderer/renderer/renderer.h"
 #include "renderer/shaders/shader_factory.h"
@@ -42,6 +43,7 @@ namespace luly::renderer
 
         // Create shader.
         m_debanding_shader = shader_factory::create_shader_from_file("assets/shaders/debanding.lsh");
+        assets::asset_factory::create_asset("debanding-shader", assets::asset_type::shader, m_debanding_shader);
 
         // Create screen quad
         m_screen_mesh = mesh_factory::create_screen_quad_mesh();

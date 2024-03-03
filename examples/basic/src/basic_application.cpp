@@ -6,7 +6,6 @@
 #include "engine_ui.h"
 #include "imgui.h"
 #include "renderer/models/model_factory.h"
-#include "renderer/textures/texture_factory.h"
 #include "scene/scene.h"
 #include "events/event_dispatcher.h"
 #include "lifetime_component.h"
@@ -101,16 +100,6 @@ void basic_application::setup_scene()
 
     const std::shared_ptr<pbr_mask_scene>& pbr_mask_scene = std::make_shared<class pbr_mask_scene>();
     luly::scene::scene_manager::get().add_scene(pbr_mask_scene);
-
-    /*
-    scene->get_camera_manager()->get_perspective_camera()->set_far_clip(250.0f);
-    scene->get_camera_manager()->get_perspective_camera()->set_position({-5.0f, 5.0f, -17.f});
-    scene->get_camera_manager()->get_perspective_camera()->set_pitch(-4.5f);
-    scene->get_camera_manager()->get_perspective_camera()->set_yaw(-300.5f);
-    */
-
-    // Setup directional light.
-
 
     luly::scene::scene_manager::get().switch_scene(physics_pyramid_scene);
 }

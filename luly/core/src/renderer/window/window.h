@@ -38,6 +38,7 @@ namespace luly::renderer
 
         /* Setters */
         void set_event_function(const std::function<void(events::base_event&)>& func);
+        void set_title(const std::string& title);
 
     private:
         void initialize();

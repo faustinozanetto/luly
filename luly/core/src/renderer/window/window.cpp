@@ -31,6 +31,12 @@ namespace luly::renderer
         m_data.event_func = func;
     }
 
+    void window::set_title(const std::string& title)
+    {
+        m_data.title = title;
+        glfwSetWindowTitle(m_handle, title.c_str());
+    }
+
     void window::initialize()
     {
         LY_TRACE("Started initializing window...");

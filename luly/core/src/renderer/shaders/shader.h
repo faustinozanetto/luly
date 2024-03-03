@@ -24,18 +24,23 @@ namespace luly::renderer
     class shader : public bindable_object
     {
     public:
-        shader(const std::unordered_map<shader_type, std::string>& shader_contents);
+        shader(const std::unordered_map<shader_type, std::string>& shader_contents, const std::string& file_path);
         ~shader() override;
 
         /* Getters */
         uint32_t get_handle() const { return m_handle; }
         int get_uniform_location(const std::string& uniform_name);
+        const std::unordered_map<shader_type, std::string>& get_contents() const { return m_contents; }
+        const std::string& get_file_path() const { return m_file_path; }
+        std::string get_name() const;
 
         /* Overrides */
         void bind() override;
         void un_bind() override;
 
         /* Methods */
+        void recompile();
+
         void set_int(const std::string& uniform_name, int value);
         void set_vec_int2(const std::string& uniform_name, const glm::ivec2& value);
         void set_vec_int3(const std::string& uniform_name, const glm::ivec3& value);
@@ -55,6 +60,7 @@ namespace luly::renderer
         void check_for_link_errors(const std::vector<uint32_t>& shader_ids) const;
 
         uint32_t m_handle;
+        std::string m_file_path;
         std::unordered_map<std::string, int> m_uniforms;
         std::unordered_map<shader_type, std::string> m_contents;
     };

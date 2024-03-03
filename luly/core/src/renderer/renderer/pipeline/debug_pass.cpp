@@ -1,6 +1,7 @@
 ﻿#include "lypch.h"
 #include "debug_pass.h"
 
+#include "assets/asset_factory.h"
 #include "renderer/renderer/renderer.h"
 #include "renderer/renderer/debug/debug_renderer.h"
 #include "renderer/shaders/shader_factory.h"
@@ -48,6 +49,7 @@ namespace luly::renderer
 
         // Load shaders
         m_debug_lines_shader = shader_factory::create_shader_from_file("assets/shaders/debug/debug_line.lsh");
+        assets::asset_factory::create_asset("debug_line-shader", assets::asset_type::shader,  m_debug_lines_shader);
 
         /* Create debug lines VAO and VBO */
         s_data.line_vao = std::make_shared<vertex_array_object>();

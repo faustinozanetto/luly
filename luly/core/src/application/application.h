@@ -25,6 +25,7 @@ namespace luly::core
         /* Getters */
         static application& get() { return *s_instance; }
         std::shared_ptr<renderer::window>& get_window() { return m_window; }
+        const std::string& get_initial_title() const { return m_initial_title; }
 
         /* Virtual Methods */
         virtual void on_create() = 0;
@@ -38,6 +39,7 @@ namespace luly::core
         bool on_window_resized_event(const events::window_resize_event& window_resize_event);
 
         std::shared_ptr<renderer::window> m_window;
+        std::string m_initial_title;
         float m_frame_delay;
 
         friend int ::main(int argc, char** argv);

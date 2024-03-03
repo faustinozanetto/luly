@@ -96,7 +96,7 @@ float directional_light_shadow_hard(vec2 projection_coords, float current_depth,
 }
 
 float calculate_directional_light_shadow(vec3 frag_pos, vec3 normal, vec3 light_dir, int cascade_index) {
-    vec4 frag_pos_light_space = u_directional_light_space_matrices.light_space_matrices[cascade_index] * vec4(frag_pos, 1.0);
+    vec4 frag_pos_light_space = u_directional_light_space_matrices[cascade_index] * vec4(frag_pos, 1.0);
     vec3 projection_coords = frag_pos_light_space.xyz / frag_pos_light_space.w;
     // transform to [0,1] range
     projection_coords = projection_coords * 0.5 + 0.5;
@@ -310,8 +310,9 @@ void main()
     vec2 brdf_lut = sample_brdf_lut_map(view_dir, normal, roughness);
     vec3 specular = prefilter * (F * brdf_lut.x + brdf_lut.y);
 
-    vec3 ambient = (kD * diffuse + specular) *  ambient_occlusion;
-    vec3 color =   ambient + luminance ;
+    vec3 ambient = (kD * diffuse + specular) * u_skybox_intensity * u_skybox_tint.rgb * ambient_occlusion;
+
+    vec3 color = cascade_debug_color + ambient + luminance + emissive;
         
     frag_color = vec4(color, full_albedo.a);
     

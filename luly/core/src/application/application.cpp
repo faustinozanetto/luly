@@ -18,6 +18,7 @@ namespace luly::core
     application::application(const renderer::window_specification& window_specification)
     {
         s_instance = this;
+        m_initial_title = window_specification.title;
         app_time::update_time();
 
         assets::assets_manager::initialize();

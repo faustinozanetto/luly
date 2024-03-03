@@ -19,11 +19,6 @@ namespace luly::renderer
 
         // Create shadow map fbo
         create_shadow_fbo();
-
-        m_light_matrices_ubo = std::make_shared<uniform_buffer_object>(sizeof(glm::mat4) * CASCADES_COUNT,
-                                                                       DIRECTIONAL_LIGHT_LIGHT_MATRICES_UBO_LOCATION);
-        m_frustum_planes_ubo = std::make_shared<uniform_buffer_object>(sizeof(glm::vec2) * CASCADES_COUNT,
-                                                                       DIRECTIONAL_LIGHT_FRUSTUM_PLANES_UBO_LOCATION);
     }
 
     void directional_light::calculate_cascade_splits(const std::shared_ptr<perspective_camera>& perspective_camera)
@@ -70,12 +65,32 @@ namespace luly::renderer
         create_shadow_fbo();
     }
 
-    void directional_light::update_shadow_cascades(const std::shared_ptr<perspective_camera>& perspective_camera)
+    void directional_light::update_shadow_cascades(const std::shared_ptr<shader>& directional_light_shadows_shader,
+                                                   const std::shared_ptr<perspective_camera>& perspective_camera)
     {
         LY_PROFILE_FUNCTION;
         calculate_cascade_splits(perspective_camera);
-        const std::vector<cascade_frustum>& cascade_frustums = calculate_shadow_frustums(perspective_camera);
-        update_ubos(cascade_frustums);
+        m_cascade_frustums = calculate_shadow_frustums(perspective_camera);
+
+        m_shadow_cascade_splits.clear();
+        for (uint32_t i = 0; i < CASCADES_COUNT; ++i)
+        {
+            const cascade_frustum& cascade_frustum = m_cascade_frustums[i];
+            m_shadow_cascade_splits.push_back(cascade_frustum.split_depth);
+        }
+
+        upload_light_space_matrices(directional_light_shadows_shader);
+    }
+
+    void directional_light::upload_light_space_matrices(const std::shared_ptr<shader>& shader)
+    {
+        for (uint32_t i = 0; i < CASCADES_COUNT; ++i)
+        {
+            const cascade_frustum& cascade_frustum = m_cascade_frustums[i];
+
+            shader->set_mat4("u_directional_light_space_matrices[" + std::to_string(i) + "]",
+                             cascade_frustum.light_space_matrices);
+        }
     }
 
     void directional_light::create_shadow_fbo()
@@ -175,13 +190,13 @@ namespace luly::renderer
             // Store cascade frustum data into the vector.
             cascade_frustum cascade_frustum;
             cascade_frustum.light_view_matrix = light_view_matrix;
-            cascade_frustum.light_view_projection_matrix = light_ortho_matrix * light_view_matrix;
+            cascade_frustum.light_space_matrices = light_ortho_matrix * light_view_matrix;
             cascade_frustum.frustum_planes = glm::vec2(min_extents.z, max_extents.z);
             cascade_frustum.split_depth = split_depth;
 
             // Stable csm.
             glm::vec4 shadow_origin = glm::vec4(0.0, 0.0, 0.0, 1.0);
-            shadow_origin = cascade_frustum.light_view_projection_matrix * shadow_origin;
+            shadow_origin = cascade_frustum.light_space_matrices * shadow_origin;
             shadow_origin = shadow_origin * (m_shadow_map_dimensions.x / 2.0f);
 
             glm::vec4 rounded_origin = glm::round(shadow_origin);
@@ -194,7 +209,7 @@ namespace luly::renderer
             shadow_proj[3] += round_offset;
 
             // Update light view projection matrix after stable csm calculation. 
-            cascade_frustum.light_view_projection_matrix = shadow_proj * light_view_matrix;
+            cascade_frustum.light_space_matrices = shadow_proj * light_view_matrix;
 
             // Store frustum data.
             cascade_frustums.push_back(cascade_frustum);
@@ -203,22 +218,5 @@ namespace luly::renderer
         }
 
         return cascade_frustums;
-    }
-
-    void directional_light::update_ubos(const std::vector<cascade_frustum>& cascade_frustums)
-    {
-        LY_PROFILE_FUNCTION;
-        m_shadow_cascade_splits.clear();
-
-        for (uint32_t i = 0; i < CASCADES_COUNT; ++i)
-        {
-            cascade_frustum cascade_frustum = cascade_frustums[i];
-            m_shadow_cascade_splits.push_back(cascade_frustum.split_depth);
-
-            m_light_matrices_ubo->set_data(&cascade_frustum.light_view_projection_matrix, sizeof(glm::mat4x4),
-                                           i * sizeof(glm::mat4x4));
-            m_frustum_planes_ubo->set_data(&cascade_frustum.frustum_planes, sizeof(glm::vec2),
-                                           i * sizeof(glm::vec2));
-        }
     }
 }

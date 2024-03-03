@@ -3,6 +3,7 @@
 
 #include "shader_utils.h"
 
+#include <filesystem>
 #include <fstream>
 
 namespace luly::renderer
@@ -14,14 +15,24 @@ namespace luly::renderer
     {
         LY_TRACE("Started loading shader from file '{0}'", file_path);
 
+        const std::filesystem::path parsed_path(file_path);
+
+        const std::unordered_map<shader_type, std::string>& contents =
+            extract_shader_contents(file_path);
+
+        LY_TRACE("Shader loaded from file successfully!");
+        return std::make_shared<shader>(contents, file_path);
+    }
+
+    std::unordered_map<shader_type, std::string> shader_factory::extract_shader_contents(const std::string& file_path)
+    {
         std::unordered_set<std::string> include_files;
 
         const std::string& shader_source = read_shader_from_file(file_path);
         const std::unordered_map<shader_type, std::string>& contents =
             parse_shader_source(shader_source, include_files);
 
-        LY_TRACE("Shader loaded from file successfully!");
-        return std::make_shared<shader>(contents);
+        return contents;
     }
 
     std::string shader_factory::read_shader_from_file(const std::string& file_path)

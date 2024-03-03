@@ -4,6 +4,7 @@
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
+#include "assets/asset_factory.h"
 #include "renderer/meshes/mesh_factory.h"
 #include "renderer/renderer/renderer.h"
 #include "renderer/render_buffer/render_buffer.h"
@@ -100,9 +101,16 @@ namespace luly::renderer
 
         m_equirectangular_to_cubemap_shader = shader_factory::create_shader_from_file(
             "assets/shaders/skybox/equirectangular_to_cubemap.lsh");
+        assets::asset_factory::create_asset("equirectangular_to_cubemap-shader", assets::asset_type::shader, m_equirectangular_to_cubemap_shader);
+        
         m_irradiance_shader = shader_factory::create_shader_from_file("assets/shaders/skybox/irradiance.lsh");
+        assets::asset_factory::create_asset("irradiance-shader", assets::asset_type::shader, m_irradiance_shader);
+        
         m_prefilter_shader = shader_factory::create_shader_from_file("assets/shaders/skybox/prefilter.lsh");
+        assets::asset_factory::create_asset("prefilter-shader", assets::asset_type::shader, m_prefilter_shader);
+
         m_brdf_shader = shader_factory::create_shader_from_file("assets/shaders/skybox/brdf.lsh");
+        assets::asset_factory::create_asset("brdf-shader", assets::asset_type::shader, m_brdf_shader);
     }
 
     void environment_pass::setup_environment_fbo()

@@ -3,6 +3,8 @@
 
 #include <random>
 
+#include "assets/asset.h"
+#include "assets/asset_factory.h"
 #include "renderer/meshes/mesh_factory.h"
 #include "renderer/renderer/renderer.h"
 #include "renderer/shaders/shader_factory.h"
@@ -51,7 +53,11 @@ namespace luly::renderer
 
         // Create shaders.
         m_ssao_shader = shader_factory::create_shader_from_file("assets/shaders/ambient_occlusion/ssao.lsh");
+        assets::asset_factory::create_asset("ssao-shader", assets::asset_type::shader, m_ssao_shader);
+        
         m_blur_shader = shader_factory::create_shader_from_file("assets/shaders/ambient_occlusion/blur.lsh");
+        assets::asset_factory::create_asset("ssao-blur-shader", assets::asset_type::shader,  m_blur_shader);
+        
         // Create screen quad
         m_screen_mesh = mesh_factory::create_screen_quad_mesh();
 

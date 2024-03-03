@@ -38,6 +38,7 @@
 
 #include "panels/debug/debug_panel.h"
 #include "panels/scene/scenes_panel.h"
+#include "panels/shaders/shaders_panel.h"
 
 namespace luly::ui
 {
@@ -189,6 +190,7 @@ namespace luly::ui
         m_panels.push_back(std::make_shared<render_passes_panel>());
         m_panels.push_back(std::make_shared<debug_panel>());
         m_panels.push_back(std::make_shared<scenes_panel>());
+        m_panels.push_back(std::make_shared<shaders_panel>());
     }
 
     void engine_ui::initialize_log_sink()

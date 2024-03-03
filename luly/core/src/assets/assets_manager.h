@@ -18,6 +18,20 @@ namespace luly::assets
         const std::unordered_map<asset_type, std::vector<std::shared_ptr<asset>>>& get_assets() { return m_assets_map; }
 
         template <class T, asset_type P>
+        std::vector<std::shared_ptr<T>> get_assets_by_type()
+        {
+            if (!m_assets_map.contains(P)) return {};
+
+            std::vector<std::shared_ptr<T>> assets;
+            for (const std::shared_ptr<asset>& asset : m_assets_map.at(P))
+            {
+                assets.push_back(asset->get_data<T>());
+            }
+
+            return assets;
+        }
+
+        template <class T, asset_type P>
         std::shared_ptr<T> get_asset(const std::string& asset_name)
         {
             std::shared_ptr<T> found_asset;

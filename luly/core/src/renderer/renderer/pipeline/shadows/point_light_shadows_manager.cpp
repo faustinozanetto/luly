@@ -1,6 +1,7 @@
 #include "lypch.h"
 #include "point_light_shadows_manager.h"
 
+#include "assets/asset_factory.h"
 #include "renderer/renderer/renderer.h"
 #include "renderer/shaders/shader_factory.h"
 #include "renderer/renderer/pipeline/lighting/lights_manager.h"
@@ -57,6 +58,8 @@ namespace luly::renderer
         LY_PROFILE_FUNCTION;
         m_point_light_shadows_shader = shader_factory::create_shader_from_file(
             "assets/shaders/shadows/point_light_shadows.lsh");
+        assets::asset_factory::create_asset("point_light_shadows-shader", assets::asset_type::shader,
+                                            m_point_light_shadows_shader);
 
         initialize_shadows_data();
     }

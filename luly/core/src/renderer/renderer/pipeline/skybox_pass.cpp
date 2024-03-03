@@ -2,6 +2,7 @@
 #include "skybox_pass.h"
 
 #include "geometry_pass.h"
+#include "assets/asset_factory.h"
 #include "renderer/meshes/mesh_factory.h"
 #include "renderer/renderer/renderer.h"
 #include "renderer/shaders/shader_factory.h"
@@ -46,7 +47,18 @@ namespace luly::renderer
 
         // Load shaders.
         m_skybox_shader = shader_factory::create_shader_from_file("assets/shaders/skybox/skybox.lsh");
-        m_screen_shader = shader_factory::create_shader_from_file("assets/shaders/screen.lsh");
+        assets::asset_factory::create_asset("skybox-shader", assets::asset_type::shader, m_skybox_shader);
+
+        if (!assets::assets_manager::get().asset_already_registered("screen-shader"))
+        {
+            m_screen_shader = shader_factory::create_shader_from_file("assets/shaders/screen.lsh");
+            assets::asset_factory::create_asset("screen-shader", assets::asset_type::shader, m_screen_shader);
+        }
+        else
+        {
+            m_screen_shader = assets::assets_manager::get().get_asset<assets::asset, assets::asset_type::shader>(
+                "screen-shader")->get_data<shader>();
+        }
         // Load meshes.
         m_cube_mesh = mesh_factory::create_cube_mesh();
         m_screen_mesh = mesh_factory::create_screen_quad_mesh();

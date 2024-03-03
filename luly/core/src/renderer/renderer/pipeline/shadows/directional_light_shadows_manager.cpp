@@ -1,6 +1,7 @@
 #include "lypch.h"
 #include "directional_light_shadows_manager.h"
 
+#include "assets/asset_factory.h"
 #include "scene/actor/components/lights/directional_light_component.h"
 #include "renderer/renderer/renderer.h"
 #include "renderer/shaders/shader_factory.h"
@@ -36,18 +37,18 @@ namespace luly::renderer
 
         if (!enable_shadows) return;
 
+        m_directional_light_shadows_shader->bind();
+
         // Calculate cascades and update ubo.
-        directional_light.get_directional_light()->update_shadow_cascades(perspective_camera);
+        directional_light.get_directional_light()->update_shadow_cascades(m_directional_light_shadows_shader, perspective_camera);
         update_shadows_cascades_data(directional_light.get_directional_light());
 
         // Bind fbo and shader.
         directional_light.get_directional_light()->get_shadow_map_fbo()->bind();
         renderer::set_viewport_size(directional_light.get_directional_light()->get_shadow_map_dimensions());
         glClear(GL_DEPTH_BUFFER_BIT);
-
-        // Bind shader
+        
         renderer::set_cull_face_mode(renderer_cull_face_mode::front);
-        m_directional_light_shadows_shader->bind();
 
         // Render geometry.
         render_geometry(m_directional_light_shadows_shader);
@@ -78,6 +79,8 @@ namespace luly::renderer
         LY_PROFILE_FUNCTION;
         m_directional_light_shadows_shader = shader_factory::create_shader_from_file(
             "assets/shaders/shadows/directional_light_shadows.lsh");
+        assets::asset_factory::create_asset("directional_light_shadows-shader", assets::asset_type::shader,
+                                            m_directional_light_shadows_shader);
 
         initialize_shadows_data();
     }
