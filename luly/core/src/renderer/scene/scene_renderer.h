@@ -19,6 +19,7 @@ namespace luly::renderer
         bloom_pass,
         tonemapping_pass,
         debanding_pass,
+        debug_pass,
         final_pass,
     };
 

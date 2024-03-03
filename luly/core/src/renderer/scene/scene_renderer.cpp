@@ -8,8 +8,10 @@
 #include "scene/actor/components/rendering/material_component.h"
 #include "scene/actor/components/rendering/skybox_component.h"
 #include "application/application.h"
+#include "renderer/renderer/debug/debug_renderer.h"
 #include "renderer/renderer/pipeline/bloom_pass.h"
 #include "renderer/renderer/pipeline/debanding_pass.h"
+#include "renderer/renderer/pipeline/debug_pass.h"
 #include "renderer/renderer/pipeline/environment_pass.h"
 #include "renderer/renderer/pipeline/skybox_pass.h"
 #include "renderer/renderer/pipeline/tonemapping_pass.h"
@@ -37,6 +39,9 @@ namespace luly::renderer
         s_data.camera = camera;
         update_camera_data();
         update_camera_buffer();
+
+        get_render_pass<debug_pass>(render_pass_type::debug_pass)->reset_stats();
+        debug_renderer::collect_debugables();
 
         for (const auto& [pass_name, pass] : s_data.passes)
         {
@@ -70,7 +75,7 @@ namespace luly::renderer
             pass->on_resize(viewport_size);
         }
     }
-    
+
     void scene_renderer::create_pipeline_passes()
     {
         LY_TRACE("Started creating pipeling passes...");
@@ -107,8 +112,12 @@ namespace luly::renderer
         debanding_render_pass->add_input({tonemapping_render_pass, "tonemapping_pass_input"});
         s_data.passes.insert({render_pass_type::debanding_pass, debanding_render_pass});
 
+        const std::shared_ptr<debug_pass>& debug_render_pass = std::make_shared<debug_pass>();
+        debug_render_pass->add_input({debanding_render_pass, "debanding_pass_input"});
+        s_data.passes.insert({render_pass_type::debug_pass, debug_render_pass});
+
         const std::shared_ptr<final_pass>& final_render_pass = std::make_shared<final_pass>();
-        final_render_pass->add_input({debanding_render_pass, "debanding_pass_input"});
+        final_render_pass->add_input({debug_render_pass, "debug_pass_input"});
         s_data.passes.insert({render_pass_type::final_pass, final_render_pass});
         LY_TRACE("Pipeline passes created successfully!");
     }

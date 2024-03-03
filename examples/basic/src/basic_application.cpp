@@ -11,15 +11,14 @@
 
 #include <events/event_dispatcher.h>
 
+#include "lifetime_component.h"
 #include "assets/asset.h"
 #include "assets/asset_factory.h"
 #include "physics/physics_material.h"
 #include "physics/physics_utils.h"
-#include "physics/physics_world.h"
 #include "physics/actors/physics_dynamic_actor.h"
 #include "physics/actors/physics_static_actor.h"
 #include "physics/collision_shapes/physics_box_collision.h"
-#include "physics/collision_shapes/physics_plane_collision.h"
 #include "physics/collision_shapes/physics_sphere_collision.h"
 #include "renderer/materials/material.h"
 #include "renderer/materials/material_specification_builder.h"
@@ -30,11 +29,12 @@
 #include "scene/actor/components/lights/directional_light_component.h"
 #include "scene/actor/components/physics/actors/physics_dynamic_actor_component.h"
 #include "scene/actor/components/physics/physics_material_component.h"
-#include "scene/actor/components/physics/actors/physics_static_actor_component.h"
 #include "scene/actor/components/physics/collision_shapes/physics_box_collision_shape_component.h"
+#include "scene/actor/components/physics/collision_shapes/physics_sphere_collision_shape_component.h"
 #include "scene/actor/components/rendering/material_component.h"
 #include "scene/actor/components/rendering/model_renderer_component.h"
 #include "scene/actor/components/rendering/skybox_component.h"
+#include "time/app_time.h"
 
 basic_application::basic_application(const luly::renderer::window_specification& window_specification) : application(
     window_specification)
@@ -64,6 +64,12 @@ void basic_application::on_update()
 
     m_engine_ui->begin_frame();
 
+    const auto& view = current_scene->get_registry()->view<lifetime_component>();
+    for (const auto& [actor, lifetime_component] : view.each())
+    {
+        lifetime_component.on_update(luly::app_time::get_delta_time());
+    }
+
     const std::shared_ptr<luly::renderer::perspective_camera>& camera = current_scene->get_camera_manager()->
         get_perspective_camera();
 
@@ -87,7 +93,7 @@ bool basic_application::on_key_pressed_event(const luly::events::key_pressed_eve
     const std::shared_ptr<luly::scene::scene>& current_scene = luly::scene::scene_manager::get().get_current_scene();
     if (key_pressed_event.get_key_code() == luly::input::key::space)
     {
-        create_ball(current_scene);
+        create_ball(current_scene, 0.25f, 75);
         return true;
     }
     return false;
@@ -100,7 +106,7 @@ void basic_application::setup_scene()
     luly::scene::scene_manager::get().add_scene(scene);
 
     scene->get_camera_manager()->get_perspective_camera()->set_far_clip(250.0f);
-    scene->get_camera_manager()->get_perspective_camera()->set_position({-5.0f, -45.0f, -17.f});
+    scene->get_camera_manager()->get_perspective_camera()->set_position({-5.0f, 5.0f, -17.f});
     scene->get_camera_manager()->get_perspective_camera()->set_pitch(-4.5f);
     scene->get_camera_manager()->get_perspective_camera()->set_yaw(-300.5f);
 
@@ -206,6 +212,7 @@ void basic_application::setup_scene()
 
 
     create_floor(scene);
+    create_cubes_pyramid(scene);
 
     luly::scene::scene_manager::get().switch_scene(scene);
 }
@@ -320,7 +327,7 @@ void basic_application::create_floor(const std::shared_ptr<luly::scene::scene>& 
     const luly::scene::transform_component& transform_component = floor_actor->get_component<
         luly::scene::transform_component>();
 
-    transform_component.get_transform()->set_location({0, -50, 0});
+    transform_component.get_transform()->set_location({0, 0, 0});
     transform_component.get_transform()->set_scale(floor_size);
 
     const std::shared_ptr<luly::physics::physics_box_collision>& floor_collision_shape = std::make_shared<
@@ -393,6 +400,7 @@ void basic_application::create_ball(const std::shared_ptr<luly::scene::scene>& s
 
     ball_actor->add_component<luly::scene::physics_dynamic_actor_component>(ball_physics_dynamic_actor);
     ball_actor->add_component<luly::scene::physics_material_component>(physics_material);
+    ball_actor->add_component<luly::scene::physics_sphere_collision_shape_component>(sphere_collision_shape);
 
     // 3. Setup material
     static std::random_device rd;
@@ -407,6 +415,90 @@ void basic_application::create_ball(const std::shared_ptr<luly::scene::scene>& s
         luly::renderer::material>(
         material_specification);
     ball_actor->add_component<luly::scene::material_component>(material);
+
+    // 4. Add lifetime
+    ball_actor->add_component<lifetime_component>(5.0f);
+}
+
+void basic_application::create_cube(const std::shared_ptr<luly::scene::scene>& scene, glm::vec3 size, glm::vec3 pos)
+{
+    const std::shared_ptr<luly::scene::scene_actor>& cube_actor = scene->create_actor("Physics Cube");
+    // 1. Load up model.
+    std::shared_ptr<luly::renderer::model> cube_model;
+    if (!luly::assets::assets_manager::get().asset_already_registered("cube-model"))
+    {
+        const std::shared_ptr<luly::renderer::mesh>& mesh = luly::renderer::mesh_factory::create_cube_mesh();
+        const std::shared_ptr<luly::renderer::model> model =
+            luly::renderer::model_factory::create_model_from_meshes({
+                mesh
+            });
+        const auto& model_asset = luly::assets::asset_factory::create_asset<
+            luly::renderer::model>(
+            "cube-model", luly::assets::asset_type::model, model);
+        cube_model = model_asset->get_data<luly::renderer::model>();
+    }
+    else
+    {
+        cube_model = luly::assets::assets_manager::get().get_asset<
+            luly::assets::asset, luly::assets::asset_type::model>("cube-model")->get_data<luly::renderer::model>();
+    }
+    cube_actor->add_component<luly::scene::model_renderer_component>(cube_model);
+    // 2. Set up transform.
+    const luly::scene::transform_component& transform_component = cube_actor->get_component<
+        luly::scene::transform_component>();
+
+    transform_component.get_transform()->set_location(pos);
+    transform_component.get_transform()->set_scale(size);
+    // 3. Setup physics.
+    const std::shared_ptr<luly::physics::physics_material>& physics_material = std::make_shared<
+        luly::physics::physics_material>(0.5f, 0.5f, 0.6f);
+    glm::vec3 half_extents = {size.x / 2, size.y / 2, size.z / 2};
+    const std::shared_ptr<luly::physics::physics_box_collision>& box_collision_shape = std::make_shared<
+        luly::physics::physics_box_collision>(physics_material, half_extents);
+
+    const std::shared_ptr<luly::physics::physics_dynamic_actor>& cube_physics_dynamic_actor = std::make_shared<
+        luly::physics::physics_dynamic_actor>(transform_component.get_transform()->get_location(),
+                                              transform_component.get_transform()->get_rotation());
+    cube_physics_dynamic_actor->set_mass(0.2f);
+    cube_physics_dynamic_actor->add_collision_shape(box_collision_shape);
+    cube_physics_dynamic_actor->initialize();
+
+    cube_actor->add_component<luly::scene::physics_dynamic_actor_component>(cube_physics_dynamic_actor);
+    cube_actor->add_component<luly::scene::physics_material_component>(physics_material);
+    cube_actor->add_component<luly::scene::physics_box_collision_shape_component>(box_collision_shape);
+
+    // 3. Setup material
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    static std::uniform_real_distribution<float> dis(0.0f, 1.0f);
+
+    const glm::vec3 albedo = glm::vec3(dis(gen), dis(gen), dis(gen));
+
+    const luly::renderer::material_specification& material_specification =
+        std::make_shared<luly::renderer::material_specification_builder>()->with_albedo(albedo).build();
+    const std::shared_ptr<luly::renderer::material>& material = std::make_shared<
+        luly::renderer::material>(
+        material_specification);
+    cube_actor->add_component<luly::scene::material_component>(material);
+}
+
+void basic_application::create_cubes_pyramid(const std::shared_ptr<luly::scene::scene>& scene)
+{
+    int levels = 10;
+
+    glm::vec3 start_pos = {0, 4, 0};
+
+    for (int i = 0; i < levels; i++)
+    {
+        int cubes_count = levels - i;
+        float half_cube_width = 0.5f; // Half of the cube width
+        for (int j = 0; j < cubes_count; j++)
+        {
+            // Adjust cube position based on current level and cube index
+            glm::vec3 cube_pos = {start_pos.x + j - (cubes_count - 1) * 0.5f + half_cube_width, start_pos.y + i, 0};
+            create_cube(scene, glm::vec3(1.0f), cube_pos);
+        }
+    }
 }
 
 luly::core::application* luly::core::create_application()

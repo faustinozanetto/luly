@@ -41,6 +41,7 @@ namespace luly::scene
     {
         if (m_current_scene)
         {
+            m_current_scene->handle_delete_entities();
             m_current_scene->on_update(delta_time);
         }
     }

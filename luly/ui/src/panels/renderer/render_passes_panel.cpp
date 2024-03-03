@@ -4,6 +4,7 @@
 #include "renderer/renderer/renderer.h"
 #include "renderer/renderer/pipeline/bloom_pass.h"
 #include "renderer/renderer/pipeline/debanding_pass.h"
+#include "renderer/renderer/pipeline/debug_pass.h"
 #include "renderer/renderer/pipeline/final_pass.h"
 #include "renderer/renderer/pipeline/geometry_pass.h"
 #include "renderer/renderer/pipeline/skybox_pass.h"
@@ -95,6 +96,14 @@ namespace luly::ui
             if (draw_render_pass_details(
                 renderer::scene_renderer::get_render_pass<renderer::debanding_pass>(
                     renderer::render_pass_type::debanding_pass)))
+            {
+                ImGui::TreePop();
+            }
+            ImGui::Separator();
+
+            if (draw_render_pass_details(
+                renderer::scene_renderer::get_render_pass<renderer::debug_pass>(
+                    renderer::render_pass_type::debug_pass)))
             {
                 ImGui::TreePop();
             }

@@ -15,7 +15,7 @@ namespace luly::scene
         scene_actor(const scene_actor& other) = default;
 
         /* Getters */
-        entt::entity get_handle() const { return m_handle; }
+        const entt::entity& get_handle() const { return m_handle; }
 
         /* Methods */
         template <typename T, typename... Args>
@@ -45,6 +45,7 @@ namespace luly::scene
         void remove_component() const
         {
             LY_ASSERT_MSG(has_component<T>(), "Scene actor does not have that component!");
+            T& component = m_scene->get_registry()->get<T>(m_handle);
             m_scene->get_registry()->remove<T>(m_handle);
         }
 

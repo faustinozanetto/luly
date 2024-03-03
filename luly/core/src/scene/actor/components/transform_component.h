@@ -15,7 +15,7 @@ namespace luly::scene
         ~transform_component() override;
 
         void initialize() override;
-
+        
         /* Getters */
         const std::shared_ptr<math::transform>& get_transform() const { return m_transform; }
 

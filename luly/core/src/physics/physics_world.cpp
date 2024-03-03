@@ -12,6 +12,7 @@ namespace luly::physics
     physics_world::physics_world(const glm::vec3& gravity)
     {
         m_gravity = gravity;
+        m_simulate = false;
         initialize_physx();
     }
 
@@ -28,7 +29,7 @@ namespace luly::physics
 
     void physics_world::on_update() const
     {
-        if (m_scene)
+        if (m_scene && m_simulate)
         {
             m_scene->simulate(app_time::get_delta_time());
             m_scene->fetchResults(true);

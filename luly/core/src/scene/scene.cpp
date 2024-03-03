@@ -3,6 +3,7 @@
 
 #include "actor/components/name_component.h"
 #include "actor/components/transform_component.h"
+#include "actor/components/base_component.h"
 #include "actor/components/lights/directional_light_component.h"
 #include "actor/components/lights/point_light_component.h"
 #include "actor/components/lights/spot_light_component.h"
@@ -50,9 +51,40 @@ namespace luly::scene
         return actor;
     }
 
+    void scene::delete_actor(entt::entity handle)
+    {
+        if (!m_actors_map.contains(handle))
+        {
+            LY_WARN("Tried to delete actor with handle: {}, that does not exist!", static_cast<uint32_t>(handle));
+            return;
+        }
+
+        if (m_pending_delete_entities.contains(handle))
+        {
+            LY_WARN("Tried to add actor with handle: {}, to delete that already has been added!",
+                    static_cast<uint32_t>(handle));
+            return;
+        }
+
+        m_actors_map.erase(handle);
+        m_pending_delete_entities.insert(handle);
+    }
+
     void scene::on_update(float delta_time)
     {
         update_lights();
+    }
+
+    void scene::handle_delete_entities()
+    {
+        for (entt::entity entity : m_pending_delete_entities)
+        {
+            if (!m_actors_registry->valid(entity))
+                continue;
+
+            m_actors_registry->destroy(entity);
+            LY_TRACE("Deleting entity with handle: {}!", static_cast<uint32_t>(entity));
+        }
     }
 
     std::vector<directional_light_component> scene::get_directional_light() const
@@ -85,7 +117,7 @@ namespace luly::scene
             return m_actors_map.at(actor);
         }
         LY_ASSERT_MSG(false, "Could not find actor with skybox component")
-        return {};
+        return nullptr;
     }
 
     void scene::update_lights()

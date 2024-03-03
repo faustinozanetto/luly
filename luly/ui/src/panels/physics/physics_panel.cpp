@@ -28,6 +28,12 @@ namespace luly::ui
                 physics_world.set_gravity(gravity);
             }
 
+            bool simulate = physics_world.get_simulate();
+            if (ui_utils::draw_property("Simulate", simulate))
+            {
+                physics_world.set_simulate(simulate);
+            }
+
             ImGui::End();
         }
     }

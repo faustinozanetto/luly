@@ -19,9 +19,11 @@ namespace luly::physics
         physx::PxPhysics* get_physics() { return m_physics; }
         physx::PxScene* get_scene() { return m_scene; }
         const glm::vec3& get_gravity() const { return m_gravity; }
+        bool get_simulate() const { return m_simulate; }
 
         /* Setters */
         void set_gravity(const glm::vec3& gravity);
+        void set_simulate(bool simulate) { m_simulate = simulate; }
 
         void on_update() const;
         void sync_transforms();
@@ -40,5 +42,6 @@ namespace luly::physics
         physx::PxPvd* m_pvd;
 
         glm::vec3 m_gravity;
+        bool m_simulate;
     };
 }

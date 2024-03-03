@@ -9,6 +9,7 @@
 #include <time/app_time.h>
 
 #include "physics/physics_world.h"
+#include "renderer/renderer/debug/debug_renderer.h"
 
 namespace luly::core
 {
@@ -27,6 +28,7 @@ namespace luly::core
 
         renderer::renderer::initialize(m_window);
         renderer::scene_renderer::initialize();
+        renderer::debug_renderer::initialize();
         physics::physics_world::initialize();
         scene::scene_manager::initialize();
 

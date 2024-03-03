@@ -97,6 +97,7 @@ namespace luly::renderer
         static void set_state(renderer_state state, bool is_enabled);
         static void set_depth_func(renderer_depth_func depth_func);
         static void set_cull_face_mode(renderer_cull_face_mode cull_face_mode);
+        static void set_lines_thickness(float lines_thickness);
 
         /* Primitive Rendering */
         static void submit_arrays(int count, renderer_draw_mode draw_mode = renderer_draw_mode::triangles);

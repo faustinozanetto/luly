@@ -54,11 +54,11 @@ namespace luly::renderer
         renderer::clear_screen();
         m_screen_shader->bind();
 
-        const render_pass_input& debanding_pass_input = m_inputs.at("debanding_pass_input");
-        const render_pass_output& debanding_pass_output = debanding_pass_input.render_pass->get_output(
-            "debanding_output");
+        const render_pass_input& debug_pass_input = m_inputs.at("debug_pass_input");
+        const render_pass_output& debug_pass_output = debug_pass_input.render_pass->get_output(
+            "debug_output");
 
-        renderer::bind_texture(0, debanding_pass_output.output);
+        renderer::bind_texture(0, debug_pass_output.output);
         renderer::submit_mesh(m_screen_mesh);
 
         m_screen_shader->un_bind();

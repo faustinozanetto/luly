@@ -1,11 +1,14 @@
 ﻿#pragma once
 
 #include "renderer/camera/camera_manager.h"
+#include "utils/uuid.h"
 
 #include <entt/entt.hpp>
+#include <unordered_set>
 
 namespace luly::scene
 {
+    class base_component;
     class scene_actor;
     class point_light_component;
     class directional_light_component;
@@ -24,7 +27,9 @@ namespace luly::scene
 
         /* Methods */
         std::shared_ptr<scene_actor> create_actor(const std::string& name);
+        void delete_actor(entt::entity handle);
         void on_update(float delta_time);
+        void handle_delete_entities();
 
         /** Common Actors Getters */
         std::vector<directional_light_component> get_directional_light() const;
@@ -35,9 +40,11 @@ namespace luly::scene
         void update_lights();
 
         std::string m_name;
+        std::shared_ptr<renderer::camera_manager> m_camera_manager;
+
         std::unique_ptr<entt::registry> m_actors_registry;
         std::unordered_map<entt::entity, std::shared_ptr<scene_actor>> m_actors_map;
-        std::shared_ptr<renderer::camera_manager> m_camera_manager;
+        std::unordered_set<entt::entity> m_pending_delete_entities;
 
         friend class scene_actor;
     };

@@ -87,6 +87,8 @@ namespace luly::ui
         const std::shared_ptr<scene::scene_actor>& selected_actor = engine_ui.get_selected_actor();
         if (selected_actor && engine_ui.get_show_guizmos())
         {
+            if (!selected_actor->has_component<scene::transform_component>()) return;
+
             const scene::transform_component& transform_component = selected_actor->get_component<
                 scene::transform_component>();
             glm::mat4 transform = transform_component.get_transform()->get_transform();

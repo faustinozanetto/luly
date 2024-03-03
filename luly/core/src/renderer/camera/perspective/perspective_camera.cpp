@@ -28,7 +28,9 @@ namespace luly::renderer
     void perspective_camera::update_projection_matrix(const glm::ivec2& dimensions)
     {
         LY_PROFILE_FUNCTION;
-        const float aspect_ratio = static_cast<float>(dimensions.x) / static_cast<float>(dimensions.y);
+        const float aspect_ratio = static_cast<float>(std::max<float>(0.1, dimensions.x)) / static_cast<float>(std::max<
+            float>(
+            0.1, dimensions.y));
         m_projection_matrix = glm::perspective(glm::radians(m_fov), aspect_ratio, m_near_clip, m_far_clip);
     }
 

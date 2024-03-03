@@ -77,6 +77,11 @@ namespace luly::renderer
         glCullFace(get_renderer_cull_face_mode_to_opengl(cull_face_mode));
     }
 
+    void renderer::set_lines_thickness(float lines_thickness)
+    {
+        glLineWidth(lines_thickness);
+    }
+
     glm::ivec2 renderer::get_viewport_size()
     {
         LY_PROFILE_FUNCTION;

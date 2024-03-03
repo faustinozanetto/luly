@@ -36,6 +36,8 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+#include "panels/debug/debug_panel.h"
+
 namespace luly::ui
 {
     engine_ui* engine_ui::s_instance = nullptr;
@@ -184,6 +186,7 @@ namespace luly::ui
         m_panels.push_back(std::make_shared<editor_panel>());
         m_panels.push_back(std::make_shared<physics_panel>());
         m_panels.push_back(std::make_shared<render_passes_panel>());
+        m_panels.push_back(std::make_shared<debug_panel>());
     }
 
     void engine_ui::initialize_log_sink()
