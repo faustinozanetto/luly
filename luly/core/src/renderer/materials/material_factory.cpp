@@ -10,7 +10,7 @@ namespace luly::renderer
         LY_PROFILE_FUNCTION;
         const material_specification& material_specification = std::make_shared<material_specification_builder>()->
             build();
-        const std::shared_ptr<material>& default_material = std::make_shared<material>(material_specification);
+        const auto& default_material = std::make_shared<material>(material_specification);
 
         return default_material;
     }

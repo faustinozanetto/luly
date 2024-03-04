@@ -31,8 +31,8 @@ namespace luly::ui
 
             ImGui::PlotLines("Frame Times", frame_times.data(), static_cast<int>(app_time::get_frame_times().size()), 0,
                              nullptr, -0.5f, 0.5f, ImVec2(0, 80.0f));
-            ImGui::End();
         }
+        ImGui::End();
     }
 
     bool profiling_panel::get_show_panel()

@@ -50,9 +50,8 @@ namespace luly::ui
                     ImGui::TreePop();
                 }
             }
-
-            ImGui::End();
         }
+        ImGui::End();
 
         if (m_selected_shader)
         {
@@ -69,8 +68,8 @@ namespace luly::ui
                 {
                     save_shader_changes_to_file();
                 }
-                ImGui::End();
             }
+            ImGui::End();
         }
     }
 

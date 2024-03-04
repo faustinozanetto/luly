@@ -24,11 +24,13 @@ namespace luly::ui
                                   ImGuiTableFlags_NoSavedSettings | ImGuiTableFlags_Borders |
                                   ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg))
             {
-                ImGui::TableSetupColumn("Level", ImGuiTableColumnFlags_NoSort | ImGuiTableColumnFlags_WidthFixed, 0.0f, 0);
-                ImGui::TableSetupColumn("Time", ImGuiTableColumnFlags_NoSort | ImGuiTableColumnFlags_WidthFixed, 0.0f, 1);
+                ImGui::TableSetupColumn("Level", ImGuiTableColumnFlags_NoSort | ImGuiTableColumnFlags_WidthFixed, 0.0f,
+                                        0);
+                ImGui::TableSetupColumn("Time", ImGuiTableColumnFlags_NoSort | ImGuiTableColumnFlags_WidthFixed, 0.0f,
+                                        1);
                 ImGui::TableSetupColumn("Message", ImGuiTableColumnFlags_NoSort, 0.0f, 2);
                 ImGui::TableSetupScrollFreeze(0, 1);
-                
+
                 ImGui::TableHeadersRow();
 
                 ImGui::TableNextRow();
@@ -52,8 +54,8 @@ namespace luly::ui
                 }
                 ImGui::EndTable();
             }
-            ImGui::End();
         }
+        ImGui::End();
     }
 
     void console_panel::add_message(const std::shared_ptr<console_panel_message>& message)

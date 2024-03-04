@@ -41,7 +41,6 @@ namespace luly::renderer
         void reset_stats();
 
     private:
-
         std::shared_ptr<shader> m_debug_lines_shader;
         std::shared_ptr<mesh> m_screen_mesh;
         debug_pass_data s_data;

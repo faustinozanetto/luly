@@ -32,15 +32,17 @@ namespace luly::renderer
         // Load shaders
         m_down_sample_shader = shader_factory::create_shader_from_file(
             "assets/shaders/bloom/bloom_down_sample.lsh");
-        assets::asset_factory::create_asset("bloom_down_sample-shader", assets::asset_type::shader,  m_down_sample_shader);
-        
+        assets::asset_factory::create_asset("bloom_down_sample-shader", assets::asset_type::shader,
+                                            m_down_sample_shader);
+
         m_up_sample_shader = shader_factory::create_shader_from_file(
             "assets/shaders/bloom/bloom_up_sample.lsh");
         assets::asset_factory::create_asset("bloom_up_sample-shader", assets::asset_type::shader, m_up_sample_shader);
-        
+
         m_composition_shader = shader_factory::create_shader_from_file(
             "assets/shaders/bloom/bloom_composition.lsh");
-        assets::asset_factory::create_asset("bloom_composition-shader", assets::asset_type::shader,  m_composition_shader);
+        assets::asset_factory::create_asset("bloom_composition-shader", assets::asset_type::shader,
+                                            m_composition_shader);
 
         // Create screen quad
         m_screen_mesh = mesh_factory::create_screen_quad_mesh();
@@ -88,7 +90,7 @@ namespace luly::renderer
     {
         LY_PROFILE_FUNCTION;
         glm::ivec2 viewport_size_int = renderer::get_viewport_size();
-        glm::vec2 viewport_size = glm::vec2(viewport_size_int);
+        auto viewport_size = glm::vec2(viewport_size_int);
 
         m_mips.clear();
         m_mips.resize(m_samples_count);

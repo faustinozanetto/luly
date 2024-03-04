@@ -36,23 +36,23 @@ namespace luly::renderer
         m_shadow_transforms.clear();
 
         m_shadow_transforms.push_back(m_shadow_map_projection *
-            glm::lookAt(position, position + glm::vec3(1.0, 0.0, 0.0)
-                        , glm::vec3(0.0, -1.0, 0.0)));
+            lookAt(position, position + glm::vec3(1.0, 0.0, 0.0)
+                   , glm::vec3(0.0, -1.0, 0.0)));
         m_shadow_transforms.push_back(m_shadow_map_projection *
-            glm::lookAt(position, position + glm::vec3(-1.0, 0.0, 0.0)
-                        , glm::vec3(0.0, -1.0, 0.0)));
+            lookAt(position, position + glm::vec3(-1.0, 0.0, 0.0)
+                   , glm::vec3(0.0, -1.0, 0.0)));
         m_shadow_transforms.push_back(m_shadow_map_projection *
-            glm::lookAt(position, position + glm::vec3(0.0, 1.0, 0.0)
-                        , glm::vec3(0.0, 0.0, 1.0)));
+            lookAt(position, position + glm::vec3(0.0, 1.0, 0.0)
+                   , glm::vec3(0.0, 0.0, 1.0)));
         m_shadow_transforms.push_back(m_shadow_map_projection *
-            glm::lookAt(position, position + glm::vec3(0.0, -1.0, 0.0)
-                        , glm::vec3(0.0, 0.0, -1.0)));
+            lookAt(position, position + glm::vec3(0.0, -1.0, 0.0)
+                   , glm::vec3(0.0, 0.0, -1.0)));
         m_shadow_transforms.push_back(m_shadow_map_projection *
-            glm::lookAt(position, position + glm::vec3(0.0, 0.0, 1.0)
-                        , glm::vec3(0.0, -1.0, 0.0)));
+            lookAt(position, position + glm::vec3(0.0, 0.0, 1.0)
+                   , glm::vec3(0.0, -1.0, 0.0)));
         m_shadow_transforms.push_back(m_shadow_map_projection *
-            glm::lookAt(position, position + glm::vec3(0.0, 0.0, -1.0)
-                        , glm::vec3(0.0, -1.0, 0.0)));
+            lookAt(position, position + glm::vec3(0.0, 0.0, -1.0)
+                   , glm::vec3(0.0, -1.0, 0.0)));
     }
 
     void point_light::create_shadow_fbo()

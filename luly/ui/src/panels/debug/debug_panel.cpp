@@ -23,7 +23,7 @@ namespace luly::ui
 
         if (ImGui::Begin("Debug", &s_show))
         {
-            renderer::debug_renderer_data& debug_renderer_data = renderer::debug_renderer::get_data();
+            const renderer::debug_renderer_data& debug_renderer_data = renderer::debug_renderer::get_data();
 
             float lines_thickness = debug_renderer_data.lines_thickness;
             if (ui_utils::draw_property("Lines Thickness", lines_thickness, 0.0f, 10.0f, 0.1f))
@@ -55,9 +55,8 @@ namespace luly::ui
             {
                 renderer::debug_renderer::set_physics_sphere_collisions_enabled(enable_physics_sphere_collisions);
             }
-
-            ImGui::End();
         }
+        ImGui::End();
     }
 
     bool debug_panel::get_show_panel()

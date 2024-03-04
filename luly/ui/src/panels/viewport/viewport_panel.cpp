@@ -36,9 +36,8 @@ namespace luly::ui
             render_toolbar();
             render_scene_viewport();
             render_guizmos();
-
-            ImGui::End();
         }
+        ImGui::End();
     }
 
     bool viewport_panel::get_show_panel()

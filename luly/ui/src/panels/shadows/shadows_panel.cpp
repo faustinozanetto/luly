@@ -27,7 +27,7 @@ namespace luly::ui
 
             const std::shared_ptr<renderer::shadows_pass>& shadows_pass = renderer::scene_renderer::get_render_pass<
                 renderer::shadows_pass>(renderer::render_pass_type::shadow_pass);
-            
+
             renderer::shadows_data& shadows_data = shadows_pass->
                 get_shadows_data();
 
@@ -80,9 +80,8 @@ namespace luly::ui
 
                 ImGui::TreePop();
             }
-
-            ImGui::End();
         }
+        ImGui::End();
     }
 
     bool shadows_panel::get_show_panel()

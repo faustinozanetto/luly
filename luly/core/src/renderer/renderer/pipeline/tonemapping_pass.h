@@ -16,8 +16,10 @@ namespace luly::renderer
         luma
     };
 
-    static const tonemapping_type TONEMAPPING_TYPES[] = {tonemapping_type::linear, tonemapping_type::reinhard, tonemapping_type::aces,
-		tonemapping_type::filmic, tonemapping_type::hable, tonemapping_type::luma };
+    static constexpr tonemapping_type TONEMAPPING_TYPES[] = {
+        tonemapping_type::linear, tonemapping_type::reinhard, tonemapping_type::aces,
+        tonemapping_type::filmic, tonemapping_type::hable, tonemapping_type::luma
+    };
 
     class tonemapping_pass : public render_pass
     {

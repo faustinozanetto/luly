@@ -36,7 +36,7 @@ namespace luly::physics
 
     physx::PxQuat physics_utils::convert_glm_vec3_to_physx_quat(const glm::vec3& glm_vec3)
     {
-        const glm::quat glm_rotation = glm::quat(glm::radians(glm_vec3));
+        const auto glm_rotation = glm::quat(radians(glm_vec3));
 
         return convert_glm_quat_to_physx(glm_rotation);
     }

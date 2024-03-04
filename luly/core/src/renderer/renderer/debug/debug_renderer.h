@@ -26,10 +26,10 @@ namespace luly::renderer
     {
         std::vector<debug_line> debug_lines;
         float lines_thickness;
-        
+
         bool enable_physics_box_collisions;
         glm::vec3 physics_box_collisions_color;
-        
+
         bool enable_physics_sphere_collisions;
         glm::vec3 physics_sphere_collisions_color;
     };
@@ -46,7 +46,9 @@ namespace luly::renderer
         static void submit_bounding_box(const math::bounding_box& bounding_box,
                                         math::transform transform = math::transform(),
                                         const glm::vec3& color = glm::vec3(0.85f, 0.5f, 0.0f));
-        static void submit_sphere(float radius, math::transform transform = math::transform(),
+        static void submit_box(math::transform transform = math::transform(),
+                               const glm::vec3& color = glm::vec3(0.85f, 0.5f, 0.0f));
+        static void submit_sphere(float radius, int segments = 16, math::transform transform = math::transform(),
                                   const glm::vec3& color = glm::vec3(0.85f));
         static void submit_physics_box_collision(
             const std::shared_ptr<physics::physics_box_collision>& physics_box_collision,
@@ -62,7 +64,7 @@ namespace luly::renderer
 
         static void set_physics_sphere_collisions_enabled(bool enable_physics_sphere_collisions);
         static void set_physics_sphere_collisions_color(const glm::vec3& physics_sphere_collisions_color);
-        
+
         static void set_physics_box_collisions_enabled(bool enable_physics_box_collisions);
         static void set_physics_box_collisions_color(const glm::vec3& physics_box_collisions_color);
 

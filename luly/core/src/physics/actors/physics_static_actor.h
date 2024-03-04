@@ -12,7 +12,8 @@ namespace luly::physics
     {
     public:
         physics_static_actor(physx::PxRigidStatic* rigid_static);
-        physics_static_actor(const glm::vec3& location = glm::vec3(0.0f), const glm::quat& rotation = glm::quat(1.0, 0.0f, 0.0f, 0.0f));
+        physics_static_actor(const glm::vec3& location = glm::vec3(0.0f),
+                             const glm::quat& rotation = glm::quat(1.0, 0.0f, 0.0f, 0.0f));
         ~physics_static_actor() override;
 
         /* Getters */

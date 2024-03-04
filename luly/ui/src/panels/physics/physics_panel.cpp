@@ -33,9 +33,8 @@ namespace luly::ui
             {
                 physics_world.set_simulate(simulate);
             }
-
-            ImGui::End();
         }
+        ImGui::End();
     }
 
     bool physics_panel::get_show_panel()

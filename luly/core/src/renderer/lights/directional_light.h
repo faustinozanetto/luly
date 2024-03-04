@@ -39,7 +39,7 @@ namespace luly::renderer
         /* Methods */
         void update_shadow_cascades(const std::shared_ptr<shader>& directional_light_shadows_shader,
                                     const std::shared_ptr<perspective_camera>& perspective_camera);
-        void upload_light_space_matrices(const std::shared_ptr<shader>& shader);
+        void upload_light_space_matrices(const std::shared_ptr<shader>& shader) const;
 
     private:
         void create_shadow_fbo();

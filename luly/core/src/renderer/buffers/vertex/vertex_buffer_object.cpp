@@ -39,7 +39,7 @@ namespace luly::renderer
         bind();
         glBufferData(GL_ARRAY_BUFFER, size, data, get_buffer_usage_to_opengl(buffer_usage));
     }
-    
+
     void vertex_buffer_object::set_layout_descriptor(
         const std::shared_ptr<vertex_buffer_layout_descriptor>& layout_descriptor)
     {

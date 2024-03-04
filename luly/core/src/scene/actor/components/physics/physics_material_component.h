@@ -26,7 +26,7 @@ namespace luly::scene
             if (!m_physics_material)
                 m_physics_material = std::make_shared<physics::physics_material>();
         }
-        
+
         /* Getters */
         const std::shared_ptr<physics::physics_material>& get_physics_material() const { return m_physics_material; }
 

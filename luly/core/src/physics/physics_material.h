@@ -9,7 +9,7 @@ namespace luly::physics
     public:
         physics_material(float static_friction = 0.5f, float dynamic_friction = 0.5f, float restitution = 0.6f);
         ~physics_material();
-        
+
         /* Getters */
         float get_static_friction() const;
         float get_dynamic_friction() const;

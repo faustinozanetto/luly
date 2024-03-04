@@ -79,44 +79,44 @@ namespace luly::renderer
     void scene_renderer::create_pipeline_passes()
     {
         LY_TRACE("Started creating pipeling passes...");
-        const std::shared_ptr<shadows_pass>& shadows_render_pass = std::make_shared<shadows_pass>();
+        const auto& shadows_render_pass = std::make_shared<shadows_pass>();
         s_data.passes.insert({render_pass_type::shadow_pass, shadows_render_pass});
 
-        const std::shared_ptr<geometry_pass>& geometry_render_pass = std::make_shared<geometry_pass>();
+        const auto& geometry_render_pass = std::make_shared<geometry_pass>();
         s_data.passes.insert({render_pass_type::geometry_pass, geometry_render_pass});
 
-        const std::shared_ptr<environment_pass>& environment_render_pass = std::make_shared<environment_pass>();
+        const auto& environment_render_pass = std::make_shared<environment_pass>();
         environment_render_pass->add_input({geometry_render_pass, "geometry_pass_input"});
         s_data.passes.insert({render_pass_type::environment_pass, environment_render_pass});
 
-        const std::shared_ptr<lighting_pass>& lighting_render_pass = std::make_shared<lighting_pass>();
+        const auto& lighting_render_pass = std::make_shared<lighting_pass>();
         lighting_render_pass->add_input({geometry_render_pass, "geometry_pass_input"});
         lighting_render_pass->add_input({environment_render_pass, "environment_pass_input"});
         lighting_render_pass->add_input({shadows_render_pass, "shadows_pass_input"});
         s_data.passes.insert({render_pass_type::lighting_pass, lighting_render_pass});
 
-        const std::shared_ptr<skybox_pass>& skybox_render_pass = std::make_shared<skybox_pass>();
+        const auto& skybox_render_pass = std::make_shared<skybox_pass>();
         skybox_render_pass->add_input({environment_render_pass, "environment_pass_input"});
         skybox_render_pass->add_input({lighting_render_pass, "lighting_pass_input"});
         s_data.passes.insert({render_pass_type::skybox_pass, skybox_render_pass});
 
-        const std::shared_ptr<bloom_pass>& bloom_render_pass = std::make_shared<bloom_pass>();
+        const auto& bloom_render_pass = std::make_shared<bloom_pass>();
         bloom_render_pass->add_input({skybox_render_pass, "skybox_pass_input"});
         s_data.passes.insert({render_pass_type::bloom_pass, bloom_render_pass});
 
-        const std::shared_ptr<tonemapping_pass>& tonemapping_render_pass = std::make_shared<tonemapping_pass>();
+        const auto& tonemapping_render_pass = std::make_shared<tonemapping_pass>();
         tonemapping_render_pass->add_input({bloom_render_pass, "bloom_pass_input"});
         s_data.passes.insert({render_pass_type::tonemapping_pass, tonemapping_render_pass});
 
-        const std::shared_ptr<debanding_pass>& debanding_render_pass = std::make_shared<debanding_pass>();
+        const auto& debanding_render_pass = std::make_shared<debanding_pass>();
         debanding_render_pass->add_input({tonemapping_render_pass, "tonemapping_pass_input"});
         s_data.passes.insert({render_pass_type::debanding_pass, debanding_render_pass});
 
-        const std::shared_ptr<debug_pass>& debug_render_pass = std::make_shared<debug_pass>();
+        const auto& debug_render_pass = std::make_shared<debug_pass>();
         debug_render_pass->add_input({debanding_render_pass, "debanding_pass_input"});
         s_data.passes.insert({render_pass_type::debug_pass, debug_render_pass});
 
-        const std::shared_ptr<final_pass>& final_render_pass = std::make_shared<final_pass>();
+        const auto& final_render_pass = std::make_shared<final_pass>();
         final_render_pass->add_input({debug_render_pass, "debug_pass_input"});
         s_data.passes.insert({render_pass_type::final_pass, final_render_pass});
         LY_TRACE("Pipeline passes created successfully!");

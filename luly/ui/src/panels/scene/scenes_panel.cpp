@@ -51,9 +51,8 @@ namespace luly::ui
                     ImGui::TreePop();
                 }
             }
-
-            ImGui::End();
         }
+        ImGui::End();
     }
 
     bool scenes_panel::get_show_panel()

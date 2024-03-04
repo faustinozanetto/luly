@@ -12,7 +12,8 @@ namespace luly::scene
         physics_plane_collision_shape_component();
 
         physics_plane_collision_shape_component(
-            const std::shared_ptr<physics::physics_plane_collision>& plane_collision) : m_plane_collision(plane_collision)
+            const std::shared_ptr<physics::physics_plane_collision>& plane_collision) : m_plane_collision(
+            plane_collision)
         {
         }
 
@@ -21,7 +22,10 @@ namespace luly::scene
         void initialize() override;
 
         /* Getters */
-        const std::shared_ptr<physics::physics_plane_collision>& get_plane_collision() const { return m_plane_collision; }
+        const std::shared_ptr<physics::physics_plane_collision>& get_plane_collision() const
+        {
+            return m_plane_collision;
+        }
 
         /* Setters */
         void set_plane_collision(const std::shared_ptr<physics::physics_plane_collision>& plane_collision)

@@ -47,8 +47,8 @@ namespace luly::ui
             {
                 ImGui::Text("No selected actor!");
             }
-            ImGui::End();
         }
+        ImGui::End();
     }
 
     void actor_details_panel::initialize_component_panels()

@@ -40,14 +40,15 @@ namespace luly::renderer
         m_directional_light_shadows_shader->bind();
 
         // Calculate cascades and update ubo.
-        directional_light.get_directional_light()->update_shadow_cascades(m_directional_light_shadows_shader, perspective_camera);
+        directional_light.get_directional_light()->update_shadow_cascades(
+            m_directional_light_shadows_shader, perspective_camera);
         update_shadows_cascades_data(directional_light.get_directional_light());
 
         // Bind fbo and shader.
         directional_light.get_directional_light()->get_shadow_map_fbo()->bind();
         renderer::set_viewport_size(directional_light.get_directional_light()->get_shadow_map_dimensions());
         glClear(GL_DEPTH_BUFFER_BIT);
-        
+
         renderer::set_cull_face_mode(renderer_cull_face_mode::front);
 
         // Render geometry.

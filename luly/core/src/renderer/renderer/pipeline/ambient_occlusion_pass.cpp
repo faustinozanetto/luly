@@ -54,10 +54,10 @@ namespace luly::renderer
         // Create shaders.
         m_ssao_shader = shader_factory::create_shader_from_file("assets/shaders/ambient_occlusion/ssao.lsh");
         assets::asset_factory::create_asset("ssao-shader", assets::asset_type::shader, m_ssao_shader);
-        
+
         m_blur_shader = shader_factory::create_shader_from_file("assets/shaders/ambient_occlusion/blur.lsh");
-        assets::asset_factory::create_asset("ssao-blur-shader", assets::asset_type::shader,  m_blur_shader);
-        
+        assets::asset_factory::create_asset("ssao-blur-shader", assets::asset_type::shader, m_blur_shader);
+
         // Create screen quad
         m_screen_mesh = mesh_factory::create_screen_quad_mesh();
 
@@ -77,10 +77,10 @@ namespace luly::renderer
             glm::vec3 sample(random_floats(generator) * 2.0 - 1.0, random_floats(generator) * 2.0 - 1.0,
                              random_floats(generator));
 
-            sample = glm::normalize(sample);
+            sample = normalize(sample);
             sample *= random_floats(generator);
 
-            float scale = (float)i / (float)m_ssao_kernel_size;
+            float scale = static_cast<float>(i) / static_cast<float>(m_ssao_kernel_size);
             scale = std::lerp(0.1f, 1.0f, scale * scale);
             sample *= scale;
 
@@ -114,8 +114,8 @@ namespace luly::renderer
         m_ssao_shader->set_float("u_ssao_bias", m_ssao_bias);
         m_ssao_shader->set_float("u_ssao_radius", m_ssao_radius);
 
-        const glm::vec2 noise_scale = glm::vec2(renderer::get_viewport_size().x / m_ssao_noise_size,
-                                                renderer::get_viewport_size().y / m_ssao_noise_size);
+        const auto noise_scale = glm::vec2(renderer::get_viewport_size().x / m_ssao_noise_size,
+                                           renderer::get_viewport_size().y / m_ssao_noise_size);
         m_ssao_shader->set_vec_float2("u_ssao_noise_size", noise_scale);
 
         m_ssao_shader->set_int("u_ssao_kernel_size", m_ssao_kernel_size);

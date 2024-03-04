@@ -76,8 +76,8 @@ namespace luly::ui
             {
                 ImGui::Text("No active scene!");
             }
-            ImGui::End();
         }
+        ImGui::End();
     }
 
     bool scene_hierarchy_panel::get_show_panel()

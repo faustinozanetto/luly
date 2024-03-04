@@ -49,7 +49,7 @@ namespace luly::renderer
 
         // Load shaders
         m_debug_lines_shader = shader_factory::create_shader_from_file("assets/shaders/debug/debug_line.lsh");
-        assets::asset_factory::create_asset("debug_line-shader", assets::asset_type::shader,  m_debug_lines_shader);
+        assets::asset_factory::create_asset("debug_line-shader", assets::asset_type::shader, m_debug_lines_shader);
 
         /* Create debug lines VAO and VBO */
         s_data.line_vao = std::make_shared<vertex_array_object>();
@@ -65,7 +65,7 @@ namespace luly::renderer
                 {"a_color", vertex_buffer_entry_type::FLOAT3, false}
             };
 
-        const std::shared_ptr<vertex_buffer_layout_descriptor> vbo_layout_descriptor = std::make_shared<
+        const auto vbo_layout_descriptor = std::make_shared<
             vertex_buffer_layout_descriptor>(layout_elements);
         s_data.line_vbo->set_layout_descriptor(vbo_layout_descriptor);
         s_data.line_vao->add_vertex_buffer(s_data.line_vbo);

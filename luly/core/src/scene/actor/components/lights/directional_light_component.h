@@ -19,6 +19,7 @@ namespace luly::scene
         {
             return m_directional_light;
         }
+
         bool get_enable_shadows() const { return m_enable_shadows; }
 
 
@@ -27,6 +28,7 @@ namespace luly::scene
         {
             m_directional_light = directional_light;
         }
+
         void set_enable_shadows(bool enable_shadows) { m_enable_shadows = enable_shadows; }
 
     private:

@@ -34,7 +34,7 @@ namespace luly::renderer
 
         for (int i = 0; i < CASCADES_COUNT; ++i)
         {
-            float p = (i + 1) / float(CASCADES_COUNT);
+            float p = (i + 1) / static_cast<float>(CASCADES_COUNT);
             float log = near_clip * std::pow(ratio, p);
             float uni = near_clip + clip_range * p;
             float d = m_cascade_split_lambda * (log - uni) + uni;
@@ -55,7 +55,7 @@ namespace luly::renderer
         m_direction.y = glm::cos(el);
         m_direction.z = glm::sin(el) * glm::sin(az);
 
-        m_direction = glm::normalize(-m_direction);
+        m_direction = normalize(-m_direction);
     }
 
     void directional_light::set_shadow_map_dimensions(const glm::ivec2& shadow_map_dimensions)
@@ -82,7 +82,7 @@ namespace luly::renderer
         upload_light_space_matrices(directional_light_shadows_shader);
     }
 
-    void directional_light::upload_light_space_matrices(const std::shared_ptr<shader>& shader)
+    void directional_light::upload_light_space_matrices(const std::shared_ptr<shader>& shader) const
     {
         for (uint32_t i = 0; i < CASCADES_COUNT; ++i)
         {
@@ -144,7 +144,7 @@ namespace luly::renderer
                 glm::vec3(-1.0f, -1.0f, 1.0f),
             };
 
-            glm::mat4 inv_cam = glm::inverse(
+            glm::mat4 inv_cam = inverse(
                 perspective_camera->get_projection_matrix() * perspective_camera->get_view_matrix());
             for (uint32_t i = 0; i < 8; ++i)
             {
@@ -159,7 +159,7 @@ namespace luly::renderer
                 frustum_corners[i] = frustum_corners[i] + (dist * last_split_dist);
             }
 
-            glm::vec3 frustum_center = glm::vec3(0.0f);
+            auto frustum_center = glm::vec3(0.0f);
             for (uint32_t i = 0; i < 8; ++i)
             {
                 frustum_center += frustum_corners[i];
@@ -169,16 +169,16 @@ namespace luly::renderer
             float radius = 0.0f;
             for (uint32_t i = 0; i < 8; ++i)
             {
-                float distance = glm::length(frustum_corners[i] - frustum_center);
+                float distance = length(frustum_corners[i] - frustum_center);
                 radius = glm::max(radius, distance);
             }
             radius = ceilf(radius * 16.0f) / 16.0f;
 
-            glm::vec3 max_extents = glm::vec3(radius);
+            auto max_extents = glm::vec3(radius);
             glm::vec3 min_extents = -max_extents;
 
-            glm::mat4 light_view_matrix = glm::lookAt(frustum_center - m_direction * -min_extents.z, frustum_center,
-                                                      glm::vec3(0.0f, 1.0f, 0.0f));
+            glm::mat4 light_view_matrix = lookAt(frustum_center - m_direction * -min_extents.z, frustum_center,
+                                                 glm::vec3(0.0f, 1.0f, 0.0f));
             glm::mat4 light_ortho_matrix = glm::ortho(min_extents.x, max_extents.x, min_extents.y, max_extents.y,
                                                       0.0f,
                                                       max_extents.z - min_extents.z);
@@ -195,11 +195,11 @@ namespace luly::renderer
             cascade_frustum.split_depth = split_depth;
 
             // Stable csm.
-            glm::vec4 shadow_origin = glm::vec4(0.0, 0.0, 0.0, 1.0);
+            auto shadow_origin = glm::vec4(0.0, 0.0, 0.0, 1.0);
             shadow_origin = cascade_frustum.light_space_matrices * shadow_origin;
             shadow_origin = shadow_origin * (m_shadow_map_dimensions.x / 2.0f);
 
-            glm::vec4 rounded_origin = glm::round(shadow_origin);
+            glm::vec4 rounded_origin = round(shadow_origin);
             glm::vec4 round_offset = rounded_origin - shadow_origin;
             round_offset = round_offset * (2.0f / m_shadow_map_dimensions.x);
             round_offset.z = 0.0f;

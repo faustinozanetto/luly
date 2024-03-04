@@ -14,7 +14,7 @@ namespace luly::renderer
     void debug_renderer::initialize()
     {
         s_debug_renderer_data.lines_thickness = 1.0f;
-        s_debug_renderer_data.physics_box_collisions_color = {0.85f, 0.65f, 0.0f};
+        s_debug_renderer_data.physics_box_collisions_color = {0.35f, 0.85f, 0.35f};
         s_debug_renderer_data.physics_sphere_collisions_color = {0.85f, 0.65f, 0.0f};
     }
 
@@ -55,9 +55,41 @@ namespace luly::renderer
         submit_line(glm::vec3(max.x, min.y, max.z), glm::vec3(max.x, max.y, max.z), color);
     }
 
-    void debug_renderer::submit_sphere(float radius, math::transform transform, const glm::vec3& color)
+    void debug_renderer::submit_box(math::transform transform, const glm::vec3& color)
     {
-        int segments = 16;
+        // Define the vertices of the box
+        const glm::vec3 vertices[] = {
+            {-0.5f, -0.5f, -0.5f},
+            {0.5f, -0.5f, -0.5f},
+            {0.5f, 0.5f, -0.5f},
+            {-0.5f, 0.5f, -0.5f},
+            {-0.5f, -0.5f, 0.5f},
+            {0.5f, -0.5f, 0.5f},
+            {0.5f, 0.5f, 0.5f},
+            {-0.5f, 0.5f, 0.5f}
+        };
+
+        // Define the indices of the box edges
+        int edges[][2] = {
+            {0, 1}, {1, 2}, {2, 3}, {3, 0}, // Bottom face
+            {4, 5}, {5, 6}, {6, 7}, {7, 4}, // Top face
+            {0, 4}, {1, 5}, {2, 6}, {3, 7} // Connecting edges
+        };
+
+        // Apply transformation to the box vertices
+        const glm::mat4 model = transform.get_transform();
+
+        // Render the edges of the box
+        for (const auto& edge : edges)
+        {
+            glm::vec3 point_a = glm::vec3(model * glm::vec4(vertices[edge[0]], 1.0f));
+            glm::vec3 point_b = glm::vec3(model * glm::vec4(vertices[edge[1]], 1.0f));
+            submit_line(point_a, point_b, color);
+        }
+    }
+
+    void debug_renderer::submit_sphere(float radius, int segments, math::transform transform, const glm::vec3& color)
+    {
         float pi = glm::pi<float>();
         float angle_increment = 2 * pi / segments;
 
@@ -66,7 +98,7 @@ namespace luly::renderer
         glm::vec3 prev_point(center.x + radius, center.y, center.z);
         glm::vec3 current_point;
 
-        glm::mat4 rotation_matrix = glm::mat4_cast(transform.get_rotation());
+        glm::mat4 rotation_matrix = mat4_cast(transform.get_rotation());
 
         // Loop through the sphere's circumference, submitting line segments
         for (int i = 1; i <= segments; ++i)
@@ -101,10 +133,10 @@ namespace luly::renderer
                                      center.z + slice_radius * sin(next_angle));
 
                 // Apply rotation to the current and next points
-                glm::vec4 rotatedCurrentPoint = rotation_matrix * glm::vec4(current_point - center, 1.0f);
-                glm::vec4 rotatedNextPoint = rotation_matrix * glm::vec4(next_point - center, 1.0f);
-                current_point = glm::vec3(rotatedCurrentPoint) + center;
-                next_point = glm::vec3(rotatedNextPoint) + center;
+                glm::vec4 rotated_current_point = rotation_matrix * glm::vec4(current_point - center, 1.0f);
+                glm::vec4 rotated_next_point = rotation_matrix * glm::vec4(next_point - center, 1.0f);
+                current_point = glm::vec3(rotated_current_point) + center;
+                next_point = glm::vec3(rotated_next_point) + center;
 
                 submit_line(current_point, next_point, color);
             }
@@ -115,8 +147,7 @@ namespace luly::renderer
         const std::shared_ptr<physics::physics_box_collision>& physics_box_collision, const math::transform& transform,
         const glm::vec3& color)
     {
-        const glm::vec3 box_size = physics_box_collision->get_half_extents();
-        submit_bounding_box({-box_size, box_size}, transform, color);
+        submit_box(transform, color);
     }
 
     void debug_renderer::submit_physics_sphere_collision(
@@ -169,8 +200,7 @@ namespace luly::renderer
         for (const auto& [actor, transform_comp, physics_box_collision_shape_comp] : view.each())
         {
             const auto& box_collision = physics_box_collision_shape_comp.get_box_collision();
-            submit_physics_box_collision(box_collision, *transform_comp.get_transform(),
-                                         s_debug_renderer_data.physics_box_collisions_color);
+            submit_physics_box_collision(box_collision, s_debug_renderer_data.physics_box_collisions_color);
         }
     }
 

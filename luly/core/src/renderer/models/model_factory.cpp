@@ -27,7 +27,7 @@ namespace luly::renderer
         LY_PROFILE_FUNCTION;
         LY_TRACE("Started loading model from meshes...");
 
-        const std::shared_ptr<model>& created_model = std::make_shared<model>(meshes);
+        const auto& created_model = std::make_shared<model>(meshes);
 
         LY_TRACE("Model loaded from meshes successfully!");
         return created_model;
@@ -122,7 +122,7 @@ namespace luly::renderer
                 const material_specification& material_specification =
                     std::make_shared<material_specification_builder>()->
                     with_textures(material_textures).build();
-                const std::shared_ptr<material>& model_material = std::make_shared<material>(material_specification);
+                const auto& model_material = std::make_shared<material>(material_specification);
                 model_materials.push_back(model_material);
             }
         }
@@ -190,7 +190,7 @@ namespace luly::renderer
             }
 
             // Tangent
-            glm::vec3 tangent = glm::vec3(0.0f);
+            auto tangent = glm::vec3(0.0f);
             if (assimp_mesh->mTangents)
             {
                 tangent.x = assimp_mesh->mTangents[i].x;
@@ -200,7 +200,7 @@ namespace luly::renderer
             vertex.tangent = tangent;
 
             // Bi tangent
-            glm::vec3 bi_tangent = glm::vec3(0.0f);
+            auto bi_tangent = glm::vec3(0.0f);
             if (assimp_mesh->mBitangents)
             {
                 bi_tangent.x = assimp_mesh->mBitangents[i].x;

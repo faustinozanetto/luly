@@ -10,7 +10,7 @@ namespace luly::math
     {
         LY_PROFILE_FUNCTION;
         // Check for invertibility
-        if (glm::determinant(transform) == 0.0f)
+        if (determinant(transform) == 0.0f)
         {
             return false; // Matrix not invertible, decomposition fails
         }
@@ -22,16 +22,16 @@ namespace luly::math
         glm::vec3 s;
         glm::vec3 skew;
         glm::vec4 perspective;
-        glm::decompose(transform, s, rotation, translation, skew, perspective);
+        decompose(transform, s, rotation, translation, skew, perspective);
 
         // Normalize rotation to avoid scaling issues
-        rotation = glm::normalize(rotation);
+        rotation = normalize(rotation);
 
         // Check for uniform scaling
-        if (std::abs(glm::length(s) - 1.0f) <= glm::epsilon<float>())
+        if (std::abs(length(s) - 1.0f) <= glm::epsilon<float>())
         {
             // Uniform scaling detected, adjust rotation
-            rotation = glm::quat_cast(glm::transpose(glm::mat3(transform)));
+            rotation = quat_cast(transpose(glm::mat3(transform)));
         }
 
         // Update scale based on extracted values

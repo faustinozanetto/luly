@@ -103,7 +103,7 @@ namespace luly::renderer
             const std::shared_ptr<model>& model = model_renderer_component.get_model();
 
 
-            glm::mat3 normal_matrix = glm::transpose(glm::inverse(glm::mat3(transform->get_transform())));
+            glm::mat3 normal_matrix = transpose(inverse(glm::mat3(transform->get_transform())));
             m_geometry_shader->set_mat3("u_normal_matrix", normal_matrix);
             m_geometry_shader->set_mat4("u_transform_matrix", transform->get_transform());
 

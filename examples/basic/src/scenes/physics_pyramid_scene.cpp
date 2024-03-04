@@ -38,10 +38,10 @@ void physics_pyramid_scene::initialize()
     create_cubes_pyramid();
 
     // Setup directional light
-    const std::shared_ptr<luly::scene::scene_actor>& dir_light_actor = create_actor("Sun Light");
+    const std::shared_ptr<luly::scene::scene_actor>& dir_light_actor = create_actor("Sun");
     const std::shared_ptr<luly::renderer::directional_light>& directional_light = std::make_shared<
         luly::renderer::directional_light>();
-    directional_light->set_direction(86.0f, 8.0f);
+    directional_light->set_direction(130.0f, -45.0f);
     dir_light_actor->add_component<luly::scene::directional_light_component>(directional_light);
 
     // Setup Skybox

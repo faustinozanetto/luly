@@ -10,7 +10,7 @@
 
 namespace luly::renderer
 {
-    typedef uint32_t mesh_index;
+    using mesh_index = uint32_t;
 
     struct mesh_vertex
     {
@@ -24,7 +24,8 @@ namespace luly::renderer
     class mesh
     {
     public:
-        mesh(const std::string& name, const std::vector<mesh_vertex>& vertices, const std::vector<mesh_index>& indices, int material_index = 0);
+        mesh(const std::string& name, const std::vector<mesh_vertex>& vertices, const std::vector<mesh_index>& indices,
+             int material_index = 0);
 
         /* Getters */
         const std::shared_ptr<vertex_array_object>& get_vao() const { return m_vao; }

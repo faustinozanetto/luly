@@ -116,9 +116,8 @@ namespace luly::ui
                 ImGui::TreePop();
             }
             ImGui::Separator();
-
-            ImGui::End();
         }
+        ImGui::End();
     }
 
     bool render_passes_panel::get_show_panel()

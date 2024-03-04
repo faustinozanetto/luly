@@ -17,7 +17,7 @@ namespace luly::assets
             LY_PROFILE_FUNCTION;
             asset_metadata metadata = {type, name};
             // Create asset and set data.
-            const std::shared_ptr<asset>& created_asset = std::make_shared<asset>(metadata);
+            const auto& created_asset = std::make_shared<asset>(metadata);
             created_asset->set_data(data);
 
             // Register asset in manager.

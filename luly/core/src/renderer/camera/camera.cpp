@@ -28,11 +28,11 @@ namespace luly::renderer
         front.x = cos(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
         front.y = sin(glm::radians(m_pitch));
         front.z = sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
-        m_front = glm::normalize(front);
+        m_front = normalize(front);
         // also re-calculate the Right and Up vector
-        m_right = glm::normalize(glm::cross(m_front, m_world_up));
+        m_right = normalize(cross(m_front, m_world_up));
         // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
-        m_up = glm::normalize(glm::cross(m_right, m_front));
+        m_up = normalize(cross(m_right, m_front));
     }
 
     void camera::set_position(const glm::vec3& position)

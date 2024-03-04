@@ -54,7 +54,7 @@ namespace luly::renderer
         spot_light_data m_spot_lights[MAX_SPOT_LIGHTS];
         directional_light_data m_directional_light;
         lights_data m_lights;
-        
+
         std::shared_ptr<uniform_buffer_object> m_lights_ubo;
     };
 }

@@ -40,9 +40,8 @@ namespace luly::ui
 
             render_tonemapping_details();
             render_bloom_details();
-
-            ImGui::End();
         }
+        ImGui::End();
     }
 
     bool renderer_panel::get_show_panel()

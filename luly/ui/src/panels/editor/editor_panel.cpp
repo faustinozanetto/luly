@@ -40,8 +40,8 @@ namespace luly::ui
             {
                 engine_ui::get().set_snap_value(snap_value);
             }
-            ImGui::End();
         }
+        ImGui::End();
     }
 
     bool editor_panel::get_show_panel()

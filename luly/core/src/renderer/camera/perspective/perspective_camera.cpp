@@ -22,7 +22,7 @@ namespace luly::renderer
     void perspective_camera::update_view_matrix()
     {
         LY_PROFILE_FUNCTION;
-        m_view_matrix = glm::lookAt(m_position, m_position + m_front, m_up);
+        m_view_matrix = lookAt(m_position, m_position + m_front, m_up);
     }
 
     void perspective_camera::update_projection_matrix(const glm::ivec2& dimensions)

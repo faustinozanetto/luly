@@ -122,7 +122,7 @@ namespace luly::renderer
     void renderer::submit_elements(int count, renderer_draw_mode draw_mode)
     {
         LY_PROFILE_FUNCTION;
-        glDrawElements(get_renderer_draw_mode_to_opengl(draw_mode), count, GL_UNSIGNED_INT, 0);
+        glDrawElements(get_renderer_draw_mode_to_opengl(draw_mode), count, GL_UNSIGNED_INT, nullptr);
     }
 
     void renderer::submit_vao(const std::shared_ptr<vertex_array_object>& vao, int count, renderer_draw_mode draw_mode)

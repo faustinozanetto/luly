@@ -101,11 +101,12 @@ namespace luly::renderer
 
         m_equirectangular_to_cubemap_shader = shader_factory::create_shader_from_file(
             "assets/shaders/skybox/equirectangular_to_cubemap.lsh");
-        assets::asset_factory::create_asset("equirectangular_to_cubemap-shader", assets::asset_type::shader, m_equirectangular_to_cubemap_shader);
-        
+        assets::asset_factory::create_asset("equirectangular_to_cubemap-shader", assets::asset_type::shader,
+                                            m_equirectangular_to_cubemap_shader);
+
         m_irradiance_shader = shader_factory::create_shader_from_file("assets/shaders/skybox/irradiance.lsh");
         assets::asset_factory::create_asset("irradiance-shader", assets::asset_type::shader, m_irradiance_shader);
-        
+
         m_prefilter_shader = shader_factory::create_shader_from_file("assets/shaders/skybox/prefilter.lsh");
         assets::asset_factory::create_asset("prefilter-shader", assets::asset_type::shader, m_prefilter_shader);
 
@@ -145,12 +146,12 @@ namespace luly::renderer
         m_capture_projection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
         m_capture_views =
         {
-            glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)),
-            glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)),
-            glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)),
-            glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)),
-            glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)),
-            glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f))
+            lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)),
+            lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)),
+            lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)),
+            lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)),
+            lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)),
+            lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f))
         };
 
         m_equirectangular_to_cubemap_shader->bind();
@@ -165,7 +166,7 @@ namespace luly::renderer
             m_equirectangular_to_cubemap_shader->set_mat4("u_view_matrix", m_capture_views[i]);
             m_environment_capture_fbo->attach_texture(m_environment_cubemap_texture, GL_FRAMEBUFFER,
                                                       render_buffer_attachment_type::color,
-                                                      GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0);
+                                                      GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, false);
             renderer::clear_screen();
 
             renderer::submit_mesh(m_cube_mesh);
@@ -207,7 +208,7 @@ namespace luly::renderer
             m_irradiance_shader->set_mat4("u_view_matrix", m_capture_views[i]);
             m_environment_capture_fbo->attach_texture(m_environment_irradiance_texture, GL_FRAMEBUFFER,
                                                       render_buffer_attachment_type::color,
-                                                      GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0);
+                                                      GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, false);
 
             renderer::clear_screen();
             renderer::submit_mesh(m_cube_mesh);
@@ -283,7 +284,7 @@ namespace luly::renderer
         m_environment_capture_rbo->set_storage_parameters(m_brdf_map_size, m_brdf_map_size,
                                                           texture_internal_format::depth_component24);
         m_environment_capture_fbo->attach_texture(m_brdf_texture, GL_FRAMEBUFFER, render_buffer_attachment_type::color,
-                                                  GL_TEXTURE_2D, 0);
+                                                  GL_TEXTURE_2D, false);
 
         renderer::set_viewport_size({m_brdf_map_size, m_brdf_map_size});
         m_brdf_shader->bind();

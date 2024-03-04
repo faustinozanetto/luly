@@ -23,11 +23,11 @@ namespace luly::renderer
         m_vao = std::make_shared<vertex_array_object>();
 
         // Create VBO
-        const std::shared_ptr<vertex_buffer_object>& vertices_vbo = std::make_shared<
+        const auto& vertices_vbo = std::make_shared<
             vertex_buffer_object>();
 
         // Create EBO
-        const std::shared_ptr<element_buffer_object>& elements_buffer = std::make_shared<
+        const auto& elements_buffer = std::make_shared<
             element_buffer_object>(m_indices.size());
 
         // Set buffers data
@@ -48,7 +48,7 @@ namespace luly::renderer
                 {"a_bi_tangent", vertex_buffer_entry_type::FLOAT3, false}
             };
 
-        const std::shared_ptr<vertex_buffer_layout_descriptor>& vertices_vbo_layout_descriptor = std::make_shared<
+        const auto& vertices_vbo_layout_descriptor = std::make_shared<
             vertex_buffer_layout_descriptor>(layout_elements);
         vertices_vbo->set_layout_descriptor(vertices_vbo_layout_descriptor);
 

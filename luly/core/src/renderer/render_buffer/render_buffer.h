@@ -19,7 +19,7 @@ namespace luly::renderer
     {
     public:
         render_buffer(int width, int height, texture_internal_format internal_format);
-        ~render_buffer();
+        ~render_buffer() override;
 
         /* Getters */
         uint32_t get_handle_id() const { return m_handle; }

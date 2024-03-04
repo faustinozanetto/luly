@@ -11,9 +11,9 @@ namespace luly::physics
         ~physics_plane_collision() override;
 
         /* Getters */
-        physx::PxShape *get_physx_shape() const override;
+        physx::PxShape* get_physx_shape() const override;
 
     private:
-        physx::PxShape *m_shape;
+        physx::PxShape* m_shape;
     };
 }

@@ -101,12 +101,12 @@ namespace luly::renderer
 
     void shader::set_mat3(const std::string& uniform_name, const glm::mat3& value)
     {
-        glUniformMatrix3fv(get_uniform_location(uniform_name), 1, GL_FALSE, glm::value_ptr(value));
+        glUniformMatrix3fv(get_uniform_location(uniform_name), 1, GL_FALSE, value_ptr(value));
     }
 
     void shader::set_mat4(const std::string& uniform_name, const glm::mat4& value)
     {
-        glUniformMatrix4fv(get_uniform_location(uniform_name), 1, GL_FALSE, glm::value_ptr(value));
+        glUniformMatrix4fv(get_uniform_location(uniform_name), 1, GL_FALSE, value_ptr(value));
     }
 
     void shader::initialize()

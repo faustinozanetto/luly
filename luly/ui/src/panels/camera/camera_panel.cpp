@@ -74,8 +74,8 @@ namespace luly::ui
             {
                 ImGui::Text("No current scene!");
             }
-            ImGui::End();
         }
+        ImGui::End();
     }
 
     bool camera_panel::get_show_panel()

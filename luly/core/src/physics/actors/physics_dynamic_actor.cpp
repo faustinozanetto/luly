@@ -19,7 +19,6 @@ namespace luly::physics
         m_rigid_dynamic = physics_world::get().get_physics()->createRigidDynamic(transform);
         m_mass = mass;
         set_kinematic(false);
-
     }
 
     physics_dynamic_actor::~physics_dynamic_actor()
