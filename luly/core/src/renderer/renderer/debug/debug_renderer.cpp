@@ -154,7 +154,7 @@ namespace luly::renderer
         const std::shared_ptr<physics::physics_sphere_collision>& physics_sphere_collision,
         const math::transform& transform, const glm::vec3& color)
     {
-        submit_sphere(physics_sphere_collision->get_radius(), transform, color);
+        submit_sphere(physics_sphere_collision->get_radius(), 16, transform, color);
     }
 
     void debug_renderer::collect_debugables()

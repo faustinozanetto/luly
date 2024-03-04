@@ -8,7 +8,8 @@
 #include "actor/components/lights/point_light_component.h"
 #include "actor/components/lights/spot_light_component.h"
 #include "actor/components/rendering/skybox_component.h"
-
+#include "physics/physics_utils.h"
+#include "physics/physics_world.h"
 #include "renderer/scene/scene_renderer.h"
 
 namespace luly::scene
@@ -23,11 +24,18 @@ namespace luly::scene
         m_actors_registry = std::make_unique<entt::registry>();
         m_camera_manager = std::make_shared<renderer::camera_manager>();
 
+        initialize_physx_scene();
+
         LY_TRACE("Scene created successfully!");
     }
 
     scene::~scene()
     {
+        if (m_physx_scene)
+        {
+            m_physx_scene->release();
+            m_physx_scene = nullptr;
+        }
     }
 
     const std::shared_ptr<scene_actor>& scene::get_actor(entt::entity entity)
@@ -37,6 +45,12 @@ namespace luly::scene
             LY_ASSERT_MSG(m_actors_map.find(entity) != m_actors_map.end(), "Actor does not belong to the registry!")
 
         return iterator->second;
+    }
+
+    void scene::set_gravity(const glm::vec3& gravity)
+    {
+        m_gravity = gravity;
+        m_physx_scene->setGravity(physics::physics_utils::convert_glm_vec3_to_physx(m_gravity));
     }
 
     std::shared_ptr<scene_actor> scene::create_actor(const std::string& name)
@@ -59,7 +73,7 @@ namespace luly::scene
             return;
         }
 
-        if (m_pending_delete_entities.contains(handle))
+        if (m_pending_delete_actors.contains(handle))
         {
             LY_WARN("Tried to add actor with handle: {}, to delete that already has been added!",
                     static_cast<uint32_t>(handle));
@@ -67,7 +81,7 @@ namespace luly::scene
         }
 
         m_actors_map.erase(handle);
-        m_pending_delete_entities.insert(handle);
+        m_pending_delete_actors.insert(handle);
     }
 
     void scene::on_update(float delta_time)
@@ -77,7 +91,7 @@ namespace luly::scene
 
     void scene::handle_delete_entities()
     {
-        for (entt::entity entity : m_pending_delete_entities)
+        for (entt::entity entity : m_pending_delete_actors)
         {
             if (!m_actors_registry->valid(entity))
                 continue;
@@ -120,7 +134,36 @@ namespace luly::scene
         return nullptr;
     }
 
-    void scene::update_lights()
+    void scene::initialize_physx_scene()
+    {
+        LY_TRACE("Started creating physics scene for scene: '{}'...", m_name);
+        physics::physics_world& physics_world = physics::physics_world::get();
+        m_gravity = glm::vec3(0.0f, -9.81f, 0.0f);
+
+        // Create the scene
+        physx::PxSceneDesc sceneDesc(physics_world.get_physics()->getTolerancesScale());
+        sceneDesc.cpuDispatcher = physics_world.get_dispatcher();
+        sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
+        sceneDesc.gravity = physics::physics_utils::convert_glm_vec3_to_physx(m_gravity);
+        m_physx_scene = physics_world.get_physics()->createScene(sceneDesc);
+        LY_ASSERT_MSG(m_physx_scene, "An error occurred while creating PhysX Scene!");
+        
+        m_physx_scene->setVisualizationParameter(physx::PxVisualizationParameter::eJOINT_LOCAL_FRAMES, 1.0f);
+        m_physx_scene->setVisualizationParameter(physx::PxVisualizationParameter::eJOINT_LIMITS, 1.0f);
+
+        // Create pvd
+#ifdef LY_DEBUG
+        if (physx::PxPvdSceneClient* pvd_client = m_physx_scene->getScenePvdClient())
+        {
+            pvd_client->setScenePvdFlag(physx::PxPvdSceneFlag::eTRANSMIT_CONSTRAINTS, true);
+            pvd_client->setScenePvdFlag(physx::PxPvdSceneFlag::eTRANSMIT_CONTACTS, true);
+            pvd_client->setScenePvdFlag(physx::PxPvdSceneFlag::eTRANSMIT_SCENEQUERIES, true);
+        }
+#endif
+        LY_TRACE("Physics scene created successfully!");
+    }
+
+    void scene::update_lights() const
     {
         // Update point lights
         const auto& point_view = m_actors_registry->view<transform_component, point_light_component>();

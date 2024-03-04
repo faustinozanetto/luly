@@ -1,8 +1,8 @@
 ﻿#include "pbr_mask_scene.h"
 
+#include "scene_utils.h"
 #include "assets/asset.h"
 #include "assets/asset_factory.h"
-#include "renderer/lights/directional_light.h"
 #include "renderer/materials/material_specification_builder.h"
 #include "renderer/models/model.h"
 #include "renderer/models/model_factory.h"
@@ -10,10 +10,8 @@
 #include "renderer/textures/texture_factory.h"
 #include "scene/actor/scene_actor.h"
 #include "scene/actor/components/transform_component.h"
-#include "scene/actor/components/lights/directional_light_component.h"
 #include "scene/actor/components/rendering/material_component.h"
 #include "scene/actor/components/rendering/model_renderer_component.h"
-#include "scene/actor/components/rendering/skybox_component.h"
 
 pbr_mask_scene::pbr_mask_scene() : scene("PBR Mask Scene")
 {
@@ -26,23 +24,7 @@ pbr_mask_scene::~pbr_mask_scene()
 
 void pbr_mask_scene::initialize()
 {
-    // Setup directional light
-    const std::shared_ptr<luly::scene::scene_actor>& dir_light_actor = create_actor("Sun Light");
-    const std::shared_ptr<luly::renderer::directional_light>& directional_light = std::make_shared<
-        luly::renderer::directional_light>();
-    directional_light->set_direction(86.0f, 8.0f);
-    dir_light_actor->add_component<luly::scene::directional_light_component>(directional_light);
-
-    // Setup Skybox
-    const std::shared_ptr<luly::scene::scene_actor>& skybox_actor = create_actor("Skybox");
-    const std::shared_ptr<luly::renderer::texture_2d>& environment_texture =
-        luly::renderer::texture_factory::create_environment_texture_from_file(
-            "assets/hdris/meadow_2_4k.hdr");
-    luly::scene::skybox_component& skybox_component = skybox_actor->add_component<luly::scene::skybox_component>(
-        environment_texture
-    );
-    skybox_component.set_intensity(0.5f);
-
+    scene_utils::create_environment(this);
     create_mask();
 }
 

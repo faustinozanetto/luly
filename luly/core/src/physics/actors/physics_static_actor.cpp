@@ -3,6 +3,8 @@
 
 #include "physics/physics_utils.h"
 #include "physics/physics_world.h"
+#include "scene/scene.h"
+#include "scene/scene_manager.h"
 
 namespace luly::physics
 {
@@ -23,10 +25,13 @@ namespace luly::physics
         m_rigid_static = nullptr;
     }
 
-    void physics_static_actor::initialize()
+    void physics_static_actor::initialize(scene::scene* scene)
     {
         attach_collision_shapes();
-        physics_world::get().get_scene()->addActor(*m_rigid_static);
+
+        const bool result = scene->get_physx_scene()->addActor(*m_rigid_static);
+        LY_ASSERT_MSG(result, "Failed to add physics static actor to scene!");
+
         m_initialized = true;
     }
 

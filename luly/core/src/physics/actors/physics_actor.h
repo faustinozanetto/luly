@@ -1,6 +1,7 @@
 #pragma once
 
 #include "physics/collision_shapes/physics_collision_shape.h"
+#include "scene/scene.h"
 
 namespace luly::physics
 {
@@ -22,7 +23,7 @@ namespace luly::physics
         virtual physx::PxRigidActor* get_physx_rigid_actor() = 0;
 
         /* Functions */
-        virtual void initialize() = 0;
+        virtual void initialize(scene::scene* scene) = 0;
 
         void add_collision_shape(const std::shared_ptr<physics_collision_shape>& collision_shape)
         {

@@ -25,8 +25,9 @@
 #include "scene/actor/components/physics/collision_shapes/physics_sphere_collision_shape_component.h"
 #include "scene/actor/components/rendering/material_component.h"
 #include "scene/actor/components/rendering/model_renderer_component.h"
-#include "scenes/physics_pyramid_scene.h"
-#include "scenes\pbr_mask_scene.h"
+#include "scenes/pbr_mask_scene.h"
+#include "scenes/physics/physics_joints_scene.h"
+#include "scenes/physics/physics_pyramid_scene.h"
 #include "time/app_time.h"
 
 basic_application::basic_application(const luly::renderer::window_specification& window_specification) : application(
@@ -98,6 +99,10 @@ void basic_application::setup_scene()
         physics_pyramid_scene>();
     luly::scene::scene_manager::get().add_scene(physics_pyramid_scene);
 
+    const std::shared_ptr<physics_joints_scene>& physics_joints_scene = std::make_shared<class
+        physics_joints_scene>();
+    luly::scene::scene_manager::get().add_scene(physics_joints_scene);
+
     const std::shared_ptr<pbr_mask_scene>& pbr_mask_scene = std::make_shared<class pbr_mask_scene>();
     luly::scene::scene_manager::get().add_scene(pbr_mask_scene);
 
@@ -146,7 +151,7 @@ void basic_application::create_ball(const std::shared_ptr<luly::scene::scene>& s
     const glm::vec3& impulse_force = scene->get_camera_manager()->get_perspective_camera()->get_front() * impulse;
     ball_physics_dynamic_actor->set_linear_velocity(impulse_force);
     ball_physics_dynamic_actor->add_collision_shape(sphere_collision_shape);
-    ball_physics_dynamic_actor->initialize();
+    ball_physics_dynamic_actor->initialize(scene.get());
 
     ball_actor->add_component<luly::scene::physics_dynamic_actor_component>(ball_physics_dynamic_actor);
     ball_actor->add_component<luly::scene::physics_material_component>(physics_material);

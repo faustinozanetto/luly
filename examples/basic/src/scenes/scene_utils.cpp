@@ -1,65 +1,67 @@
-﻿#include "physics_pyramid_scene.h"
+﻿#include "scene_utils.h"
 
 #include <random>
 
 #include "assets/asset.h"
 #include "assets/asset_factory.h"
 #include "physics/physics_material.h"
-#include "physics/physics_utils.h"
 #include "physics/actors/physics_dynamic_actor.h"
-#include "physics/actors/physics_static_actor.h"
 #include "physics/collision_shapes/physics_box_collision.h"
 #include "renderer/lights/directional_light.h"
-#include "renderer/materials/material.h"
 #include "renderer/materials/material_specification_builder.h"
+#include "renderer/models/model.h"
 #include "renderer/models/model_factory.h"
 #include "renderer/textures/texture_factory.h"
+#include "scene/actor/scene_actor.h"
 #include "scene/actor/components/transform_component.h"
 #include "scene/actor/components/lights/directional_light_component.h"
-#include "scene/actor/components/physics/actors/physics_dynamic_actor_component.h"
 #include "scene/actor/components/physics/physics_material_component.h"
+#include "scene/actor/components/physics/actors/physics_dynamic_actor_component.h"
 #include "scene/actor/components/physics/collision_shapes/physics_box_collision_shape_component.h"
 #include "scene/actor/components/rendering/material_component.h"
 #include "scene/actor/components/rendering/model_renderer_component.h"
 #include "scene/actor/components/rendering/skybox_component.h"
 
-physics_pyramid_scene::physics_pyramid_scene() : scene("Physics Pyramid Scene")
+void scene_utils::create_environment(luly::scene::scene* scene)
 {
-    initialize();
-}
-
-physics_pyramid_scene::~physics_pyramid_scene()
-{
-}
-
-void physics_pyramid_scene::initialize()
-{
-    create_floor();
-    create_cubes_pyramid();
-
     // Setup directional light
-    const std::shared_ptr<luly::scene::scene_actor>& dir_light_actor = create_actor("Sun");
+    const std::shared_ptr<luly::scene::scene_actor>& dir_light_actor = scene->create_actor("Sun");
     const std::shared_ptr<luly::renderer::directional_light>& directional_light = std::make_shared<
         luly::renderer::directional_light>();
     directional_light->set_direction(130.0f, -45.0f);
     dir_light_actor->add_component<luly::scene::directional_light_component>(directional_light);
 
     // Setup Skybox
-    const std::shared_ptr<luly::scene::scene_actor>& skybox_actor = create_actor("Skybox");
-    const std::shared_ptr<luly::renderer::texture_2d>& environment_texture =
-        luly::renderer::texture_factory::create_environment_texture_from_file(
-            "assets/hdris/blue_photo_studio_4k.hdr");
+    const std::shared_ptr<luly::scene::scene_actor>& skybox_actor = scene->create_actor("Skybox");
+
+    std::shared_ptr<luly::renderer::texture_2d> skybox_texture;
+    if (!luly::assets::assets_manager::get().asset_already_registered("skybox-texture"))
+    {
+        const std::shared_ptr<luly::renderer::texture_2d> texture =
+            luly::renderer::texture_factory::create_environment_texture_from_file(
+                "assets/hdris/blue_photo_studio_4k.hdr");
+        const auto& model_asset = luly::assets::asset_factory::create_asset<
+            luly::renderer::texture>(
+            "skybox-texture", luly::assets::asset_type::texture, texture);
+        skybox_texture = model_asset->get_data<luly::renderer::texture_2d>();
+    }
+    else
+    {
+        skybox_texture = luly::assets::assets_manager::get().get_asset<
+            luly::assets::asset, luly::assets::asset_type::texture>("skybox-texture")->get_data<
+            luly::renderer::texture_2d>();
+    }
+
     luly::scene::skybox_component& skybox_component = skybox_actor->add_component<luly::scene::skybox_component>(
-        environment_texture
+        skybox_texture
     );
     skybox_component.set_intensity(0.5f);
 }
 
-
-void physics_pyramid_scene::create_floor()
+void scene_utils::create_floor(luly::scene::scene* scene)
 {
-    glm::vec3 floor_size = {50.0f, 1.0f, 50.0f};
-    const std::shared_ptr<luly::scene::scene_actor>& floor_actor = create_actor("Floor");
+    const glm::vec3 floor_size = {50.0f, 1.0f, 50.0f};
+    const std::shared_ptr<luly::scene::scene_actor>& floor_actor = scene->create_actor("Floor");
     // 1. Load up model.
     const std::shared_ptr<luly::renderer::model> floor_model =
         luly::renderer::model_factory::create_model_from_file(
@@ -92,7 +94,7 @@ void physics_pyramid_scene::create_floor()
     floor_physics_actor->set_kinematic(true);
 
     floor_physics_actor->add_collision_shape(floor_collision_shape);
-    floor_physics_actor->initialize();
+    floor_physics_actor->initialize(scene);
 
     floor_actor->add_component<luly::scene::physics_dynamic_actor_component>(floor_physics_actor);
     floor_actor->add_component<luly::scene::physics_material_component>(physics_material);
@@ -108,9 +110,10 @@ void physics_pyramid_scene::create_floor()
     floor_actor->add_component<luly::scene::material_component>(material);
 }
 
-void physics_pyramid_scene::create_cube(glm::vec3 size, glm::vec3 pos)
+std::shared_ptr<luly::scene::scene_actor> scene_utils::create_cube(luly::scene::scene* scene, glm::vec3 size,
+                                                                   glm::vec3 pos)
 {
-    const std::shared_ptr<luly::scene::scene_actor>& cube_actor = create_actor("Physics Cube");
+    const std::shared_ptr<luly::scene::scene_actor>& cube_actor = scene->create_actor("Physics Cube");
     // 1. Load up model.
     std::shared_ptr<luly::renderer::model> cube_model;
     if (!luly::assets::assets_manager::get().asset_already_registered("cube-model"))
@@ -146,7 +149,7 @@ void physics_pyramid_scene::create_cube(glm::vec3 size, glm::vec3 pos)
                                               transform_component.get_transform()->get_rotation());
     cube_physics_dynamic_actor->set_mass(0.2f);
     cube_physics_dynamic_actor->add_collision_shape(box_collision_shape);
-    cube_physics_dynamic_actor->initialize();
+    cube_physics_dynamic_actor->initialize(scene);
 
     cube_actor->add_component<luly::scene::physics_dynamic_actor_component>(cube_physics_dynamic_actor);
     cube_actor->add_component<luly::scene::physics_material_component>(physics_material);
@@ -165,23 +168,6 @@ void physics_pyramid_scene::create_cube(glm::vec3 size, glm::vec3 pos)
         luly::renderer::material>(
         material_specification);
     cube_actor->add_component<luly::scene::material_component>(material);
-}
 
-void physics_pyramid_scene::create_cubes_pyramid()
-{
-    int levels = 8;
-    glm::vec3 start_pos = {0, 4, 0};
-
-    for (int i = 0; i < levels; i++)
-    {
-        int cubes_count = levels - i;
-        float half_cube_width = 0.5f;
-        for (int j = 0; j < cubes_count; j++)
-        {
-            const glm::vec3 cube_pos = {
-                start_pos.x + j - (cubes_count - 1) * 0.5f + half_cube_width, start_pos.y + i, 0
-            };
-            create_cube(glm::vec3(1.0f), cube_pos);
-        }
-    }
+    return cube_actor;
 }

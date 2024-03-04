@@ -27,10 +27,10 @@ namespace luly::core
         m_window = std::make_shared<renderer::window>(window_specification);
         m_window->set_event_function(BIND_EVENT_FN(application::on_event));
 
+        physics::physics_world::initialize();
         renderer::renderer::initialize(m_window);
         renderer::scene_renderer::initialize();
         renderer::debug_renderer::initialize();
-        physics::physics_world::initialize();
         scene::scene_manager::initialize();
 
         app_time::update_time();

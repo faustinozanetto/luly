@@ -21,7 +21,7 @@ namespace luly::physics
         physx::PxRigidActor* get_physx_rigid_actor() override { return m_rigid_static; }
 
         /* Functions */
-        void initialize() override;
+        void initialize(scene::scene* scene) override;
 
     protected:
         void attach_collision_shapes() override;

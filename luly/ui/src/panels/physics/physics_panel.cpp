@@ -22,12 +22,13 @@ namespace luly::ui
         if (ImGui::Begin("Physics", &s_show))
         {
             physics::physics_world& physics_world = physics::physics_world::get();
+            /*
             glm::vec3 gravity = physics_world.get_gravity();
             if (ui_utils::draw_property("Gravity", gravity, -50.0f, 50.0f, 0.01f))
             {
                 physics_world.set_gravity(gravity);
             }
-
+*/
             bool simulate = physics_world.get_simulate();
             if (ui_utils::draw_property("Simulate", simulate))
             {

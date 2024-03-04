@@ -9,9 +9,8 @@
 
 namespace luly::physics
 {
-    physics_world::physics_world(const glm::vec3& gravity)
+    physics_world::physics_world()
     {
-        m_gravity = gravity;
         m_simulate = false;
         initialize_physx();
     }
@@ -21,25 +20,29 @@ namespace luly::physics
         cleanup();
     }
 
-    void physics_world::set_gravity(const glm::vec3& gravity)
-    {
-        m_gravity = gravity;
-        m_scene->setGravity(physics_utils::convert_glm_vec3_to_physx(gravity));
-    }
-
     void physics_world::on_update() const
     {
+        const std::shared_ptr<scene::scene>& current_scene = scene::scene_manager::get().get_current_scene();
+        if (!current_scene) return;
+
+        physx::PxScene* current_scene_physx = current_scene->get_physx_scene();
+        if (current_scene_physx && m_simulate)
+        {
+            current_scene_physx->simulate(app_time::get_delta_time());
+            current_scene_physx->fetchResults(true);
+        }
+        /*
         if (m_scene && m_simulate)
         {
             m_scene->simulate(app_time::get_delta_time());
             m_scene->fetchResults(true);
-        }
+        }*/
     }
 
     void physics_world::sync_transforms()
     {
         const auto& current_scene = scene::scene_manager::get().get_current_scene();
-        if (!current_scene) return;
+        if (!current_scene && !m_simulate) return;
 
         const auto& scene_view = current_scene->get_registry()->view<
             scene::transform_component, scene::physics_dynamic_actor_component>();
@@ -84,49 +87,32 @@ namespace luly::physics
 #endif
         // Create the physics instance
         m_physics = PxCreatePhysics(PX_PHYSICS_VERSION, *m_foundation, physx::PxTolerancesScale(), true, m_pvd);
-        LY_ASSERT_MSG(m_physics, "An error occurred while creating PhysX Instance!");
+        LY_ASSERT_MSG(m_physics, "An error occurred while creating PhysX Instance!")
 
+        PxInitExtensions(*m_physics, m_pvd);
 
         // Create the default CPU dispatcher
         m_dispatcher = physx::PxDefaultCpuDispatcherCreate(2);
-        LY_ASSERT_MSG(m_dispatcher, "An error occurred while creating PhysX Dispatcher!");
-
-        // Create the scene
-        physx::PxSceneDesc sceneDesc(m_physics->getTolerancesScale());
-        sceneDesc.cpuDispatcher = m_dispatcher;
-        sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
-        sceneDesc.gravity = physics_utils::convert_glm_vec3_to_physx(m_gravity);
-        m_scene = m_physics->createScene(sceneDesc);
-        LY_ASSERT_MSG(m_scene, "An error occurred while creating PhysX Scene!");
-
-        m_scene->setVisualizationParameter(physx::PxVisualizationParameter::eJOINT_LOCAL_FRAMES, 1.0f);
-        m_scene->setVisualizationParameter(physx::PxVisualizationParameter::eJOINT_LIMITS, 1.0f);
-
-#ifdef LY_DEBUG
-        physx::PxPvdSceneClient* pvd_client = m_scene->getScenePvdClient();
-        if (pvd_client)
-        {
-            pvd_client->setScenePvdFlag(physx::PxPvdSceneFlag::eTRANSMIT_CONSTRAINTS, true);
-            pvd_client->setScenePvdFlag(physx::PxPvdSceneFlag::eTRANSMIT_CONTACTS, true);
-            pvd_client->setScenePvdFlag(physx::PxPvdSceneFlag::eTRANSMIT_SCENEQUERIES, true);
-        }
-#endif
+        LY_ASSERT_MSG(m_dispatcher, "An error occurred while creating PhysX Dispatcher!")
 
         LY_TRACE("PhysX world initialized successfully!");
     }
 
     void physics_world::cleanup()
     {
+        /*
         if (m_scene)
         {
             m_scene->release();
             m_scene = nullptr;
         }
+        */
         if (m_dispatcher)
         {
             m_dispatcher->release();
             m_dispatcher = nullptr;
         }
+        PxCloseExtensions();
         if (m_physics)
         {
             m_physics->release();

@@ -37,7 +37,7 @@ namespace luly::physics
         void set_kinematic(bool is_kinematic);
 
         /* Functions */
-        void initialize() override;
+        void initialize(scene::scene* scene) override;
 
     protected:
         void attach_collision_shapes() override;

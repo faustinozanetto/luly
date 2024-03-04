@@ -3,6 +3,8 @@
 
 #include "physics/physics_utils.h"
 #include "physics/physics_world.h"
+#include "scene/scene.h"
+#include "scene/scene_manager.h"
 
 namespace luly::physics
 {
@@ -93,7 +95,7 @@ namespace luly::physics
         m_rigid_dynamic->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, is_kinematic);
     }
 
-    void physics_dynamic_actor::initialize()
+    void physics_dynamic_actor::initialize(scene::scene* scene)
     {
         LY_ASSERT_MSG(!m_collision_shapes.empty(), "Physics dynamic actor does not have a collision shape!");
         // Attach collision shapes.
@@ -103,7 +105,8 @@ namespace luly::physics
         physx::PxRigidBodyExt::updateMassAndInertia(*m_rigid_dynamic, m_mass);
 
         // Add actor to physics world
-        physics_world::get().get_scene()->addActor(*m_rigid_dynamic);
+        const bool result = scene->get_physx_scene()->addActor(*m_rigid_dynamic);
+        LY_ASSERT_MSG(result, "Failed to add physics dynamic actor to scene!");
 
         m_initialized = true;
     }
