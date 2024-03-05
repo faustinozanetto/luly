@@ -41,7 +41,7 @@ namespace luly::renderer
         set_wrapping(texture_wrapping_type::wrap_t, texture_wrapping::clamp_to_edge);
         set_wrapping(texture_wrapping_type::wrap_r, texture_wrapping::clamp_to_edge);
 
-        set_filtering(texture_filtering_type::filter_min, texture_filtering::linear);
+        set_filtering(texture_filtering_type::filter_min, texture_filtering::linear_mipmap_linear);
         set_filtering(texture_filtering_type::filter_mag, texture_filtering::linear);
     }
 }

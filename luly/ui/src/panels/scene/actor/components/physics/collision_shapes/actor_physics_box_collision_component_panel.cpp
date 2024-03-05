@@ -27,7 +27,7 @@ namespace luly::ui
                 scene::physics_box_collision_shape_component>();
 
         glm::vec3 half_extents = physics_box_collision_shape_component.get_box_collision()->get_half_extents();
-        if (ui_utils::draw_property("Half Extents", half_extents, 0.0f, 50.0f, 0.01f))
+        if (ui_utils::draw_property("Half Extents", half_extents, 0.01f, 50.0f, 0.01f))
         {
             physics_box_collision_shape_component.get_box_collision()->set_half_extents(half_extents);
         }

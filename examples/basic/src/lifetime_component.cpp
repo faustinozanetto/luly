@@ -17,6 +17,5 @@ void lifetime_component::on_update(float delta_time)
     if (m_lifetime <= 0)
     {
         luly::scene::scene_manager::get().get_current_scene()->delete_actor(m_actor->get_handle());
-        LY_TRACE("LIFETIME COMPLETED");
     }
 }

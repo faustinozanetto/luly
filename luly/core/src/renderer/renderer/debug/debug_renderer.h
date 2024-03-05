@@ -44,19 +44,20 @@ namespace luly::renderer
 
         static void submit_line(const glm::vec3& point_a, const glm::vec3& point_b, const glm::vec3& color);
         static void submit_bounding_box(const math::bounding_box& bounding_box,
-                                        math::transform transform = math::transform(),
+                                        const glm::mat4& transform = glm::mat4(1.0f),
                                         const glm::vec3& color = glm::vec3(0.85f, 0.5f, 0.0f));
-        static void submit_box(math::transform transform = math::transform(),
+        static void submit_box(const glm::mat4& transform = glm::mat4(1.0f),
                                const glm::vec3& color = glm::vec3(0.85f, 0.5f, 0.0f));
-        static void submit_sphere(float radius, int segments = 16, math::transform transform = math::transform(),
+        static void submit_sphere(float radius, int segments = 16, const glm::mat4& transform = glm::mat4(1.0f),
                                   const glm::vec3& color = glm::vec3(0.85f));
+
         static void submit_physics_box_collision(
             const std::shared_ptr<physics::physics_box_collision>& physics_box_collision,
-            const math::transform& transform = math::transform(),
+            math::transform transform = math::transform(),
             const glm::vec3& color = glm::vec3(0.85f, 0.5f, 0.0f));
         static void submit_physics_sphere_collision(
             const std::shared_ptr<physics::physics_sphere_collision>& physics_sphere_collision,
-            const math::transform& transform = math::transform(),
+            math::transform transform = math::transform(),
             const glm::vec3& color = glm::vec3(0.85f, 0.5f, 0.0f));
 
         static void collect_debugables();

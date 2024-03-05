@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-
 #include "physics/collision_shapes/physics_box_collision.h"
 #include "scene/actor/components/base_component.h"
 

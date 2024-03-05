@@ -4,9 +4,9 @@
 
 #include "renderer/camera/camera_manager.h"
 #include "utils/uuid.h"
-
 #include <entt/entt.hpp>
 #include <unordered_set>
+
 
 namespace luly::scene
 {
@@ -35,18 +35,19 @@ namespace luly::scene
         /* Methods */
         std::shared_ptr<scene_actor> create_actor(const std::string& name);
         void delete_actor(entt::entity handle);
-        void handle_delete_entities();
+        void handle_delete_entities() const;
 
+        /* Virtuals */
         virtual void on_update(float delta_time);
 
         virtual void on_img_gui()
         {
-        };
+        }
 
         /** Common Actors Getters */
         std::vector<directional_light_component> get_directional_light() const;
         std::vector<point_light_component> get_point_lights() const;
-        const std::shared_ptr<scene_actor>& get_skybox_actor() const;
+        class skybox_component* get_skybox() const;
 
     private:
         void initialize_physx_scene();

@@ -114,17 +114,18 @@ void physics_joints_scene::create_chain()
 
     for (int i = 0; i < length; ++i)
     {
-        /* Box collision shape */
-        const std::shared_ptr<luly::physics::physics_box_collision>& box_collision_shape = std::make_shared<
-            luly::physics::physics_box_collision>(
-            phys_material, link_scale);
-
         /* Setup physics dynamic actor */
         physx::PxTransform curr_trans = start_position * local_transform;
         const std::shared_ptr<luly::physics::physics_dynamic_actor>& dynamic_actor = std::make_shared<
             luly::physics::physics_dynamic_actor>(
             luly::physics::physics_utils::convert_physx_vec3_to_glm(curr_trans.p),
             luly::physics::physics_utils::convert_physx_quat_to_glm(curr_trans.q));
+
+        /* Box collision shape */
+        const std::shared_ptr<luly::physics::physics_box_collision>& box_collision_shape = std::make_shared<
+            luly::physics::physics_box_collision>(
+            dynamic_actor, phys_material, link_scale);
+
         dynamic_actor->add_collision_shape(box_collision_shape);
         dynamic_actor->initialize(this);
 

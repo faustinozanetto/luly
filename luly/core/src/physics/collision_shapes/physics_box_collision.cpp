@@ -3,11 +3,13 @@
 
 #include "physics/physics_utils.h"
 #include "physics/physics_world.h"
+#include "physics/actors/physics_actor.h"
 
 namespace luly::physics
 {
-    physics_box_collision::physics_box_collision(const std::shared_ptr<physics_material>& physics_material,
-                                                 const glm::vec3& half_extents) : physics_collision_shape(
+    physics_box_collision::physics_box_collision(const std::shared_ptr<physics_actor>& physics_actor,
+                                                 const std::shared_ptr<physics_material>& physics_material,
+                                                 const glm::vec3& half_extents) : physics_collision_shape(physics_actor,
         physics_material)
     {
         m_half_extents = half_extents;
@@ -21,7 +23,7 @@ namespace luly::physics
         if (m_shape)
         {
             // Release the existing shape
-            m_shape->release();
+            m_physics_actor->get_physx_rigid_actor()->detachShape(*m_shape);
             m_shape = nullptr;
         }
     }
@@ -39,7 +41,7 @@ namespace luly::physics
         if (m_shape)
         {
             // Release the existing shape
-            m_shape->release();
+            m_physics_actor->get_physx_rigid_actor()->detachShape(*m_shape);
             m_shape = nullptr;
         }
 
@@ -47,5 +49,6 @@ namespace luly::physics
         m_shape = physics_world::get().get_physics()->createShape(
             physx::PxBoxGeometry(physics_utils::convert_glm_vec3_to_physx(m_half_extents)),
             *m_physics_material->get_physx_material());
+        m_physics_actor->get_physx_rigid_actor()->attachShape(*m_shape);
     }
 }

@@ -87,15 +87,15 @@ void scene_utils::create_floor(luly::scene::scene* scene)
 
     glm::vec3 half_extends = {floor_size.x / 2, floor_size.y / 2, floor_size.z / 2};
 
-    const std::shared_ptr<luly::physics::physics_box_collision>& floor_collision_shape = std::make_shared<
-        luly::physics::physics_box_collision>(physics_material, half_extends);
-
     const std::shared_ptr<luly::physics::physics_dynamic_actor>& floor_physics_actor = std::make_shared<
         luly::physics::physics_dynamic_actor>(transform_component.get_transform()->get_location(),
                                               transform_component.get_transform()->get_rotation());
-    floor_physics_actor->set_kinematic(true);
+
+    const std::shared_ptr<luly::physics::physics_box_collision>& floor_collision_shape = std::make_shared<
+        luly::physics::physics_box_collision>(floor_physics_actor, physics_material, half_extends);
 
     floor_physics_actor->add_collision_shape(floor_collision_shape);
+    floor_physics_actor->set_kinematic(true);
     floor_physics_actor->initialize(scene);
 
     floor_actor->add_component<luly::scene::physics_dynamic_actor_component>(floor_physics_actor);
@@ -143,12 +143,14 @@ std::shared_ptr<luly::scene::scene_actor> scene_utils::create_cube(luly::scene::
     const std::shared_ptr<luly::physics::physics_material>& physics_material = std::make_shared<
         luly::physics::physics_material>(0.5f, 0.5f, 0.6f);
     glm::vec3 half_extents = {size.x / 2, size.y / 2, size.z / 2};
-    const std::shared_ptr<luly::physics::physics_box_collision>& box_collision_shape = std::make_shared<
-        luly::physics::physics_box_collision>(physics_material, half_extents);
 
     const std::shared_ptr<luly::physics::physics_dynamic_actor>& cube_physics_dynamic_actor = std::make_shared<
         luly::physics::physics_dynamic_actor>(transform_component.get_transform()->get_location(),
                                               transform_component.get_transform()->get_rotation());
+
+    const std::shared_ptr<luly::physics::physics_box_collision>& box_collision_shape = std::make_shared<
+        luly::physics::physics_box_collision>(cube_physics_dynamic_actor, physics_material, half_extents);
+
     cube_physics_dynamic_actor->add_collision_shape(box_collision_shape);
     cube_physics_dynamic_actor->initialize(scene);
 
@@ -174,9 +176,9 @@ std::shared_ptr<luly::scene::scene_actor> scene_utils::create_cube(luly::scene::
 }
 
 std::shared_ptr<luly::scene::scene_actor> scene_utils::create_static_cube(luly::scene::scene* scene, glm::vec3 size,
-    glm::vec3 pos)
+                                                                          glm::vec3 pos)
 {
-        const std::shared_ptr<luly::scene::scene_actor>& cube_actor = scene->create_actor("Physics Cube");
+    const std::shared_ptr<luly::scene::scene_actor>& cube_actor = scene->create_actor("Physics Cube");
     // 1. Load up model.
     std::shared_ptr<luly::renderer::model> cube_model;
     if (!luly::assets::assets_manager::get().asset_already_registered("cube-model"))
@@ -204,12 +206,14 @@ std::shared_ptr<luly::scene::scene_actor> scene_utils::create_static_cube(luly::
     const std::shared_ptr<luly::physics::physics_material>& physics_material = std::make_shared<
         luly::physics::physics_material>(0.5f, 0.5f, 0.6f);
     glm::vec3 half_extents = {size.x / 2, size.y / 2, size.z / 2};
-    const std::shared_ptr<luly::physics::physics_box_collision>& box_collision_shape = std::make_shared<
-        luly::physics::physics_box_collision>(physics_material, half_extents);
 
     const std::shared_ptr<luly::physics::physics_static_actor>& cube_physics_static_actor = std::make_shared<
         luly::physics::physics_static_actor>(transform_component.get_transform()->get_location(),
-                                              transform_component.get_transform()->get_rotation());
+                                             transform_component.get_transform()->get_rotation());
+
+    const std::shared_ptr<luly::physics::physics_box_collision>& box_collision_shape = std::make_shared<
+        luly::physics::physics_box_collision>(cube_physics_static_actor, physics_material, half_extents);
+
     cube_physics_static_actor->add_collision_shape(box_collision_shape);
     cube_physics_static_actor->initialize(scene);
 

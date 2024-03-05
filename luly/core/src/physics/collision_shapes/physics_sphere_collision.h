@@ -7,7 +7,8 @@ namespace luly::physics
     class physics_sphere_collision : public physics_collision_shape
     {
     public:
-        physics_sphere_collision(const std::shared_ptr<physics_material>& physics_material, float radius = 1.0f);
+        physics_sphere_collision(const std::shared_ptr<physics_actor>& physics_actor,
+                                 const std::shared_ptr<physics_material>& physics_material, float radius = 1.0f);
         ~physics_sphere_collision() override;
 
         /* Getters */

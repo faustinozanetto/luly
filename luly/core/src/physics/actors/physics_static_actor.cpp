@@ -30,14 +30,14 @@ namespace luly::physics
         attach_collision_shapes();
 
         const bool result = scene->get_physx_scene()->addActor(*m_rigid_static);
-        LY_ASSERT_MSG(result, "Failed to add physics static actor to scene!");
+        LY_ASSERT_MSG(result, "Failed to add physics static actor to scene!")
 
         m_initialized = true;
     }
 
     void physics_static_actor::attach_collision_shapes()
     {
-        for (const auto& collision_shape : m_collision_shapes)
+        for (const std::shared_ptr<physics_collision_shape>& collision_shape : m_collision_shapes)
         {
             m_rigid_static->attachShape(*collision_shape->get_physx_shape());
         }

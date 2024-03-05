@@ -113,7 +113,7 @@ void basic_application::setup_scene()
         physics_ramp_scene>();
     luly::scene::scene_manager::get().add_scene(physics_ramp_scene);
 
-    luly::scene::scene_manager::get().switch_scene(physics_ramp_scene);
+    luly::scene::scene_manager::get().switch_scene(physics_pyramid_scene);
 }
 
 void basic_application::create_ball(const std::shared_ptr<luly::scene::scene>& scene, float radius, float impulse)
@@ -149,15 +149,19 @@ void basic_application::create_ball(const std::shared_ptr<luly::scene::scene>& s
     // 3. Setup physics.
     const std::shared_ptr<luly::physics::physics_material>& physics_material = std::make_shared<
         luly::physics::physics_material>(0.5f, 0.5f, 0.6f);
-    const std::shared_ptr<luly::physics::physics_sphere_collision>& sphere_collision_shape = std::make_shared<
-        luly::physics::physics_sphere_collision>(physics_material, radius);
 
     const std::shared_ptr<luly::physics::physics_dynamic_actor>& ball_physics_dynamic_actor = std::make_shared<
         luly::physics::physics_dynamic_actor>(transform_component.get_transform()->get_location(),
                                               transform_component.get_transform()->get_rotation());
+
+    const std::shared_ptr<luly::physics::physics_sphere_collision>& sphere_collision_shape = std::make_shared<
+        luly::physics::physics_sphere_collision>(ball_physics_dynamic_actor, physics_material, radius);
+
+
     const glm::vec3& impulse_force = scene->get_camera_manager()->get_perspective_camera()->get_front() * impulse;
     ball_physics_dynamic_actor->set_linear_velocity(impulse_force);
     ball_physics_dynamic_actor->add_collision_shape(sphere_collision_shape);
+    ball_physics_dynamic_actor->set_mass(5.0f);
     ball_physics_dynamic_actor->initialize(scene.get());
 
     ball_actor->add_component<luly::scene::physics_dynamic_actor_component>(ball_physics_dynamic_actor);

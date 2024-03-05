@@ -53,7 +53,6 @@ void pbr_mask_scene::create_mask()
         "plague-mask-albedo-texture", luly::assets::asset_type::texture, albedo_texture);
     luly::renderer::material_texture albedo = {albedo_texture, luly::renderer::material_texture_type::albedo};
 
-    /*
     const std::shared_ptr<luly::renderer::texture_2d>& normal_texture =
         luly::renderer::texture_factory::create_texture_from_file(
             "assets/textures/PlagueMask/PlagueMask_Mat_Normal_DirectX.png");
@@ -91,15 +90,14 @@ void pbr_mask_scene::create_mask()
     luly::renderer::material_texture ao = {
         ao_texture, luly::renderer::material_texture_type::ambient_occlusion
     };
-*/
+
     std::map<luly::renderer::material_texture_type, luly::renderer::material_texture> textures;
     textures.insert({luly::renderer::material_texture_type::albedo, albedo});
-    /*
     textures.insert({luly::renderer::material_texture_type::normal, normal});
     textures.insert({luly::renderer::material_texture_type::metallic, metallic});
     textures.insert({luly::renderer::material_texture_type::roughness, roughness});
     textures.insert({luly::renderer::material_texture_type::ambient_occlusion, ao});
-*/
+
     const luly::renderer::material_specification& helmet_material_specification =
         std::make_shared<luly::renderer::material_specification_builder>()->
         with_textures(textures).build();

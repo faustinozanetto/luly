@@ -91,7 +91,7 @@ namespace luly::renderer
     void environment_pass::setup_environment()
     {
         LY_PROFILE_FUNCTION;
-        m_irradiance_map_size = 32;
+        m_irradiance_map_size = 128;
         m_prefilter_map_size = 512;
         m_brdf_map_size = 512;
         m_environment_map_size = 2048;
@@ -198,7 +198,9 @@ namespace luly::renderer
 
         m_irradiance_shader->bind();
         m_irradiance_shader->set_mat4("u_projection_matrix", m_capture_projection);
-        renderer::bind_texture(0, m_environment_cubemap_texture->get_handle_id());
+        //   renderer::bind_texture(0, m_environment_cubemap_texture->get_handle_id());
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, m_environment_cubemap_texture->get_handle_id());
 
         renderer::set_viewport_size({m_irradiance_map_size, m_irradiance_map_size});
         m_environment_capture_fbo->bind();
@@ -229,24 +231,26 @@ namespace luly::renderer
         texture_specification.data = nullptr;
 
         m_environment_prefilter_texture = std::make_shared<texture_cubemap>(texture_specification);
-
+        // Generate mipmaps for the cubemap so OpenGL automatically allocates the required memory.
         glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
         // pbr: run a quasi monte-carlo simulation on the environment lighting to create a prefilter (cube)map.
         // ----------------------------------------------------------------------------------------------------
         m_prefilter_shader->bind();
         m_prefilter_shader->set_mat4("u_projection_matrix", m_capture_projection);
-        renderer::bind_texture(0, m_environment_cubemap_texture->get_handle_id());
+        //  renderer::bind_texture(0, m_environment_cubemap_texture->get_handle_id());
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, m_environment_cubemap_texture->get_handle_id());
 
         m_environment_capture_fbo->bind();
-        const unsigned int max_mip_map_levels = glm::log2(static_cast<float>(m_prefilter_map_size));
-        for (unsigned int mip = 0; mip < max_mip_map_levels; ++mip)
+        const uint32_t max_mip_map_levels = glm::log2(static_cast<float>(m_prefilter_map_size));
+        for (uint32_t mip = 0; mip < max_mip_map_levels; ++mip)
         {
             // Resize framebuffer according to mip-level size.
-            const unsigned int mip_width = m_prefilter_map_size * std::pow(0.5, mip);
-            const unsigned int mip_height = m_prefilter_map_size * std::pow(0.5, mip);
+            const uint32_t mip_width = static_cast<uint32_t>(m_prefilter_map_size * std::pow(0.5, mip));
+            const uint32_t mip_height = static_cast<uint32_t>(m_prefilter_map_size * std::pow(0.5, mip));
 
-            m_environment_capture_rbo->bind();
+            //m_environment_capture_rbo->bind();
             m_environment_capture_rbo->set_storage_parameters(mip_width, mip_height,
                                                               texture_internal_format::depth_component24);
             renderer::set_viewport_size({mip_width, mip_height});
@@ -254,12 +258,17 @@ namespace luly::renderer
             const float roughness = static_cast<float>(mip) / static_cast<float>(max_mip_map_levels - 1);
             m_prefilter_shader->set_float("u_roughness", roughness);
 
-            for (unsigned int i = 0; i < 6; ++i)
+            for (uint32_t i = 0; i < 6; ++i)
             {
                 m_prefilter_shader->set_mat4("u_view_matrix", m_capture_views[i]);
-                m_environment_capture_fbo->attach_texture(m_environment_prefilter_texture, GL_FRAMEBUFFER,
-                                                          render_buffer_attachment_type::color,
-                                                          GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, mip);
+                /*
+                                m_environment_capture_fbo->attach_texture(m_environment_prefilter_texture, GL_FRAMEBUFFER,
+                                                                          render_buffer_attachment_type::color,
+                                                                          GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, mip, false);
+                                                                          */
+                glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                                       m_environment_prefilter_texture->get_handle_id(), mip);
+
                 renderer::clear_screen();
                 renderer::submit_mesh(m_cube_mesh);
             }

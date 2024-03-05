@@ -33,7 +33,7 @@ namespace luly::renderer
         s_debug_renderer_data.debug_lines.emplace_back(point_a, point_b, color);
     }
 
-    void debug_renderer::submit_bounding_box(const math::bounding_box& bounding_box, math::transform transform,
+    void debug_renderer::submit_bounding_box(const math::bounding_box& bounding_box, const glm::mat4& transform,
                                              const glm::vec3& color)
     {
         const math::bounding_box& transformed_bounding_box = bounding_box.get_transformed(transform);
@@ -55,7 +55,7 @@ namespace luly::renderer
         submit_line(glm::vec3(max.x, min.y, max.z), glm::vec3(max.x, max.y, max.z), color);
     }
 
-    void debug_renderer::submit_box(math::transform transform, const glm::vec3& color)
+    void debug_renderer::submit_box(const glm::mat4& transform, const glm::vec3& color)
     {
         // Define the vertices of the box
         const glm::vec3 vertices[] = {
@@ -76,29 +76,26 @@ namespace luly::renderer
             {0, 4}, {1, 5}, {2, 6}, {3, 7} // Connecting edges
         };
 
-        // Apply transformation to the box vertices
-        const glm::mat4 model = transform.get_transform();
-
         // Render the edges of the box
         for (const auto& edge : edges)
         {
-            glm::vec3 point_a = glm::vec3(model * glm::vec4(vertices[edge[0]], 1.0f));
-            glm::vec3 point_b = glm::vec3(model * glm::vec4(vertices[edge[1]], 1.0f));
+            glm::vec3 point_a = glm::vec3(transform * glm::vec4(vertices[edge[0]], 1.0f));
+            glm::vec3 point_b = glm::vec3(transform * glm::vec4(vertices[edge[1]], 1.0f));
             submit_line(point_a, point_b, color);
         }
     }
 
-    void debug_renderer::submit_sphere(float radius, int segments, math::transform transform, const glm::vec3& color)
+    void debug_renderer::submit_sphere(float radius, int segments, const glm::mat4& transform, const glm::vec3& color)
     {
         float pi = glm::pi<float>();
         float angle_increment = 2 * pi / segments;
 
-        glm::vec3 center = transform.get_location();
+        glm::vec3 center = transform[3];
 
         glm::vec3 prev_point(center.x + radius, center.y, center.z);
         glm::vec3 current_point;
 
-        glm::mat4 rotation_matrix = mat4_cast(transform.get_rotation());
+        glm::mat4 rotation_matrix = mat4_cast(glm::toQuat(glm::mat3(transform)));
 
         // Loop through the sphere's circumference, submitting line segments
         for (int i = 1; i <= segments; ++i)
@@ -144,17 +141,22 @@ namespace luly::renderer
     }
 
     void debug_renderer::submit_physics_box_collision(
-        const std::shared_ptr<physics::physics_box_collision>& physics_box_collision, const math::transform& transform,
+        const std::shared_ptr<physics::physics_box_collision>& physics_box_collision, math::transform transform,
         const glm::vec3& color)
     {
-        submit_box(transform, color);
+        glm::vec3 scale = physics_box_collision->get_half_extents();
+        scale.x *= 2;
+        scale.y *= 2;
+        scale.z *= 2;
+        transform.set_scale(scale);
+        submit_box(transform.get_transform(), color);
     }
 
     void debug_renderer::submit_physics_sphere_collision(
         const std::shared_ptr<physics::physics_sphere_collision>& physics_sphere_collision,
-        const math::transform& transform, const glm::vec3& color)
+        math::transform transform, const glm::vec3& color)
     {
-        submit_sphere(physics_sphere_collision->get_radius(), 16, transform, color);
+        submit_sphere(physics_sphere_collision->get_radius(), 16, transform.get_transform(), color);
     }
 
     void debug_renderer::collect_debugables()

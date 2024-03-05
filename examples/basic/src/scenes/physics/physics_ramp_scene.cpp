@@ -99,12 +99,13 @@ void physics_ramp_scene::create_ramp()
 
     glm::vec3 half_extends = {ramp_size.x / 2, ramp_size.y / 2, ramp_size.z / 2};
 
-    const std::shared_ptr<luly::physics::physics_box_collision>& floor_collision_shape = std::make_shared<
-        luly::physics::physics_box_collision>(physics_material, half_extends);
-
     const std::shared_ptr<luly::physics::physics_dynamic_actor>& floor_physics_actor = std::make_shared<
         luly::physics::physics_dynamic_actor>(transform_component.get_transform()->get_location(),
                                               transform_component.get_transform()->get_rotation());
+
+    const std::shared_ptr<luly::physics::physics_box_collision>& floor_collision_shape = std::make_shared<
+        luly::physics::physics_box_collision>(floor_physics_actor, physics_material, half_extends);
+
     floor_physics_actor->add_collision_shape(floor_collision_shape);
     floor_physics_actor->set_kinematic(true);
     floor_physics_actor->initialize(this);
@@ -134,7 +135,7 @@ void physics_ramp_scene::create_wall()
     const std::shared_ptr<luly::assets::asset>& model_asset = luly::assets::asset_factory::create_asset<
         luly::renderer::model>(
         "wall-model", luly::assets::asset_type::model, model);
-    luly::scene::model_renderer_component& model_renderer_component = floor_actor->add_component<
+    floor_actor->add_component<
         luly::scene::model_renderer_component>(
         model_asset->get_data<luly::renderer::model>());
     // 2. Setup physics.
@@ -147,14 +148,15 @@ void physics_ramp_scene::create_wall()
     transform_component.get_transform()->set_location({-5, 5, 0});
     transform_component.get_transform()->set_scale(wall_size);
 
-    glm::vec3 half_extends = {wall_size.x / 2, wall_size.y / 2, wall_size.z / 2};
-
-    const std::shared_ptr<luly::physics::physics_box_collision>& floor_collision_shape = std::make_shared<
-        luly::physics::physics_box_collision>(physics_material, half_extends);
+    glm::vec3 half_extents = {wall_size.x / 2, wall_size.y / 2, wall_size.z / 2};
 
     const std::shared_ptr<luly::physics::physics_dynamic_actor>& floor_physics_actor = std::make_shared<
         luly::physics::physics_dynamic_actor>(transform_component.get_transform()->get_location(),
                                               transform_component.get_transform()->get_rotation());
+
+    const std::shared_ptr<luly::physics::physics_box_collision>& floor_collision_shape = std::make_shared<
+        luly::physics::physics_box_collision>(floor_physics_actor, physics_material, half_extents);
+
     floor_physics_actor->add_collision_shape(floor_collision_shape);
     floor_physics_actor->set_kinematic(true);
     floor_physics_actor->initialize(this);
@@ -211,12 +213,14 @@ void physics_ramp_scene::create_ball(const glm::vec3& position, float radius)
     // 3. Setup physics.
     const std::shared_ptr<luly::physics::physics_material>& physics_material = std::make_shared<
         luly::physics::physics_material>(0.5f, 0.5f, 0.6f);
-    const std::shared_ptr<luly::physics::physics_sphere_collision>& sphere_collision_shape = std::make_shared<
-        luly::physics::physics_sphere_collision>(physics_material, radius);
 
     const std::shared_ptr<luly::physics::physics_dynamic_actor>& ball_physics_dynamic_actor = std::make_shared<
         luly::physics::physics_dynamic_actor>(transform_component.get_transform()->get_location(),
                                               transform_component.get_transform()->get_rotation());
+
+    const std::shared_ptr<luly::physics::physics_sphere_collision>& sphere_collision_shape = std::make_shared<
+        luly::physics::physics_sphere_collision>(ball_physics_dynamic_actor, physics_material, radius);
+
     ball_physics_dynamic_actor->add_collision_shape(sphere_collision_shape);
     ball_physics_dynamic_actor->initialize(this);
 

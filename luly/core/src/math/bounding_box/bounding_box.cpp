@@ -41,24 +41,28 @@ namespace luly::math
         m_max_extents = max_extents;
     }
 
-    void bounding_box::apply_transform(transform& transform)
+    void bounding_box::apply_transform(const glm::mat4& transform)
     {
-        const glm::mat4& transform_matrix = transform.get_transform();
-        const glm::vec3 updated_center = transform_matrix * glm::vec4(get_center(), 1.0f);
+        const glm::vec3 updated_center = transform * glm::vec4(get_center(), 1.0f);
         const glm::vec3 edge = get_size() * 0.5f;
         const auto updated_edge = glm::vec3(
-            glm::abs(transform_matrix[0][0]) * edge.x + glm::abs(transform_matrix[1][0]) * edge.y + glm::abs(
-                transform_matrix[2][0]) * edge.z,
-            glm::abs(transform_matrix[0][1]) * edge.x + glm::abs(transform_matrix[1][1]) * edge.y + glm::abs(
-                transform_matrix[2][1]) * edge.z,
-            glm::abs(transform_matrix[0][2]) * edge.x + glm::abs(transform_matrix[1][2]) * edge.y + glm::abs(
-                transform_matrix[2][2]) * edge.z);
+            glm::abs(transform[0][0]) * edge.x + glm::abs(transform[1][0]) * edge.y + glm::abs(
+                transform[2][0]) * edge.z,
+            glm::abs(transform[0][1]) * edge.x + glm::abs(transform[1][1]) * edge.y + glm::abs(
+                transform[2][1]) * edge.z,
+            glm::abs(transform[0][2]) * edge.x + glm::abs(transform[1][2]) * edge.y + glm::abs(
+                transform[2][2]) * edge.z);
 
         m_min_extents = updated_center - updated_edge;
         m_max_extents = updated_center + updated_edge;
     }
 
     bounding_box bounding_box::get_transformed(transform& transform) const
+    {
+        return get_transformed(transform.get_transform());
+    }
+
+    bounding_box bounding_box::get_transformed(const glm::mat4& transform) const
     {
         bounding_box box(*this);
         box.apply_transform(transform);

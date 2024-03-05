@@ -67,16 +67,16 @@ namespace luly::scene
 
     void scene::delete_actor(entt::entity handle)
     {
+        std::string actor_name = m_actors_registry->get<name_component>(handle).get_name();
         if (!m_actors_map.contains(handle))
         {
-            LY_WARN("Tried to delete actor with handle: {}, that does not exist!", static_cast<uint32_t>(handle));
+            LY_WARN("Tried to delete actor with name: '{}', that does not exist!", actor_name);
             return;
         }
 
         if (m_pending_delete_actors.contains(handle))
         {
-            LY_WARN("Tried to add actor with handle: {}, to delete that already has been added!",
-                    static_cast<uint32_t>(handle));
+            LY_WARN("Tried to add actor with name: '{}' to delete that already has been added!", actor_name);
             return;
         }
 
@@ -89,15 +89,17 @@ namespace luly::scene
         update_lights();
     }
 
-    void scene::handle_delete_entities()
+    void scene::handle_delete_entities() const
     {
-        for (entt::entity entity : m_pending_delete_actors)
+        for (const entt::entity handle : m_pending_delete_actors)
         {
-            if (!m_actors_registry->valid(entity))
+            if (!m_actors_registry->valid(handle))
                 continue;
 
-            m_actors_registry->destroy(entity);
-            LY_TRACE("Deleting entity with handle: {}!", static_cast<uint32_t>(entity));
+            std::string actor_name = m_actors_registry->get<name_component>(handle).get_name();
+
+            m_actors_registry->destroy(handle);
+            LY_TRACE("Deleting actor with name: '{}'!", actor_name);
         }
     }
 
@@ -123,12 +125,12 @@ namespace luly::scene
         return point_lights;
     }
 
-    const std::shared_ptr<scene_actor>& scene::get_skybox_actor() const
+    skybox_component* scene::get_skybox() const
     {
         const auto& view = m_actors_registry->view<skybox_component>();
         for (auto [actor, skybox_component] : view.each())
         {
-            return m_actors_map.at(actor);
+            return &skybox_component;
         }
         LY_ASSERT_MSG(false, "Could not find actor with skybox component")
         return nullptr;

@@ -26,8 +26,9 @@ namespace luly::math
         void set_max_extents(const glm::vec3& max_extents);
 
         /* Functions */
-        void apply_transform(transform& transform);
+        void apply_transform(const glm::mat4& transform);
         bounding_box get_transformed(transform& transform) const;
+        bounding_box get_transformed(const glm::mat4& transform) const;
 
     private:
         glm::vec3 m_min_extents;

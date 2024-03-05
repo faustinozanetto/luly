@@ -138,7 +138,7 @@ namespace luly::renderer
         }
 
         // Error checking
-        const auto fboStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+        const GLenum fboStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         LY_ASSERT_MSG(fboStatus == GL_FRAMEBUFFER_COMPLETE,
                       "An error occurred while creating frame buffer: " + std::to_string(fboStatus))
 

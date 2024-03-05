@@ -9,7 +9,8 @@ namespace luly::physics
     class physics_box_collision : public physics_collision_shape
     {
     public:
-        physics_box_collision(const std::shared_ptr<physics_material>& physics_material,
+        physics_box_collision(const std::shared_ptr<physics_actor>& physics_actor,
+                              const std::shared_ptr<physics_material>& physics_material,
                               const glm::vec3& half_extents = glm::vec3(1.0f));
         ~physics_box_collision() override;
 

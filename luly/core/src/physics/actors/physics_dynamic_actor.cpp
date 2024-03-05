@@ -4,7 +4,6 @@
 #include "physics/physics_utils.h"
 #include "physics/physics_world.h"
 #include "scene/scene.h"
-#include "scene/scene_manager.h"
 
 namespace luly::physics
 {
@@ -113,7 +112,7 @@ namespace luly::physics
 
     void physics_dynamic_actor::attach_collision_shapes()
     {
-        for (const auto& collision_shape : m_collision_shapes)
+        for (const std::shared_ptr<physics_collision_shape>& collision_shape : m_collision_shapes)
         {
             m_rigid_dynamic->attachShape(*collision_shape->get_physx_shape());
         }
