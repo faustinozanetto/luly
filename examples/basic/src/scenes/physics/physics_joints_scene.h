@@ -12,4 +12,5 @@ private:
     void initialize();
 
     void create_fixed_joint_example();
+    void create_chain();
 };

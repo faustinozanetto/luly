@@ -14,6 +14,7 @@ namespace luly::physics
         /* Getters */
         float get_projection_linear_tolerance() const;
         float get_projection_angular_tolerance() const;
+        physx::PxFixedJoint* get_physx_joint() const { return m_physx_fixed_joint; }
 
         /* Setters */
         void set_projection_linear_tolerance(float distance) const;

@@ -31,15 +31,9 @@ namespace luly::physics
             current_scene_physx->simulate(app_time::get_delta_time());
             current_scene_physx->fetchResults(true);
         }
-        /*
-        if (m_scene && m_simulate)
-        {
-            m_scene->simulate(app_time::get_delta_time());
-            m_scene->fetchResults(true);
-        }*/
     }
 
-    void physics_world::sync_transforms()
+    void physics_world::sync_transforms() const
     {
         const auto& current_scene = scene::scene_manager::get().get_current_scene();
         if (!current_scene && !m_simulate) return;
@@ -75,12 +69,12 @@ namespace luly::physics
 
         // Create the foundation
         m_foundation = PxCreateFoundation(PX_PHYSICS_VERSION, m_default_allocator_callback, m_error_callback);
-        LY_ASSERT_MSG(m_foundation, "An error occurred while creating PhysX Foundation!");
+        LY_ASSERT_MSG(m_foundation, "An error occurred while creating PhysX Foundation!")
 
 #ifdef LY_DEBUG
         // Create pvd
         m_pvd = PxCreatePvd(*m_foundation);
-        LY_ASSERT_MSG(m_pvd, "An error occurred while creating PhysX PVD!");
+        LY_ASSERT_MSG(m_pvd, "An error occurred while creating PhysX PVD!")
 
         physx::PxPvdTransport* transport = physx::PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10);
         m_pvd->connect(*transport, physx::PxPvdInstrumentationFlag::eALL);
@@ -92,7 +86,7 @@ namespace luly::physics
         PxInitExtensions(*m_physics, m_pvd);
 
         // Create the default CPU dispatcher
-        m_dispatcher = physx::PxDefaultCpuDispatcherCreate(2);
+        m_dispatcher = physx::PxDefaultCpuDispatcherCreate(4);
         LY_ASSERT_MSG(m_dispatcher, "An error occurred while creating PhysX Dispatcher!")
 
         LY_TRACE("PhysX world initialized successfully!");
@@ -100,13 +94,6 @@ namespace luly::physics
 
     void physics_world::cleanup()
     {
-        /*
-        if (m_scene)
-        {
-            m_scene->release();
-            m_scene = nullptr;
-        }
-        */
         if (m_dispatcher)
         {
             m_dispatcher->release();

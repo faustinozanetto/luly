@@ -5,8 +5,6 @@
 
 #include <PxPhysicsAPI.h>
 
-#include <glm/glm.hpp>
-
 namespace luly::physics
 {
     class physics_world : public singleton<physics_world>
@@ -16,16 +14,15 @@ namespace luly::physics
         ~physics_world() override;
 
         /* Getters */
-        physx::PxPhysics* get_physics() { return m_physics; }
-        physx::PxDefaultCpuDispatcher* get_dispatcher() { return  m_dispatcher;}
-       // physx::PxScene* get_scene() { return m_scene; }
+        physx::PxPhysics* get_physics() const { return m_physics; }
+        physx::PxDefaultCpuDispatcher* get_dispatcher() const { return m_dispatcher; }
         bool get_simulate() const { return m_simulate; }
 
         /* Setters */
         void set_simulate(bool simulate) { m_simulate = simulate; }
 
         void on_update() const;
-        void sync_transforms();
+        void sync_transforms() const;
 
     private:
         void initialize_physx();
@@ -37,7 +34,6 @@ namespace luly::physics
         physx::PxTolerancesScale m_toleranceScale;
         physx::PxFoundation* m_foundation;
         physx::PxPhysics* m_physics;
-        //physx::PxScene* m_scene;
         physx::PxPvd* m_pvd;
 
         bool m_simulate;

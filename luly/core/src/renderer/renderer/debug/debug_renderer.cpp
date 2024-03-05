@@ -200,7 +200,8 @@ namespace luly::renderer
         for (const auto& [actor, transform_comp, physics_box_collision_shape_comp] : view.each())
         {
             const auto& box_collision = physics_box_collision_shape_comp.get_box_collision();
-            submit_physics_box_collision(box_collision, s_debug_renderer_data.physics_box_collisions_color);
+            submit_physics_box_collision(box_collision, *transform_comp.get_transform(),
+                                         s_debug_renderer_data.physics_box_collisions_color);
         }
     }
 

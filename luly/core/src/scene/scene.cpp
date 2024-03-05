@@ -137,8 +137,8 @@ namespace luly::scene
     void scene::initialize_physx_scene()
     {
         LY_TRACE("Started creating physics scene for scene: '{}'...", m_name);
-        physics::physics_world& physics_world = physics::physics_world::get();
         m_gravity = glm::vec3(0.0f, -9.81f, 0.0f);
+        const physics::physics_world& physics_world = physics::physics_world::get();
 
         // Create the scene
         physx::PxSceneDesc sceneDesc(physics_world.get_physics()->getTolerancesScale());
@@ -146,8 +146,8 @@ namespace luly::scene
         sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
         sceneDesc.gravity = physics::physics_utils::convert_glm_vec3_to_physx(m_gravity);
         m_physx_scene = physics_world.get_physics()->createScene(sceneDesc);
-        LY_ASSERT_MSG(m_physx_scene, "An error occurred while creating PhysX Scene!");
-        
+        LY_ASSERT_MSG(m_physx_scene, "An error occurred while creating PhysX Scene!")
+
         m_physx_scene->setVisualizationParameter(physx::PxVisualizationParameter::eJOINT_LOCAL_FRAMES, 1.0f);
         m_physx_scene->setVisualizationParameter(physx::PxVisualizationParameter::eJOINT_LIMITS, 1.0f);
 

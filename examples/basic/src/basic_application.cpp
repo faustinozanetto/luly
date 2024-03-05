@@ -28,6 +28,7 @@
 #include "scenes/pbr_mask_scene.h"
 #include "scenes/physics/physics_joints_scene.h"
 #include "scenes/physics/physics_pyramid_scene.h"
+#include "scenes/physics/physics_ramp_scene.h"
 #include "time/app_time.h"
 
 basic_application::basic_application(const luly::renderer::window_specification& window_specification) : application(
@@ -57,6 +58,8 @@ void basic_application::on_update()
     if (!current_scene) return;
 
     m_engine_ui->begin_frame();
+
+    current_scene->on_img_gui();
 
     const auto& view = current_scene->get_registry()->view<lifetime_component>();
     for (const auto& [actor, lifetime_component] : view.each())
@@ -99,14 +102,18 @@ void basic_application::setup_scene()
         physics_pyramid_scene>();
     luly::scene::scene_manager::get().add_scene(physics_pyramid_scene);
 
+    const std::shared_ptr<pbr_mask_scene>& pbr_mask_scene = std::make_shared<class pbr_mask_scene>();
+    luly::scene::scene_manager::get().add_scene(pbr_mask_scene);
+
     const std::shared_ptr<physics_joints_scene>& physics_joints_scene = std::make_shared<class
         physics_joints_scene>();
     luly::scene::scene_manager::get().add_scene(physics_joints_scene);
 
-    const std::shared_ptr<pbr_mask_scene>& pbr_mask_scene = std::make_shared<class pbr_mask_scene>();
-    luly::scene::scene_manager::get().add_scene(pbr_mask_scene);
+    const std::shared_ptr<physics_ramp_scene>& physics_ramp_scene = std::make_shared<class
+        physics_ramp_scene>();
+    luly::scene::scene_manager::get().add_scene(physics_ramp_scene);
 
-    luly::scene::scene_manager::get().switch_scene(physics_pyramid_scene);
+    luly::scene::scene_manager::get().switch_scene(physics_ramp_scene);
 }
 
 void basic_application::create_ball(const std::shared_ptr<luly::scene::scene>& scene, float radius, float impulse)

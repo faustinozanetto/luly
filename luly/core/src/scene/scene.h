@@ -26,7 +26,7 @@ namespace luly::scene
         std::unique_ptr<entt::registry>& get_registry() { return m_actors_registry; }
         const std::shared_ptr<scene_actor>& get_actor(entt::entity entity);
         const std::shared_ptr<renderer::camera_manager>& get_camera_manager() const { return m_camera_manager; }
-        physx::PxScene* get_physx_scene() { return m_physx_scene; }
+        physx::PxScene* get_physx_scene() const { return m_physx_scene; }
         const glm::vec3& get_gravity() const { return m_gravity; }
 
         /* Setters */
@@ -35,8 +35,13 @@ namespace luly::scene
         /* Methods */
         std::shared_ptr<scene_actor> create_actor(const std::string& name);
         void delete_actor(entt::entity handle);
-        void on_update(float delta_time);
         void handle_delete_entities();
+
+        virtual void on_update(float delta_time);
+
+        virtual void on_img_gui()
+        {
+        };
 
         /** Common Actors Getters */
         std::vector<directional_light_component> get_directional_light() const;
