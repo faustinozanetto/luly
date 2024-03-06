@@ -77,6 +77,8 @@ namespace luly::ui
         void begin_dockspace();
         void end_dockspace();
 
+        void handle_mouse_picking();
+
         /* Events */
         bool on_mouse_button_pressed_event(const events::mouse_button_pressed_event& mouse_button_pressed_event);
         bool on_mouse_button_released_event(const events::mouse_button_released_event& mouse_button_released_event);

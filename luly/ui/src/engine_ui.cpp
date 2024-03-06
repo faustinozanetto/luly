@@ -62,6 +62,7 @@ namespace luly::ui
         s_instance = this;
         initialize_data();
         initialize_imgui();
+        set_color_scheme();
         initialize_panels();
         initialize_log_sink();
         LY_TRACE("Engine UI initialized successfully.");
@@ -83,87 +84,85 @@ namespace luly::ui
     void engine_ui::set_color_scheme()
     {
         ImVec4* colors = ImGui::GetStyle().Colors;
-        /*
-                colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
-                colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
-                colors[ImGuiCol_WindowBg] = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
-                colors[ImGuiCol_ChildBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-                colors[ImGuiCol_PopupBg] = ImVec4(0.19f, 0.19f, 0.19f, 0.92f);
-                colors[ImGuiCol_Border] = ImVec4(0.19f, 0.19f, 0.19f, 0.29f);
-                colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.24f);
-                colors[ImGuiCol_FrameBg] = ImVec4(0.05f, 0.05f, 0.05f, 0.54f);
-                colors[ImGuiCol_FrameBgHovered] = ImVec4(0.19f, 0.19f, 0.19f, 0.54f);
-                colors[ImGuiCol_FrameBgActive] = ImVec4(0.20f, 0.22f, 0.23f, 1.00f);
-                colors[ImGuiCol_TitleBg] = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
-                colors[ImGuiCol_TitleBgActive] = ImVec4(0.06f, 0.06f, 0.06f, 1.00f);
-                colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
-                colors[ImGuiCol_MenuBarBg] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
-                colors[ImGuiCol_ScrollbarBg] = ImVec4(0.05f, 0.05f, 0.05f, 0.54f);
-                colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.34f, 0.34f, 0.34f, 0.54f);
-                colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.40f, 0.40f, 0.40f, 0.54f);
-                colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.56f, 0.56f, 0.56f, 0.54f);
-                colors[ImGuiCol_CheckMark] = ImVec4(0.26f, 0.36f, 0.98f, 1.00f);
-                colors[ImGuiCol_SliderGrab] = ImVec4(0.24f, 0.28f, 0.88f, 1.00f);
-                colors[ImGuiCol_SliderGrabActive] = ImVec4(0.26f, 0.31f, 0.98f, 1.00f);
-                colors[ImGuiCol_Button] = ImVec4(0.27f, 0.26f, 0.98f, 0.40f);
-                colors[ImGuiCol_ButtonHovered] = ImVec4(0.26f, 0.39f, 0.98f, 1.00f);
-                colors[ImGuiCol_ButtonActive] = ImVec4(0.06f, 0.26f, 0.98f, 1.00f);
-                colors[ImGuiCol_Header] = ImVec4(0.19f, 0.22f, 0.38f, 0.68f);
-                colors[ImGuiCol_HeaderHovered] = ImVec4(0.24f, 0.37f, 0.83f, 0.80f);
-                colors[ImGuiCol_HeaderActive] = ImVec4(0.26f, 0.31f, 0.98f, 1.00f);
-                colors[ImGuiCol_Separator] = ImVec4(0.43f, 0.43f, 0.50f, 0.50f);
-                colors[ImGuiCol_SeparatorHovered] = ImVec4(0.10f, 0.40f, 0.75f, 0.78f);
-                colors[ImGuiCol_SeparatorActive] = ImVec4(0.10f, 0.40f, 0.75f, 1.00f);
-                colors[ImGuiCol_ResizeGrip] = ImVec4(0.26f, 0.36f, 0.98f, 0.20f);
-                colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.26f, 0.42f, 0.98f, 0.67f);
-                colors[ImGuiCol_ResizeGripActive] = ImVec4(0.26f, 0.33f, 0.98f, 0.95f);
-                colors[ImGuiCol_Tab] = ImVec4(0.18f, 0.28f, 0.58f, 0.86f);
-                colors[ImGuiCol_TabHovered] = ImVec4(0.26f, 0.28f, 0.98f, 0.80f);
-                colors[ImGuiCol_TabActive] = ImVec4(0.20f, 0.27f, 0.68f, 1.00f);
-                colors[ImGuiCol_TabUnfocused] = ImVec4(0.07f, 0.10f, 0.15f, 0.97f);
-                colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.14f, 0.21f, 0.42f, 1.00f);
-                colors[ImGuiCol_DockingPreview] = ImVec4(0.26f, 0.31f, 0.98f, 0.70f);
-                colors[ImGuiCol_DockingEmptyBg] = ImVec4(1.00f, 0.00f, 0.00f, 1.00f);
-                colors[ImGuiCol_PlotLines] = ImVec4(0.00f, 0.64f, 1.00f, 1.00f);
-                colors[ImGuiCol_PlotLinesHovered] = ImVec4(0.00f, 0.10f, 1.00f, 1.00f);
-                colors[ImGuiCol_PlotHistogram] = ImVec4(0.13f, 0.00f, 1.00f, 1.00f);
-                colors[ImGuiCol_PlotHistogramHovered] = ImVec4(0.10f, 0.22f, 0.99f, 1.00f);
-                colors[ImGuiCol_TableHeaderBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.52f);
-                colors[ImGuiCol_TableBorderStrong] = ImVec4(0.00f, 0.00f, 0.00f, 0.52f);
-                colors[ImGuiCol_TableBorderLight] = ImVec4(0.28f, 0.28f, 0.28f, 0.29f);
-                colors[ImGuiCol_TableRowBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-                colors[ImGuiCol_TableRowBgAlt] = ImVec4(1.00f, 1.00f, 1.00f, 0.06f);
-                colors[ImGuiCol_TextSelectedBg] = ImVec4(0.20f, 0.22f, 0.23f, 1.00f);
-                colors[ImGuiCol_DragDropTarget] = ImVec4(0.33f, 0.67f, 0.86f, 1.00f);
-                colors[ImGuiCol_NavHighlight] = ImVec4(1.00f, 0.00f, 0.00f, 1.00f);
-                colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 0.00f, 0.00f, 0.70f);
-                colors[ImGuiCol_NavWindowingDimBg] = ImVec4(1.00f, 0.00f, 0.00f, 0.20f);
-                colors[ImGuiCol_ModalWindowDimBg] = ImVec4(1.00f, 0.00f, 0.00f, 0.35f);
-        
-                /*
-                ImGuiStyle& style = ImGui::GetStyle();
-        
-                style.FramePadding = ImVec2(5.00f, 2.00f);
-                style.CellPadding = ImVec2(6.00f, 6.00f);
-                style.ItemSpacing = ImVec2(6.00f, 6.00f);
-                style.ItemInnerSpacing = ImVec2(6.00f, 6.00f);
-                style.TouchExtraPadding = ImVec2(0.00f, 0.00f);
-                style.IndentSpacing = 25;
-                style.ScrollbarSize = 15;
-                style.GrabMinSize = 10;
-                style.WindowBorderSize = 1;
-                style.ChildBorderSize = 1;
-                style.PopupBorderSize = 1;
-                style.FrameBorderSize = 1;
-                style.TabBorderSize = 1;
-                style.WindowRounding = 7;
-                style.ChildRounding = 4;
-                style.FrameRounding = 3;
-                style.PopupRounding = 4;
-                style.ScrollbarRounding = 9;
-                style.GrabRounding = 3;
-                style.LogSliderDeadzone = 4;
-                style.TabRounding = 4;*/
+
+        colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+        colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
+        colors[ImGuiCol_WindowBg] = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
+        colors[ImGuiCol_ChildBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+        colors[ImGuiCol_PopupBg] = ImVec4(0.19f, 0.19f, 0.19f, 0.92f);
+        colors[ImGuiCol_Border] = ImVec4(0.19f, 0.19f, 0.19f, 0.29f);
+        colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.24f);
+        colors[ImGuiCol_FrameBg] = ImVec4(0.05f, 0.05f, 0.05f, 0.54f);
+        colors[ImGuiCol_FrameBgHovered] = ImVec4(0.19f, 0.19f, 0.19f, 0.54f);
+        colors[ImGuiCol_FrameBgActive] = ImVec4(0.20f, 0.22f, 0.23f, 1.00f);
+        colors[ImGuiCol_TitleBg] = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
+        colors[ImGuiCol_TitleBgActive] = ImVec4(0.06f, 0.06f, 0.06f, 1.00f);
+        colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
+        colors[ImGuiCol_MenuBarBg] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
+        colors[ImGuiCol_ScrollbarBg] = ImVec4(0.05f, 0.05f, 0.05f, 0.54f);
+        colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.34f, 0.34f, 0.34f, 0.54f);
+        colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.40f, 0.40f, 0.40f, 0.54f);
+        colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.56f, 0.56f, 0.56f, 0.54f);
+        colors[ImGuiCol_CheckMark] = ImVec4(0.26f, 0.36f, 0.98f, 1.00f);
+        colors[ImGuiCol_SliderGrab] = ImVec4(0.24f, 0.28f, 0.88f, 1.00f);
+        colors[ImGuiCol_SliderGrabActive] = ImVec4(0.26f, 0.31f, 0.98f, 1.00f);
+        colors[ImGuiCol_Button] = ImVec4(0.27f, 0.26f, 0.98f, 0.40f);
+        colors[ImGuiCol_ButtonHovered] = ImVec4(0.26f, 0.39f, 0.98f, 1.00f);
+        colors[ImGuiCol_ButtonActive] = ImVec4(0.06f, 0.26f, 0.98f, 1.00f);
+        colors[ImGuiCol_Header] = ImVec4(0.19f, 0.22f, 0.38f, 0.68f);
+        colors[ImGuiCol_HeaderHovered] = ImVec4(0.24f, 0.37f, 0.83f, 0.80f);
+        colors[ImGuiCol_HeaderActive] = ImVec4(0.26f, 0.31f, 0.98f, 1.00f);
+        colors[ImGuiCol_Separator] = ImVec4(0.43f, 0.43f, 0.50f, 0.50f);
+        colors[ImGuiCol_SeparatorHovered] = ImVec4(0.10f, 0.40f, 0.75f, 0.78f);
+        colors[ImGuiCol_SeparatorActive] = ImVec4(0.10f, 0.40f, 0.75f, 1.00f);
+        colors[ImGuiCol_ResizeGrip] = ImVec4(0.26f, 0.36f, 0.98f, 0.20f);
+        colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.26f, 0.42f, 0.98f, 0.67f);
+        colors[ImGuiCol_ResizeGripActive] = ImVec4(0.26f, 0.33f, 0.98f, 0.95f);
+        colors[ImGuiCol_Tab] = ImVec4(0.18f, 0.28f, 0.58f, 0.86f);
+        colors[ImGuiCol_TabHovered] = ImVec4(0.26f, 0.28f, 0.98f, 0.80f);
+        colors[ImGuiCol_TabActive] = ImVec4(0.20f, 0.27f, 0.68f, 1.00f);
+        colors[ImGuiCol_TabUnfocused] = ImVec4(0.07f, 0.10f, 0.15f, 0.97f);
+        colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.14f, 0.21f, 0.42f, 1.00f);
+        colors[ImGuiCol_DockingPreview] = ImVec4(0.26f, 0.31f, 0.98f, 0.70f);
+        colors[ImGuiCol_DockingEmptyBg] = ImVec4(1.00f, 0.00f, 0.00f, 1.00f);
+        colors[ImGuiCol_PlotLines] = ImVec4(0.00f, 0.64f, 1.00f, 1.00f);
+        colors[ImGuiCol_PlotLinesHovered] = ImVec4(0.00f, 0.10f, 1.00f, 1.00f);
+        colors[ImGuiCol_PlotHistogram] = ImVec4(0.13f, 0.00f, 1.00f, 1.00f);
+        colors[ImGuiCol_PlotHistogramHovered] = ImVec4(0.10f, 0.22f, 0.99f, 1.00f);
+        colors[ImGuiCol_TableHeaderBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.52f);
+        colors[ImGuiCol_TableBorderStrong] = ImVec4(0.00f, 0.00f, 0.00f, 0.52f);
+        colors[ImGuiCol_TableBorderLight] = ImVec4(0.28f, 0.28f, 0.28f, 0.29f);
+        colors[ImGuiCol_TableRowBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+        colors[ImGuiCol_TableRowBgAlt] = ImVec4(1.00f, 1.00f, 1.00f, 0.06f);
+        colors[ImGuiCol_TextSelectedBg] = ImVec4(0.20f, 0.22f, 0.23f, 1.00f);
+        colors[ImGuiCol_DragDropTarget] = ImVec4(0.33f, 0.67f, 0.86f, 1.00f);
+        colors[ImGuiCol_NavHighlight] = ImVec4(1.00f, 0.00f, 0.00f, 1.00f);
+        colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 0.00f, 0.00f, 0.70f);
+        colors[ImGuiCol_NavWindowingDimBg] = ImVec4(1.00f, 0.00f, 0.00f, 0.20f);
+        colors[ImGuiCol_ModalWindowDimBg] = ImVec4(1.00f, 0.00f, 0.00f, 0.35f);
+
+        ImGuiStyle& style = ImGui::GetStyle();
+        style.FrameRounding = 4.0f;
+        style.CellPadding = ImVec2(6.00f, 6.00f);
+        style.ItemSpacing = ImVec2(6.00f, 6.00f);
+        style.ItemInnerSpacing = ImVec2(6.00f, 6.00f);
+        style.TouchExtraPadding = ImVec2(0.00f, 0.00f);
+        style.IndentSpacing = 25;
+        style.ScrollbarSize = 15;
+        style.GrabMinSize = 10;
+        style.WindowBorderSize = 1;
+        style.ChildBorderSize = 1;
+        style.PopupBorderSize = 1;
+        style.FrameBorderSize = 1;
+        style.TabBorderSize = 1;
+        style.WindowRounding = 7;
+        style.ChildRounding = 4;
+        style.FrameRounding = 3;
+        style.PopupRounding = 4;
+        style.ScrollbarRounding = 9;
+        style.GrabRounding = 3;
+        style.LogSliderDeadzone = 4;
+        style.TabRounding = 4;
     }
 
     void engine_ui::initialize_data()
@@ -354,6 +353,47 @@ namespace luly::ui
         ImGui::End();
     }
 
+    void engine_ui::handle_mouse_picking()
+    {
+        const std::shared_ptr<renderer::geometry_pass>& geometry_pass = renderer::scene_renderer::get_render_pass<
+            renderer::geometry_pass>(renderer::render_pass_type::geometry_pass);
+
+        const glm::vec2 framebuffer_size = {
+            geometry_pass->get_fbo()->get_width(), geometry_pass->get_fbo()->get_height()
+        };
+
+        // Map viewport mouse coordinates to framebuffer coordinates
+        auto [mx, my] = ImGui::GetMousePos();
+        mx -= m_viewport_bounds[0].x;
+        my -= m_viewport_bounds[0].y;
+        const glm::vec2 viewport_size = m_viewport_bounds[1] - m_viewport_bounds[0];
+
+        // Calculate scale factors to map viewport coordinates to framebuffer coordinates
+        float sx = framebuffer_size.x / viewport_size.x;
+        float sy = framebuffer_size.y / viewport_size.y;
+
+        // Map mouse coordinates to framebuffer coordinates
+        mx *= sx;
+        my = framebuffer_size.y - my * sy; // Flip y-coordinate to match OpenGL convention
+
+        const int mouse_x = static_cast<int>(mx);
+        const int mouse_y = static_cast<int>(my);
+        if (mouse_x >= 0 && mouse_y >= 0 && mouse_x < static_cast<int>(framebuffer_size.x) && mouse_y < static_cast<
+                int>(framebuffer_size.y)
+            && !ImGuizmo::IsUsing())
+        {
+            geometry_pass->get_fbo()->bind();
+            const int pixel_data = geometry_pass->get_fbo()->read_pixel(
+                GEOMETRY_PASS_ACTOR_ID_ATTACHMENT_IDX, mouse_x, mouse_y);
+            if (pixel_data != -1)
+            {
+                m_selected_actor = scene::scene_manager::get().get_current_scene()->get_actor(
+                    static_cast<entt::entity>(pixel_data));
+            }
+            geometry_pass->get_fbo()->un_bind();
+        }
+    }
+
     bool engine_ui::on_mouse_button_pressed_event(const events::mouse_button_pressed_event& mouse_button_pressed_event)
     {
         ImGuiIO& io = ImGui::GetIO();
@@ -361,47 +401,7 @@ namespace luly::ui
 
         if (mouse_button_pressed_event.get_button_code() == input::mouse_button::button_left)
         {
-            const std::shared_ptr<renderer::geometry_pass>& geometry_pass = renderer::scene_renderer::get_render_pass<
-                renderer::geometry_pass>(renderer::render_pass_type::geometry_pass);
-
-            const glm::vec2 framebuffer_size = {
-                geometry_pass->get_fbo()->get_width(), geometry_pass->get_fbo()->get_height()
-            };
-
-            // Map viewport mouse coordinates to framebuffer coordinates
-            auto [mx, my] = ImGui::GetMousePos();
-            mx -= m_viewport_bounds[0].x;
-            my -= m_viewport_bounds[0].y;
-            const glm::vec2 viewport_size = m_viewport_bounds[1] - m_viewport_bounds[0];
-
-            // Calculate scale factors to map viewport coordinates to framebuffer coordinates
-            float sx = framebuffer_size.x / viewport_size.x;
-            float sy = framebuffer_size.y / viewport_size.y;
-
-            // Map mouse coordinates to framebuffer coordinates
-            mx *= sx;
-            my = framebuffer_size.y - my * sy; // Flip y-coordinate to match OpenGL convention
-
-            const int mouse_x = static_cast<int>(mx);
-            const int mouse_y = static_cast<int>(my);
-
-            if (mouse_x >= 0 && mouse_y >= 0 && mouse_x < static_cast<int>(framebuffer_size.x) && mouse_y < static_cast<
-                    int>(framebuffer_size.y)
-                && !ImGuizmo::IsUsing())
-            {
-                geometry_pass->get_fbo()->bind();
-                const int pixel_data = geometry_pass->get_fbo()->read_pixel(6, mouse_x, mouse_y);
-                if (pixel_data != -1)
-                {
-                    m_selected_actor = scene::scene_manager::get().get_current_scene()->get_actor(
-                        static_cast<entt::entity>(pixel_data));
-                }
-                else
-                {
-                    m_selected_actor = nullptr;
-                }
-                geometry_pass->get_fbo()->un_bind();
-            }
+            handle_mouse_picking();
         }
         return false;
     }

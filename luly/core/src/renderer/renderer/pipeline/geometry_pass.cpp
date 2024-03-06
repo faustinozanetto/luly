@@ -101,7 +101,7 @@ namespace luly::renderer
         m_geometry_shader->bind();
         renderer::set_clear_color({0.1f, 0.1f, 0.1f, 1});
         renderer::clear_screen();
-        m_fbo->clear_attachment(6, GL_RED_INTEGER, GL_INT, &actor_id_clear);
+        m_fbo->clear_attachment(GEOMETRY_PASS_ACTOR_ID_ATTACHMENT_IDX, GL_RED_INTEGER, GL_INT, &actor_id_clear);
 
         const std::shared_ptr<scene::scene>& current_scene = scene::scene_manager::get().get_current_scene();
 

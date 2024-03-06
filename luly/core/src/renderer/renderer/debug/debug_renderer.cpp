@@ -79,8 +79,8 @@ namespace luly::renderer
         // Render the edges of the box
         for (const auto& edge : edges)
         {
-            glm::vec3 point_a = glm::vec3(transform * glm::vec4(vertices[edge[0]], 1.0f));
-            glm::vec3 point_b = glm::vec3(transform * glm::vec4(vertices[edge[1]], 1.0f));
+            auto point_a = glm::vec3(transform * glm::vec4(vertices[edge[0]], 1.0f));
+            auto point_b = glm::vec3(transform * glm::vec4(vertices[edge[1]], 1.0f));
             submit_line(point_a, point_b, color);
         }
     }
@@ -95,7 +95,7 @@ namespace luly::renderer
         glm::vec3 prev_point(center.x + radius, center.y, center.z);
         glm::vec3 current_point;
 
-        glm::mat4 rotation_matrix = mat4_cast(glm::toQuat(glm::mat3(transform)));
+        glm::mat4 rotation_matrix = mat4_cast(toQuat(glm::mat3(transform)));
 
         // Loop through the sphere's circumference, submitting line segments
         for (int i = 1; i <= segments; ++i)

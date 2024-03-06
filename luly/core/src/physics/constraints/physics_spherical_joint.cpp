@@ -41,7 +41,7 @@ namespace luly::physics
 
     void physics_spherical_joint::set_limit_cone(float y_limit, float z_limit) const
     {
-        const physx::PxJointLimitCone limit = physx::PxJointLimitCone(y_limit, z_limit);
+        const auto limit = physx::PxJointLimitCone(y_limit, z_limit);
         m_physx_spherical_joint->setLimitCone(limit);
     }
 

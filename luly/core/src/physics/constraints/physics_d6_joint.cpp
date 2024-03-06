@@ -15,7 +15,7 @@ namespace luly::physics
         physx::PxRigidActor* rigid_actor_a = m_physics_actor_a ? m_physics_actor_a->get_physx_rigid_actor() : nullptr;
         physx::PxRigidActor* rigid_actor_b = m_physics_actor_b ? m_physics_actor_b->get_physx_rigid_actor() : nullptr;
 
-        m_physx_d6_joint = physx::PxD6JointCreate(*physics, rigid_actor_a, t0, rigid_actor_b, t1);
+        m_physx_d6_joint = PxD6JointCreate(*physics, rigid_actor_a, t0, rigid_actor_b, t1);
         LY_ASSERT_MSG(m_physx_d6_joint, "Failed to create PhysX d6 joint!");
     }
 
@@ -75,7 +75,7 @@ namespace luly::physics
 
     void physics_d6_joint::set_linear_limit(physx::PxD6Axis::Enum axis, float lower_limit, float upper_limit)
     {
-        physx::PxJointLinearLimitPair limit_pair = physx::PxJointLinearLimitPair(lower_limit, upper_limit);
+        auto limit_pair = physx::PxJointLinearLimitPair(lower_limit, upper_limit);
         m_physx_d6_joint->setLinearLimit(axis, limit_pair);
     }
 
@@ -86,7 +86,7 @@ namespace luly::physics
 
     void physics_d6_joint::set_twist_limit(float lower_limit, float upper_limit)
     {
-        physx::PxJointAngularLimitPair limit_pair = physx::PxJointAngularLimitPair(lower_limit, upper_limit);
+        auto limit_pair = physx::PxJointAngularLimitPair(lower_limit, upper_limit);
         m_physx_d6_joint->setTwistLimit(limit_pair);
     }
 

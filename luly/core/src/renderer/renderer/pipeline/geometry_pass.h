@@ -5,6 +5,7 @@
 
 namespace luly::renderer
 {
+#define GEOMETRY_PASS_ACTOR_ID_ATTACHMENT_IDX 6
     class geometry_pass : public render_pass
     {
     public:
