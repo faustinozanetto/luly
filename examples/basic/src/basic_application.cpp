@@ -103,8 +103,8 @@ void basic_application::setup_scene()
         physics_pyramid_scene>();
     luly::scene::scene_manager::get().add_scene(physics_pyramid_scene);
 
-     const std::shared_ptr<pbr_mask_scene>& pbr_mask_scene = std::make_shared<class pbr_mask_scene>();
-     luly::scene::scene_manager::get().add_scene(pbr_mask_scene);
+    const std::shared_ptr<pbr_mask_scene>& pbr_mask_scene = std::make_shared<class pbr_mask_scene>();
+    luly::scene::scene_manager::get().add_scene(pbr_mask_scene);
 
     const std::shared_ptr<physics_joints_scene>& physics_joints_scene = std::make_shared<class
         physics_joints_scene>();
@@ -176,7 +176,7 @@ void basic_application::create_ball(const std::shared_ptr<luly::scene::scene>& s
     // 3. Setup material
     static std::random_device rd;
     static std::mt19937 gen(rd());
-    static std::uniform_real_distribution<float> dis(0.0f, 1.0f);
+    static std::uniform_real_distribution dis(0.0f, 1.0f);
 
     const glm::vec4 albedo = glm::vec4(dis(gen), dis(gen), dis(gen), 1.0f);
 

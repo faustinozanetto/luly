@@ -67,5 +67,6 @@ namespace luly::scene
         glm::vec3 m_gravity;
 
         friend class scene_actor;
+        friend class scene_serializer;
     };
 }

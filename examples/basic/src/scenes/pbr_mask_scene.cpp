@@ -26,8 +26,8 @@ void pbr_mask_scene::initialize()
 {
     scene_utils::create_environment(this);
     create_mask();
+    scene_utils::create_point_light(this, {2, 4, 2}, {0.2f, 0.2f, 0.2f});
 }
-
 
 void pbr_mask_scene::create_mask()
 {

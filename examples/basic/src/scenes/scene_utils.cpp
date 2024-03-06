@@ -16,6 +16,7 @@
 #include "scene/actor/scene_actor.h"
 #include "scene/actor/components/transform_component.h"
 #include "scene/actor/components/lights/directional_light_component.h"
+#include "scene/actor/components/lights/point_light_component.h"
 #include "scene/actor/components/physics/physics_material_component.h"
 #include "scene/actor/components/physics/actors/physics_dynamic_actor_component.h"
 #include "scene/actor/components/physics/actors/physics_static_actor_component.h"
@@ -23,6 +24,27 @@
 #include "scene/actor/components/rendering/material_component.h"
 #include "scene/actor/components/rendering/model_renderer_component.h"
 #include "scene/actor/components/rendering/skybox_component.h"
+
+std::shared_ptr<luly::scene::scene_actor> scene_utils::create_point_light(
+    luly::scene::scene* scene, const glm::vec3& position, const glm::vec3& color)
+{
+    const std::shared_ptr<luly::scene::scene_actor>& actor = scene->create_actor("Point Light");
+    const std::shared_ptr<luly::renderer::point_light>& point_light = std::make_shared<
+        luly::renderer::point_light>(color, position);
+    point_light->set_intensity(10.0f);
+    actor->add_component<luly::scene::point_light_component>(point_light);
+    actor->get_component<luly::scene::transform_component>().get_transform()->set_location(position);
+    actor->get_component<luly::scene::transform_component>().get_transform()->set_scale(glm::vec3(0.25f));
+
+    const std::shared_ptr<luly::renderer::model> model =
+        luly::renderer::model_factory::create_model_from_file(
+            "assets/models/cube.obj");
+    luly::scene::model_renderer_component& model_renderer_component = actor->add_component<
+        luly::scene::model_renderer_component>(model);
+    model_renderer_component.set_casts_shadows(false);
+
+    return actor;
+}
 
 void scene_utils::create_environment(luly::scene::scene* scene)
 {

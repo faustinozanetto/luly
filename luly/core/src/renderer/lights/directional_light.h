@@ -52,12 +52,13 @@ namespace luly::renderer
         glm::vec2 m_direction_angles;
 
         // Cascaded shadows
+        float m_cascade_split_lambda;
+        glm::ivec2 m_shadow_map_dimensions;
+        
+        float m_average_frustum_size;
         std::vector<cascade_frustum> m_cascade_frustums;
         std::vector<float> m_shadow_cascade_splits_distances;
         std::vector<float> m_shadow_cascade_splits;
-        float m_cascade_split_lambda;
-        float m_average_frustum_size;
-        glm::ivec2 m_shadow_map_dimensions;
         std::shared_ptr<frame_buffer> m_shadow_map_fbo;
         uint32_t m_shadow_maps;
         std::shared_ptr<uniform_buffer_object> m_frustum_planes_ubo;

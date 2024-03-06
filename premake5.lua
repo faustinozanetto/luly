@@ -22,6 +22,7 @@ group "dependencies"
     include "third_party/stb"
     include "third_party/imgui"
     include "third_party/imguizmo"
+    include "third_party/yaml-cpp"
 group ""
 
 group "luly"

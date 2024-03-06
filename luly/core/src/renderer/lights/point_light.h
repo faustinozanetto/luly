@@ -16,6 +16,7 @@ namespace luly::renderer
         const uint32_t get_shadow_cubemap() const { return m_shadow_cubemap; }
         const std::vector<glm::mat4>& get_shadow_transforms() const { return m_shadow_transforms; }
         float get_shadow_map_far_plane() const { return m_shadow_map_far_plane; }
+        float get_shadow_map_near_plane() const { return m_shadow_map_near_plane; }
         const glm::ivec2& get_shadow_map_dimensions() const { return m_shadow_map_dimensions; }
         float get_quadratic_factor() const { return m_quadratic_factor; }
         float get_linear_factor() const { return m_linear_factor; }

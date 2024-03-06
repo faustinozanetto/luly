@@ -10,6 +10,7 @@ include_dirs["imgui"] = "%{wks.location}/third_party/imgui"
 include_dirs["imguizmo"] = "%{wks.location}/third_party/imguizmo"
 include_dirs["entt"] = "%{wks.location}/third_party/entt/single_include"
 include_dirs["tracy"] = "%{wks.location}/third_party/tracy/public"
+include_dirs["yaml_cpp"] = "%{wks.location}/third_party/yaml-cpp/include"
 include_dirs["physx"] = "%{wks.location}/third_party/physx/physx/include"
 include_dirs["physx_omnipvd"] = "%{wks.location}/third_party/physx/physx/pvdruntime/include"
 

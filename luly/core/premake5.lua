@@ -30,12 +30,14 @@ includedirs {
     "%{include_dirs.tracy}",
     "%{include_dirs.physx}",
     "%{include_dirs.physx_omnipvd}",
+    "%{include_dirs.yaml_cpp}",
 }
 
 links {
     "luly-shared",
     "glfw",
     "glad",
+    "yaml-cpp",
     "stb"
 }
 

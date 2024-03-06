@@ -4,6 +4,7 @@
 #include "actor/components/name_component.h"
 #include "actor/components/transform_component.h"
 #include "actor/components/base_component.h"
+#include "actor/components/identifier_component.h"
 #include "actor/components/lights/directional_light_component.h"
 #include "actor/components/lights/point_light_component.h"
 #include "actor/components/lights/spot_light_component.h"
@@ -58,6 +59,7 @@ namespace luly::scene
         entt::entity actor_handle = m_actors_registry->create();
         const auto& actor = std::make_shared<scene_actor>(actor_handle, this);
         actor->add_component<name_component>(name);
+        actor->add_component<identifier_component>();
         actor->add_component<transform_component>();
 
         m_actors_map.insert({actor_handle, actor});

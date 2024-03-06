@@ -1,6 +1,8 @@
 ﻿#include "menubar_panel.h"
 
+#include "scene/serialization/scene_serializer.h"
 #include "engine_ui.h"
+#include "scene/scene_manager.h"
 
 namespace luly::ui
 {
@@ -20,6 +22,21 @@ namespace luly::ui
             if (ImGui::BeginMenu("File"))
             {
                 ImGui::MenuItem("Test");
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("Scene"))
+            {
+                if (ImGui::MenuItem("Save to File"))
+                {
+                    const std::shared_ptr<scene::scene>& current_scene = scene::scene_manager::get().
+                        get_current_scene();
+                    if (current_scene)
+                    {
+                        const std::shared_ptr<scene::scene_serializer>& scene_serializer = std::make_shared<
+                            scene::scene_serializer>(current_scene);
+                        scene_serializer->serialize("assets/scenes/" + current_scene->get_name() + ".yaml");
+                    }
+                }
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Settings"))

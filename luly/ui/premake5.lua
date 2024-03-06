@@ -29,6 +29,7 @@ project "luly-ui"
         "%{include_dirs.tracy}",
         "%{include_dirs.physx}",
         "%{include_dirs.physx_omnipvd}",
+        "%{include_dirs.yaml_cpp}",
     }
     
     links {
@@ -39,6 +40,7 @@ project "luly-ui"
         "stb",
         "imgui",
         "imguizmo",
+        "yaml-cpp"
     }
     
     filter "configurations:debug"

@@ -17,7 +17,6 @@ namespace luly::physics
         physx::PxRigidActor* rigid_actor_b = m_physics_actor_b ? m_physics_actor_b->get_physx_rigid_actor() : nullptr;
         m_physx_spherical_joint = PxSphericalJointCreate(*physics, rigid_actor_a, t0, rigid_actor_b, t1);
         LY_ASSERT_MSG(m_physx_spherical_joint, "Failed to create PhysX spherical joint!")
-        m_physx_spherical_joint->setConstraintFlag(physx::PxConstraintFlag::eVISUALIZATION, true);
     }
 
     physics_spherical_joint::~physics_spherical_joint()
