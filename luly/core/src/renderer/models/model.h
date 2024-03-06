@@ -13,6 +13,7 @@ namespace luly::renderer
     public:
         model(const std::vector<std::shared_ptr<mesh>>& meshes,
               const std::unordered_map<std::string, std::shared_ptr<material>>& materials = {});
+        ~model();
 
         /* Getters */
         const std::vector<std::shared_ptr<mesh>>& get_meshes() const { return m_meshes; }

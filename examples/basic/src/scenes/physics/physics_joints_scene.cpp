@@ -122,9 +122,10 @@ void physics_joints_scene::create_chain()
             luly::physics::physics_utils::convert_physx_quat_to_glm(curr_trans.q));
 
         /* Box collision shape */
+        glm::vec3 half_extents = {link_scale.x / 2, link_scale.y / 2, link_scale.z / 2};
         const std::shared_ptr<luly::physics::physics_box_collision>& box_collision_shape = std::make_shared<
             luly::physics::physics_box_collision>(
-            dynamic_actor, phys_material, link_scale);
+            dynamic_actor, phys_material, half_extents);
 
         dynamic_actor->add_collision_shape(box_collision_shape);
         dynamic_actor->initialize(this);

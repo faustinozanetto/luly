@@ -19,6 +19,7 @@ namespace luly::renderer
         bloom_pass,
         tonemapping_pass,
         debanding_pass,
+        ambient_occlusion_pass,
         debug_pass,
         final_pass,
     };
@@ -61,7 +62,7 @@ namespace luly::renderer
         template <typename T, typename = std::enable_if<std::is_base_of_v<render_pass, T>>>
         static std::shared_ptr<T> get_render_pass(render_pass_type pass_type)
         {
-            std::shared_ptr<render_pass> base_pass = s_data.passes.at(pass_type);
+            const std::shared_ptr<render_pass>& base_pass = s_data.passes.at(pass_type);
 
             // Attempt the dynamic_cast
             std::shared_ptr<T> derived_pass = std::dynamic_pointer_cast<T>(base_pass);

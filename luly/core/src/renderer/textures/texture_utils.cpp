@@ -25,7 +25,7 @@ namespace luly::renderer
         case texture_filtering::linear_mipmap_linear:
             return "linear_mipmap_linear";
         }
-        LY_ASSERT_MSG(false, "Invalid texture filtering!");
+        LY_ASSERT_MSG(false, "Invalid texture filtering!")
         return nullptr;
     }
 
@@ -38,7 +38,7 @@ namespace luly::renderer
         case texture_filtering_type::filter_mag:
             return "filter_mag";
         }
-        LY_ASSERT_MSG(false, "Invalid texture filtering type!");
+        LY_ASSERT_MSG(false, "Invalid texture filtering type!")
         return nullptr;
     }
 
@@ -57,7 +57,7 @@ namespace luly::renderer
         case texture_wrapping::clamp_to_border:
             return "clamp_to_border";
         }
-        LY_ASSERT_MSG(false, "Invalid texture wrapping!");
+        LY_ASSERT_MSG(false, "Invalid texture wrapping!")
         return nullptr;
     }
 
@@ -72,7 +72,7 @@ namespace luly::renderer
         case texture_wrapping_type::wrap_t:
             return "wrap_t";
         }
-        LY_ASSERT_MSG(false, "Invalid texture wrapping type!");
+        LY_ASSERT_MSG(false, "Invalid texture wrapping type!")
         return nullptr;
     }
 
@@ -95,7 +95,7 @@ namespace luly::renderer
         case texture_filtering::linear_mipmap_linear:
             return GL_LINEAR_MIPMAP_LINEAR;
         }
-        LY_ASSERT_MSG(false, "Invalid texture filtering!");
+        LY_ASSERT_MSG(false, "Invalid texture filtering!")
         return 0;
     }
 
@@ -108,7 +108,7 @@ namespace luly::renderer
         case texture_filtering_type::filter_mag:
             return GL_TEXTURE_MAG_FILTER;
         }
-        LY_ASSERT_MSG(false, "Invalid texture filtering type!");
+        LY_ASSERT_MSG(false, "Invalid texture filtering type!")
         return 0;
     }
 
@@ -127,7 +127,7 @@ namespace luly::renderer
         case texture_wrapping::clamp_to_border:
             return GL_CLAMP_TO_BORDER;
         }
-        LY_ASSERT_MSG(false, "Invalid texture wrapping!");
+        LY_ASSERT_MSG(false, "Invalid texture wrapping!")
         return 0;
     }
 
@@ -142,7 +142,7 @@ namespace luly::renderer
         case texture_wrapping_type::wrap_t:
             return GL_TEXTURE_WRAP_T;
         }
-        LY_ASSERT_MSG(false, "Invalid texture wrapping type!");
+        LY_ASSERT_MSG(false, "Invalid texture wrapping type!")
         return 0;
     }
 
@@ -151,9 +151,9 @@ namespace luly::renderer
         switch (internal_format)
         {
         case texture_internal_format::r8:
-            return texture_format::red;
+            return texture_format::red_int;
         case texture_internal_format::r16:
-            return texture_format::red;
+            return texture_format::red_int;
         case texture_internal_format::r16f:
             return texture_format::red;
         case texture_internal_format::r32f:
@@ -185,19 +185,18 @@ namespace luly::renderer
         case texture_internal_format::r11g11b10:
             return texture_format::rgb;
         case texture_internal_format::depth_component16:
-            return texture_format::red;
+            return texture_format::red_int;
         case texture_internal_format::depth_component24:
-            return texture_format::red;
+            return texture_format::red_int;
         case texture_internal_format::depth_component32:
-            return texture_format::red;
+            return texture_format::red_int;
         case texture_internal_format::depth_component32f:
             return texture_format::red;
         case texture_internal_format::stencil_index8:
             return texture_format::red;
-        default:
-            return texture_format::rgba;
         }
-        LY_ASSERT_MSG(false, "Invalid texture internal format!");
+        LY_ASSERT_MSG(false, "Invalid texture internal format!")
+        return {};
     }
 
     const char* texture_utils::get_texture_format_to_string(texture_format format)
@@ -216,6 +215,8 @@ namespace luly::renderer
             return "bgra";
         case texture_format::red:
             return "red";
+        case texture_format::red_int:
+            return "red_int";
         case texture_format::green:
             return "green";
         case texture_format::blue:
@@ -223,7 +224,7 @@ namespace luly::renderer
         case texture_format::alpha:
             return "alpha";
         }
-        LY_ASSERT_MSG(false, "Invalid texture format!");
+        LY_ASSERT_MSG(false, "Invalid texture format!")
         return nullptr;
     }
 
@@ -276,7 +277,7 @@ namespace luly::renderer
         case texture_internal_format::stencil_index8:
             return "stencil_index8";
         }
-        LY_ASSERT_MSG(false, "Invalid texture internal format!");
+        LY_ASSERT_MSG(false, "Invalid texture internal format!")
         return nullptr;
     }
 
@@ -295,6 +296,8 @@ namespace luly::renderer
         case texture_format::bgra:
             return GL_BGRA;
         case texture_format::red:
+            return GL_RED;
+        case texture_format::red_int:
             return GL_RED_INTEGER;
         case texture_format::green:
             return GL_GREEN;
@@ -303,7 +306,7 @@ namespace luly::renderer
         case texture_format::alpha:
             return GL_ALPHA;
         }
-        LY_ASSERT_MSG(false, "Invalid texture format!");
+        LY_ASSERT_MSG(false, "Invalid texture format!")
         return 0;
     }
 
@@ -314,7 +317,7 @@ namespace luly::renderer
         case texture_internal_format::r8:
             return GL_R32I;
         case texture_internal_format::r16:
-            return GL_R16;
+            return GL_R16I;
         case texture_internal_format::r16f:
             return GL_R16F;
         case texture_internal_format::r32f:
@@ -356,13 +359,13 @@ namespace luly::renderer
         case texture_internal_format::stencil_index8:
             return GL_STENCIL_INDEX8;
         }
-        LY_ASSERT_MSG(false, "Invalid texture internal format!");
+        LY_ASSERT_MSG(false, "Invalid texture internal format!")
         return 0;
     }
 
     texture_formats texture_utils::get_texture_formats_from_channel_count(int channel_count)
     {
-        LY_ASSERT_MSG(channel_count > 0 && channel_count < 5, "Invalid texture channels count!");
+        LY_ASSERT_MSG(channel_count > 0 && channel_count < 5, "Invalid texture channels count!")
         texture_formats formats = {};
         if (channel_count == 4)
         {

@@ -2,6 +2,7 @@ project "basic"
     kind "ConsoleApp"
     language "C++"
     cppdialect "C++20"
+    staticruntime "off"
 
     editandcontinue "Off"
     
@@ -41,7 +42,6 @@ project "basic"
     }
 
     filter "system:windows"
-        staticruntime "off"
         systemversion "latest"
     
     filter "configurations:debug"

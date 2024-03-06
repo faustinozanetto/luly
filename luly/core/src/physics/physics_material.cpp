@@ -10,6 +10,8 @@ namespace luly::physics
 
     physics_material::~physics_material()
     {
+        m_material->release();
+        m_material = nullptr;
     }
 
     float physics_material::get_static_friction() const

@@ -19,6 +19,7 @@ namespace luly::ui
     private:
         void render_tonemapping_details();
         void render_bloom_details();
+        void render_ambient_occlusion_details();
         
         static bool s_show;
 

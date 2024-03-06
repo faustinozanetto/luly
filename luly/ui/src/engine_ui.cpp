@@ -218,21 +218,6 @@ namespace luly::ui
 
     void engine_ui::on_update()
     {
-        /*
-                const std::shared_ptr<renderer::geometry_pass>& geometry_pass = renderer::scene_renderer::get_render_pass<
-                    renderer::geometry_pass>(renderer::render_pass_type::geometry_pass);
-                int fbo_width = geometry_pass->get_fbo()->get_width();
-                int fbo_height = geometry_pass->get_fbo()->get_height();
-                if (
-                    m_viewport_size.x > 0.0f && m_viewport_size.y > 0.0f &&
-                    (fbo_width != (int)m_viewport_size.x || fbo_height != (int)m_viewport_size.y))
-                {
-                    LY_TRACE("New viewport size: ({},{})", m_viewport_size.x, m_viewport_size.y);
-                    //renderer::renderer::set_viewport_size(m_viewport_size);
-                    renderer::scene_renderer::on_resize(m_viewport_size);
-                    scene::scene_manager::get().on_resize(m_viewport_size);
-                }*/
-
         // Check for key press.
         if (input::input_manager::is_key_pressed(input::key::d1))
         {
@@ -379,7 +364,7 @@ namespace luly::ui
             const std::shared_ptr<renderer::geometry_pass>& geometry_pass = renderer::scene_renderer::get_render_pass<
                 renderer::geometry_pass>(renderer::render_pass_type::geometry_pass);
 
-            glm::vec2 framebuffer_size = {
+            const glm::vec2 framebuffer_size = {
                 geometry_pass->get_fbo()->get_width(), geometry_pass->get_fbo()->get_height()
             };
 
@@ -397,15 +382,15 @@ namespace luly::ui
             mx *= sx;
             my = framebuffer_size.y - my * sy; // Flip y-coordinate to match OpenGL convention
 
-            int mouse_x = (int)mx;
-            int mouse_y = (int)my;
+            const int mouse_x = static_cast<int>(mx);
+            const int mouse_y = static_cast<int>(my);
 
-            if (mouse_x >= 0 && mouse_y >= 0 && mouse_x < (int)framebuffer_size.x && mouse_y < (int)framebuffer_size.y
+            if (mouse_x >= 0 && mouse_y >= 0 && mouse_x < static_cast<int>(framebuffer_size.x) && mouse_y < static_cast<
+                    int>(framebuffer_size.y)
                 && !ImGuizmo::IsUsing())
             {
                 geometry_pass->get_fbo()->bind();
-                const int pixel_data = geometry_pass->get_fbo()->read_pixel(5, mouse_x, mouse_y);
-                LY_WARN("Mouse Position: ({}, {}) | Data: {}", mouse_x, mouse_y, pixel_data);
+                const int pixel_data = geometry_pass->get_fbo()->read_pixel(6, mouse_x, mouse_y);
                 if (pixel_data != -1)
                 {
                     m_selected_actor = scene::scene_manager::get().get_current_scene()->get_actor(

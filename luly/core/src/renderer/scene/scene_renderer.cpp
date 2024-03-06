@@ -89,9 +89,14 @@ namespace luly::renderer
         environment_render_pass->add_input({geometry_render_pass, "geometry_pass_input"});
         s_data.passes.insert({render_pass_type::environment_pass, environment_render_pass});
 
+        const auto& ambient_occlusion_render_pass = std::make_shared<ambient_occlusion_pass>();
+        ambient_occlusion_render_pass->add_input({geometry_render_pass, "geometry_pass_input"});
+        s_data.passes.insert({render_pass_type::ambient_occlusion_pass, ambient_occlusion_render_pass});
+
         const auto& lighting_render_pass = std::make_shared<lighting_pass>();
         lighting_render_pass->add_input({geometry_render_pass, "geometry_pass_input"});
         lighting_render_pass->add_input({environment_render_pass, "environment_pass_input"});
+        lighting_render_pass->add_input({ambient_occlusion_render_pass, "ambient_occlusion_pass_input"});
         lighting_render_pass->add_input({shadows_render_pass, "shadows_pass_input"});
         s_data.passes.insert({render_pass_type::lighting_pass, lighting_render_pass});
 

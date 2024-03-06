@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "events/base_event.h"
-
 #include "shared_api.h"
 
 #include <glm/glm.hpp>

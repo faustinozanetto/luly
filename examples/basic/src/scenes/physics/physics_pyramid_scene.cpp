@@ -23,7 +23,7 @@ void physics_pyramid_scene::initialize()
 
 void physics_pyramid_scene::create_cubes_pyramid()
 {
-    int levels = 8;
+    int levels = 12;
     glm::vec3 start_pos = {0, 4, 0};
 
     for (int i = 0; i < levels; i++)

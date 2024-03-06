@@ -38,8 +38,11 @@ namespace luly::ui
                 renderer::renderer::set_vsync_enabled(vsync_enabled);
             }
 
+            ImGui::Separator();
+
             render_tonemapping_details();
             render_bloom_details();
+            render_ambient_occlusion_details();
         }
         ImGui::End();
     }
@@ -100,6 +103,35 @@ namespace luly::ui
         if (ui_utils::draw_property("Filter Radius", filter_radius, 0.001f, 5.0f, 0.001f))
         {
             bloom_pass->set_filter_radius(filter_radius);
+        }
+    }
+
+    void renderer_panel::render_ambient_occlusion_details()
+    {
+        const std::shared_ptr<renderer::ambient_occlusion_pass>& ambient_occlusion_pass =
+            renderer::scene_renderer::get_render_pass<
+                renderer::ambient_occlusion_pass>(renderer::render_pass_type::ambient_occlusion_pass);
+
+        ui_utils::draw_property("Ambient Occlusion");
+        ImGui::Separator();
+
+
+        float bias = ambient_occlusion_pass->get_ssao_bias();
+        if (ui_utils::draw_property("Bias", bias, 0.0001f, 10.0f, 0.0001f))
+        {
+            ambient_occlusion_pass->set_ssao_bias(bias);
+        }
+
+        float radius = ambient_occlusion_pass->get_ssao_radius();
+        if (ui_utils::draw_property("Radius", radius, 0.001f, 10.0f, 0.0001f))
+        {
+            ambient_occlusion_pass->set_ssao_radius(radius);
+        }
+
+        float noise_size = ambient_occlusion_pass->get_ssao_noise_size();
+        if (ui_utils::draw_property("Noise Size", noise_size, 0.0001f, 10.0f, 0.0001f))
+        {
+            ambient_occlusion_pass->set_ssao_noise_size(noise_size);
         }
     }
 }

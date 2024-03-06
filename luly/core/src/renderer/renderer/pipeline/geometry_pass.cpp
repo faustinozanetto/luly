@@ -33,6 +33,13 @@ namespace luly::renderer
                 texture_wrapping::clamp_to_edge,
                 viewport_size
             },
+            // View Space Position
+            {
+                texture_internal_format::rgb16f,
+                texture_filtering::linear,
+                texture_wrapping::clamp_to_edge,
+                viewport_size
+            },
             // Albedo
             {
                 texture_internal_format::rgba16f,
@@ -94,7 +101,7 @@ namespace luly::renderer
         m_geometry_shader->bind();
         renderer::set_clear_color({0.1f, 0.1f, 0.1f, 1});
         renderer::clear_screen();
-        m_fbo->clear_attachment(5, GL_RED_INTEGER, GL_INT, &actor_id_clear);
+        m_fbo->clear_attachment(6, GL_RED_INTEGER, GL_INT, &actor_id_clear);
 
         const std::shared_ptr<scene::scene>& current_scene = scene::scene_manager::get().get_current_scene();
 
@@ -177,29 +184,34 @@ namespace luly::renderer
         position_output.output = m_fbo->get_attachment_id(0);
         add_output(position_output);
 
+        render_pass_output view_space_position_output;
+        view_space_position_output.name = "view_space_position_output";
+        view_space_position_output.output = m_fbo->get_attachment_id(1);
+        add_output(view_space_position_output);
+
         render_pass_output albedo_output;
         albedo_output.name = "albedo_output";
-        albedo_output.output = m_fbo->get_attachment_id(1);
+        albedo_output.output = m_fbo->get_attachment_id(2);
         add_output(albedo_output);
 
         render_pass_output normals_output;
         normals_output.name = "normals_output";
-        normals_output.output = m_fbo->get_attachment_id(2);
+        normals_output.output = m_fbo->get_attachment_id(3);
         add_output(normals_output);
 
         render_pass_output rough_metal_ao_output;
         rough_metal_ao_output.name = "rough_metal_ao_output";
-        rough_metal_ao_output.output = m_fbo->get_attachment_id(3);
+        rough_metal_ao_output.output = m_fbo->get_attachment_id(4);
         add_output(rough_metal_ao_output);
 
         render_pass_output emissive_output;
         emissive_output.name = "emissive_output";
-        emissive_output.output = m_fbo->get_attachment_id(4);
+        emissive_output.output = m_fbo->get_attachment_id(5);
         add_output(emissive_output);
 
         render_pass_output actor_id_output;
         actor_id_output.name = "actor_id_output";
-        actor_id_output.output = m_fbo->get_attachment_id(5);
+        actor_id_output.output = m_fbo->get_attachment_id(6);
         add_output(actor_id_output);
 
         render_pass_output depth_output;

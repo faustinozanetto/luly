@@ -9,4 +9,8 @@ namespace luly::renderer
         m_meshes = meshes;
         m_materials = materials;
     }
+
+    model::~model()
+    {
+    }
 }

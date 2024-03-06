@@ -134,7 +134,7 @@ int calculate_cascade_index(float frag_pos_z) {
 vec3 calculate_debug_cascade_color(int cascade_index) {
     if (u_directional_light_shadows.show_cascades == 0)
         return vec3(0, 0, 0);
-        
+
     return u_directional_light_shadows.cascade_debug_colors[cascade_index].rgb;
 }
 
@@ -161,7 +161,7 @@ vec3 calculate_directional_light_luminance(directional_light dir_light, vec3 nor
     float shadow = 0.0;
     if (u_directional_light_shadows.enable_shadows)
         shadow = calculate_directional_light_shadow(frag_pos, normal, L, cascade_index);
-    
+
     vec3 final = (1 - shadow) * (kD * albedo / PI + specular) * radiance * NdotL;
     final *= dir_light.parameters.x;
 
@@ -171,10 +171,10 @@ vec3 calculate_directional_light_luminance(directional_light dir_light, vec3 nor
 float point_light_shadow_hard(vec3 frag_to_light, float bias, int light_index) {
     float closest_depth = texture(u_point_light_shadow_maps[light_index], frag_to_light).r;
     closest_depth *= u_point_light_shadows.far_planes[light_index];
-    
+
     float current_depth = length(frag_to_light);
     float shadow = (current_depth - bias) > closest_depth ? 1.0: 0.0;
-    
+
     return shadow;
 }
 
@@ -189,7 +189,7 @@ vec3 point_light_sample_offset_vectors[20] = vec3[]
 
 float point_light_shadow_pcf(vec3 frag_pos, vec3 frag_to_light, float bias, int light_index) {
     float shadow = 0.0;
-    
+
     float view_distance = length(camera.position.xyz - frag_pos);
     float disk_radius = (1.0 + (view_distance / u_point_light_shadows.far_planes[light_index])) / 25.0;
     float current_depth = length(frag_to_light);
@@ -217,7 +217,7 @@ float calculate_point_light_shadow(point_light point_light, vec3 frag_pos, int l
     } else {
         shadow = point_light_shadow_hard(frag_to_light, u_point_light_shadows.shadow_bias, light_index);
     }
-    
+
     return shadow;
 }
 
@@ -269,7 +269,7 @@ void main()
     float ambient_occlusion = rough_metal_ao.b;
 
     float world_ambient_occlusion = texture(u_ambient_occlusion_map, o_tex_coord).r;
-    //ambient_occlusion *= world_ambient_occlusion;
+    // ambient_occlusion += world_ambient_occlusion;
     //ambient_occlusion /= 2;
 
     vec3 view_dir = normalize(camera.position.xyz - frag_pos);
@@ -277,7 +277,7 @@ void main()
 
     vec3 F0 = vec3(0.04);
     F0 = mix(F0, albedo, metallic);
-    
+
     vec4 frag_pos_view_space = camera.view_matrix * vec4(frag_pos, 1.0);
     int cascade_index = calculate_cascade_index(frag_pos_view_space.z);
     vec3 cascade_debug_color = calculate_debug_cascade_color(cascade_index);
@@ -285,17 +285,15 @@ void main()
     vec3 luminance = vec3(0.0);
     luminance += calculate_directional_light_luminance(u_lights.directional_light, normal, view_dir, frag_pos, albedo, F0, roughness, metallic, cascade_index);
 
-    /*
     int point_light_count = u_lights.lights.parameters.x;
     for (int i = 0; i < point_light_count; i++) {
-        luminance += calculate_point_light_luminance(u_lights.point_lights[i], normal, view_dir, reflect_dir, frag_pos, albedo, F0, roughness, metallic, i);   
+        luminance += calculate_point_light_luminance(u_lights.point_lights[i], normal, view_dir, reflect_dir, frag_pos, albedo, F0, roughness, metallic, i);
     }
-    
     /*
-       for (int i = 0; i < 16; i++) {
-           luminance += calculate_spot_light_luminance(u_lights.spot_lights[i], normal, view_dir, frag_pos, albedo, F0, roughness, metallic);
-       }
-           */
+           for (int i = 0; i < 16; i++) {
+               luminance += calculate_spot_light_luminance(u_lights.spot_lights[i], normal, view_dir, frag_pos, albedo, F0, roughness, metallic);
+           }
+               */
 
     vec3 F = fresnel_schlick_roughness(max(dot(normal, view_dir), 0.0), F0, roughness);
 
@@ -310,10 +308,10 @@ void main()
     vec2 brdf_lut = sample_brdf_lut_map(view_dir, normal, roughness);
     vec3 specular = prefilter * (F * brdf_lut.x + brdf_lut.y);
 
-    vec3 ambient = (kD * diffuse + specular) * u_skybox_intensity * u_skybox_tint.rgb * ambient_occlusion;
+    vec3 ambient = (kD * diffuse * world_ambient_occlusion + specular) * u_skybox_intensity * u_skybox_tint.rgb;
 
     vec3 color = cascade_debug_color + ambient + luminance + emissive;
-        
+
     frag_color = vec4(color, full_albedo.a);
     
 }

@@ -13,6 +13,7 @@ layout (location = 0) uniform mat4 u_transform_matrix;
 layout (location = 1) uniform mat3 u_normal_matrix;
 
 struct geometry_out {
+    vec3 view_space_frag_pos;
     vec3 frag_pos;
     vec2 tex_coords;
     vec3 normal;
@@ -34,6 +35,7 @@ void main() {
     o_geometry.normal = N;
     o_geometry.tex_coords = a_tex_coord;
     o_geometry.frag_pos = vec3(u_transform_matrix * vec4(a_pos, 1.0));
+    o_geometry.view_space_frag_pos = vec3(camera.view_matrix * vec4(o_geometry.frag_pos, 1.0));
     o_actor_id = u_actor_id;
 
     gl_Position = camera.view_projection_matrix * u_transform_matrix * vec4(a_pos, 1.0);
@@ -45,6 +47,7 @@ void main() {
 #include "common/materials.lsh"
 
 struct geometry_out {
+    vec3 view_space_frag_pos;
     vec3 frag_pos;
     vec2 tex_coords;
     vec3 normal;
@@ -68,11 +71,12 @@ layout (binding = 6) uniform sampler2D u_emissive_map;
 
 // G-Buffer outputs
 layout(location = 0) out vec3 g_position;
-layout(location = 1) out vec4 g_albedo_opacity;
-layout(location = 2) out vec3 g_normal;
-layout(location = 3) out vec3 g_roughmetalao;
-layout(location = 4) out vec3 g_emissive;
-layout(location = 5) out int g_actor_id;
+layout(location = 1) out vec3 g_view_space_position;
+layout(location = 2) out vec4 g_albedo_opacity;
+layout(location = 3) out vec3 g_normal;
+layout(location = 4) out vec3 g_roughmetalao;
+layout(location = 5) out vec3 g_emissive;
+layout(location = 6) out int g_actor_id;
 
 float extract_data_from_packed_texture(sampler2D texture_map, vec2 tex_coords, float initial_value,
 float tilling, int channel_mode, int texture_enabled) {
@@ -91,6 +95,7 @@ float tilling, int channel_mode, int texture_enabled) {
 
 void main() {
     g_position = o_geometry.frag_pos;
+    g_view_space_position = o_geometry.view_space_frag_pos;
 
     vec4 sampled_albedo = u_material.albedo;
     vec3 albedo = sampled_albedo.rgb;

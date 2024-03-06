@@ -48,6 +48,14 @@ namespace luly::ui
             ImGui::Separator();
 
             if (draw_render_pass_details(
+                renderer::scene_renderer::get_render_pass<renderer::ambient_occlusion_pass>(
+                    renderer::render_pass_type::ambient_occlusion_pass)))
+            {
+                ImGui::TreePop();
+            }
+            ImGui::Separator();
+
+            if (draw_render_pass_details(
                 renderer::scene_renderer::get_render_pass<renderer::lighting_pass>(
                     renderer::render_pass_type::lighting_pass)))
             {

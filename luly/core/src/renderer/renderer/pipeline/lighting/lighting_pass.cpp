@@ -73,7 +73,7 @@ namespace luly::renderer
         // Retrieve render pass inputs
         const render_pass_input& geometry_pass_input = m_inputs.at("geometry_pass_input");
         const render_pass_input& environment_pass_input = m_inputs.at("environment_pass_input");
-        //  const render_pass_input& ambient_occlusion_pass_input = m_inputs.at("ambient_occlusion_pass_input");
+        const render_pass_input& ambient_occlusion_pass_input = m_inputs.at("ambient_occlusion_pass_input");
         const render_pass_input& shadows_pass_input = m_inputs.at("shadows_pass_input");
 
         // Retrieve render pass inputs outputs.
@@ -109,7 +109,7 @@ namespace luly::renderer
         renderer::bind_texture(6, environment_pass_input.render_pass->get_output("prefilter_output").output);
         renderer::bind_texture(7, environment_pass_input.render_pass->get_output("brdf_output").output);
         // Bind ssao output.
-        //  renderer::bind_texture(8, ambient_occlusion_pass_input.render_pass->get_output("ssao_blur_output").output);
+        renderer::bind_texture(8, ambient_occlusion_pass_input.render_pass->get_output("ssao_blur_output").output);
         // Bind shadow pass outputs.
         renderer::bind_texture(9, directional_shadow_map_output.output);
         renderer::bind_texture(10, m_poisson_distribution_texture->get_handle_id());

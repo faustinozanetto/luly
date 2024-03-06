@@ -15,6 +15,7 @@ namespace luly::renderer
         bgr,
         bgra,
         red,
+        red_int,
         green,
         blue,
         alpha,

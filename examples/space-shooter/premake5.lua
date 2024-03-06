@@ -49,7 +49,7 @@ project "space-shooter"
         }
     
     filter "configurations:release"
-        defines "LY_RELEASE;NDEBUG"
+        defines "LY_RELEASE"
         runtime "Release"
         optimize "on"
         links {

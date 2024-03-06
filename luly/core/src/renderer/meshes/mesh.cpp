@@ -13,6 +13,12 @@ namespace luly::renderer
         initialize_buffers();
     }
 
+    mesh::~mesh()
+    {
+        m_vao.reset();
+        m_vertices.clear();
+    }
+
     void mesh::initialize_buffers()
     {
         LY_PROFILE_FUNCTION;

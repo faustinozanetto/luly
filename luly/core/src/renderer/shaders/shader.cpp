@@ -2,10 +2,11 @@
 #include "shader.h"
 
 #include "shader_utils.h"
+#include "shader_factory.h"
 
 #include <glm/gtc/type_ptr.hpp>
-
-#include "shader_factory.h"
+#include <glad/glad.h>
+#include <glfw/glfw3.h>
 
 namespace luly::renderer
 {
