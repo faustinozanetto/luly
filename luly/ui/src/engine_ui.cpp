@@ -39,6 +39,8 @@
 #include "panels/debug/debug_panel.h"
 #include "panels/scene/scenes_panel.h"
 #include "panels/shaders/shaders_panel.h"
+#include "renderer/renderer/pipeline/geometry_pass.h"
+#include "renderer/scene/scene_renderer.h"
 
 namespace luly::ui
 {
@@ -171,6 +173,12 @@ namespace luly::ui
         m_snap_value = 0.1f;
         m_guizmos_scale = 0.25f;
         m_selected_guizmo_operation = ImGuizmo::UNIVERSAL;
+        m_viewport_bounds[0] = {0, 0};
+        m_viewport_bounds[1] = {0, 0};
+
+        const std::shared_ptr<renderer::geometry_pass>& geometry_pass = renderer::scene_renderer::get_render_pass<
+            renderer::geometry_pass>(renderer::render_pass_type::geometry_pass);
+        m_viewport_size = {geometry_pass->get_fbo()->get_width(), geometry_pass->get_fbo()->get_height()};
     }
 
     void engine_ui::initialize_panels()
@@ -210,6 +218,21 @@ namespace luly::ui
 
     void engine_ui::on_update()
     {
+        /*
+                const std::shared_ptr<renderer::geometry_pass>& geometry_pass = renderer::scene_renderer::get_render_pass<
+                    renderer::geometry_pass>(renderer::render_pass_type::geometry_pass);
+                int fbo_width = geometry_pass->get_fbo()->get_width();
+                int fbo_height = geometry_pass->get_fbo()->get_height();
+                if (
+                    m_viewport_size.x > 0.0f && m_viewport_size.y > 0.0f &&
+                    (fbo_width != (int)m_viewport_size.x || fbo_height != (int)m_viewport_size.y))
+                {
+                    LY_TRACE("New viewport size: ({},{})", m_viewport_size.x, m_viewport_size.y);
+                    //renderer::renderer::set_viewport_size(m_viewport_size);
+                    renderer::scene_renderer::on_resize(m_viewport_size);
+                    scene::scene_manager::get().on_resize(m_viewport_size);
+                }*/
+
         // Check for key press.
         if (input::input_manager::is_key_pressed(input::key::d1))
         {
@@ -351,6 +374,50 @@ namespace luly::ui
         ImGuiIO& io = ImGui::GetIO();
         io.MouseDown[ui_utils::get_mouse_button_code_to_imgui(mouse_button_pressed_event.get_button_code())] = true;
 
+        if (mouse_button_pressed_event.get_button_code() == input::mouse_button::button_left)
+        {
+            const std::shared_ptr<renderer::geometry_pass>& geometry_pass = renderer::scene_renderer::get_render_pass<
+                renderer::geometry_pass>(renderer::render_pass_type::geometry_pass);
+
+            glm::vec2 framebuffer_size = {
+                geometry_pass->get_fbo()->get_width(), geometry_pass->get_fbo()->get_height()
+            };
+
+            // Map viewport mouse coordinates to framebuffer coordinates
+            auto [mx, my] = ImGui::GetMousePos();
+            mx -= m_viewport_bounds[0].x;
+            my -= m_viewport_bounds[0].y;
+            const glm::vec2 viewport_size = m_viewport_bounds[1] - m_viewport_bounds[0];
+
+            // Calculate scale factors to map viewport coordinates to framebuffer coordinates
+            float sx = framebuffer_size.x / viewport_size.x;
+            float sy = framebuffer_size.y / viewport_size.y;
+
+            // Map mouse coordinates to framebuffer coordinates
+            mx *= sx;
+            my = framebuffer_size.y - my * sy; // Flip y-coordinate to match OpenGL convention
+
+            int mouse_x = (int)mx;
+            int mouse_y = (int)my;
+
+            if (mouse_x >= 0 && mouse_y >= 0 && mouse_x < (int)framebuffer_size.x && mouse_y < (int)framebuffer_size.y
+                && !ImGuizmo::IsUsing())
+            {
+                geometry_pass->get_fbo()->bind();
+                const int pixel_data = geometry_pass->get_fbo()->read_pixel(5, mouse_x, mouse_y);
+                LY_WARN("Mouse Position: ({}, {}) | Data: {}", mouse_x, mouse_y, pixel_data);
+                if (pixel_data != -1)
+                {
+                    m_selected_actor = scene::scene_manager::get().get_current_scene()->get_actor(
+                        static_cast<entt::entity>(pixel_data));
+                }
+                else
+                {
+                    m_selected_actor = nullptr;
+                }
+                geometry_pass->get_fbo()->un_bind();
+            }
+        }
         return false;
     }
 

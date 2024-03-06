@@ -102,8 +102,8 @@ void basic_application::setup_scene()
         physics_pyramid_scene>();
     luly::scene::scene_manager::get().add_scene(physics_pyramid_scene);
 
-    const std::shared_ptr<pbr_mask_scene>& pbr_mask_scene = std::make_shared<class pbr_mask_scene>();
-    luly::scene::scene_manager::get().add_scene(pbr_mask_scene);
+   // const std::shared_ptr<pbr_mask_scene>& pbr_mask_scene = std::make_shared<class pbr_mask_scene>();
+   // luly::scene::scene_manager::get().add_scene(pbr_mask_scene);
 
     const std::shared_ptr<physics_joints_scene>& physics_joints_scene = std::make_shared<class
         physics_joints_scene>();

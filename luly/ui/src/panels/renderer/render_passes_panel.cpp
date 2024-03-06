@@ -155,14 +155,26 @@ namespace luly::ui
         const std::unordered_map<std::string, renderer::render_pass_output>& pass_outputs)
     {
         ImGui::Columns(2);
-        for (std::pair<std::string, renderer::render_pass_output> pair : pass_outputs)
+
+        for (const auto& render_pass : pass_outputs)
         {
-            if (ui_utils::draw_property(pair.second.output, {90, 90}))
+            // Draw the name above the image
+            ImGui::Text("%s", render_pass.second.name.c_str());
+
+            // Align the image to the center of the column
+            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (ImGui::GetColumnWidth() - 90) / 2);
+
+            // Draw the image
+            if (ui_utils::draw_property(render_pass.second.output, {90, 90}))
             {
-                engine_ui::get().set_render_target(pair.second.output);
+                engine_ui::get().set_render_target(render_pass.second.output);
             }
+
+            // Move to the next column
             ImGui::NextColumn();
         }
+
+        // Reset column layout
         ImGui::Columns(1);
     }
 }

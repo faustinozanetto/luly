@@ -25,7 +25,7 @@ namespace luly::renderer
         m_filter_radius = 0.005f;
         m_strength = 0.02f;
 
-        generate_fbo();
+        generate_fbo(renderer::get_viewport_size());
         generate_mips();
         attach_mip_texture();
 
@@ -74,16 +74,15 @@ namespace luly::renderer
     void bloom_pass::on_resize(const glm::ivec2& dimensions)
     {
         LY_PROFILE_FUNCTION;
-        generate_fbo();
+        generate_fbo(dimensions);
         generate_mips();
         attach_mip_texture();
     }
 
-    void bloom_pass::generate_fbo()
+    void bloom_pass::generate_fbo(const glm::ivec2& dimensions)
     {
         LY_PROFILE_FUNCTION;
-        glm::ivec2 viewport_size = renderer::get_viewport_size();
-        m_fbo = std::make_shared<frame_buffer>(viewport_size.x, viewport_size.y);
+        m_fbo = std::make_shared<frame_buffer>(dimensions.x, dimensions.y);
     }
 
     void bloom_pass::generate_mips()

@@ -295,7 +295,7 @@ namespace luly::renderer
         case texture_format::bgra:
             return GL_BGRA;
         case texture_format::red:
-            return GL_RED;
+            return GL_RED_INTEGER;
         case texture_format::green:
             return GL_GREEN;
         case texture_format::blue:
@@ -312,7 +312,7 @@ namespace luly::renderer
         switch (internal_format)
         {
         case texture_internal_format::r8:
-            return GL_R8;
+            return GL_R32I;
         case texture_internal_format::r16:
             return GL_R16;
         case texture_internal_format::r16f:

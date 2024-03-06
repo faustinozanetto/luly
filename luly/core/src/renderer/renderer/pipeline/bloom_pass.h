@@ -34,7 +34,7 @@ namespace luly::renderer
         void set_strength(float strength) { m_strength = strength; }
 
     private:
-        void generate_fbo();
+        void generate_fbo(const glm::ivec2& dimensions);
         void generate_mips();
         void attach_mip_texture();
 

@@ -47,6 +47,8 @@ namespace luly::renderer
         /* Methods */
         void initialize();
         void resize(const glm::ivec2& dimensions, bool resize_attachments = true);
+        int read_pixel(uint32_t attachment_index, int x, int y) const;
+        void clear_attachment(uint32_t attachment_index, uint32_t format, uint32_t type, const void* value) const;
         void attach_texture(const std::shared_ptr<texture>& texture, uint32_t target,
                             render_buffer_attachment_type attachment, uint32_t texture_target,
                             bool register_attachment = true, int mipmaps_level = 0);

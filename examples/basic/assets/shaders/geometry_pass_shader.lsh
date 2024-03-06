@@ -20,17 +20,21 @@ struct geometry_out {
 };
 
 layout (location = 0) out geometry_out o_geometry;
+layout (location = 8) out flat int o_actor_id;
+
+uniform int u_actor_id;
 
 void main() {
     vec3 T = normalize(u_normal_matrix * a_tangent);
     vec3 N = normalize(u_normal_matrix * a_normal);
     T = normalize(T - dot(T, N) * N);
     vec3 B = cross(N, T);
-    
+
     o_geometry.tbn = mat3(T, B, N);
     o_geometry.normal = N;
     o_geometry.tex_coords = a_tex_coord;
     o_geometry.frag_pos = vec3(u_transform_matrix * vec4(a_pos, 1.0));
+    o_actor_id = u_actor_id;
 
     gl_Position = camera.view_projection_matrix * u_transform_matrix * vec4(a_pos, 1.0);
 }
@@ -48,6 +52,7 @@ struct geometry_out {
 };
 
 layout(location = 0) in geometry_out o_geometry;
+layout(location = 8) in flat int o_actor_id;
 
 // Uniforms
 layout (location = 2) uniform material u_material;
@@ -67,9 +72,10 @@ layout(location = 1) out vec4 g_albedo_opacity;
 layout(location = 2) out vec3 g_normal;
 layout(location = 3) out vec3 g_roughmetalao;
 layout(location = 4) out vec3 g_emissive;
+layout(location = 5) out int g_actor_id;
 
 float extract_data_from_packed_texture(sampler2D texture_map, vec2 tex_coords, float initial_value,
-    float tilling, int channel_mode, int texture_enabled) {
+float tilling, int channel_mode, int texture_enabled) {
     float value = initial_value;
     if (texture_enabled == 1) {
         vec3 sampled_value = texture(texture_map, tex_coords * tilling).rgb;
@@ -95,7 +101,7 @@ void main() {
 
     float opacity = sampled_albedo.a;
     if (u_material.opacity_map_enabled == 1)
-        opacity = texture(u_opacity_map, o_geometry.tex_coords * u_material.tilling).r;
+    opacity = texture(u_opacity_map, o_geometry.tex_coords * u_material.tilling).r;
 
     g_albedo_opacity = vec4(albedo, opacity);
 
@@ -108,19 +114,21 @@ void main() {
     }
 
     float roughness = extract_data_from_packed_texture(u_roughness_map, o_geometry.tex_coords,
-        u_material.roughness, u_material.tilling, u_material.roughness_channel, u_material.roughness_map_enabled);
+    u_material.roughness, u_material.tilling, u_material.roughness_channel, u_material.roughness_map_enabled);
 
     float metallic = extract_data_from_packed_texture(u_metallic_map, o_geometry.tex_coords,
-        u_material.metallic, u_material.tilling, u_material.metallic_channel, u_material.metallic_map_enabled);
+    u_material.metallic, u_material.tilling, u_material.metallic_channel, u_material.metallic_map_enabled);
 
     float ambient_occlusion = extract_data_from_packed_texture(u_ambient_occlusion_map, o_geometry.tex_coords,
     u_material.ambient_occlusion, u_material.tilling, u_material.ambient_occlusion_channel, u_material.ambient_occlusion_map_enabled);
-    
+
     g_roughmetalao = vec3(roughness, metallic, ambient_occlusion);
 
     vec3 emissive = u_material.emissive.rgb * u_material.emissive_strength;
     if (u_material.emissive_map_enabled == 1)
-        emissive *= texture(u_emissive_map, o_geometry.tex_coords * u_material.tilling).rgb * u_material.emissive_strength;
+    emissive *= texture(u_emissive_map, o_geometry.tex_coords * u_material.tilling).rgb * u_material.emissive_strength;
 
     g_emissive = emissive;
+
+    g_actor_id = o_actor_id;
 }

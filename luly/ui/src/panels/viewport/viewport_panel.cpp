@@ -33,6 +33,16 @@ namespace luly::ui
 
         if (ImGui::Begin("Viewport", &s_show))
         {
+            const auto viewport_min_region = ImGui::GetWindowContentRegionMin();
+            const auto viewport_max_region = ImGui::GetWindowContentRegionMax();
+            const auto viewport_offset = ImGui::GetWindowPos();
+            engine_ui::get().set_viewport_min_bounds({
+                viewport_min_region.x + viewport_offset.x, viewport_min_region.y + viewport_offset.y
+            });
+            engine_ui::get().set_viewport_max_bounds({
+                viewport_max_region.x + viewport_offset.x, viewport_max_region.y + viewport_offset.y
+            });
+
             render_toolbar();
             render_scene_viewport();
             render_guizmos();
@@ -52,16 +62,12 @@ namespace luly::ui
 
     void viewport_panel::render_guizmos()
     {
-        const ImVec2 min_region = ImGui::GetWindowContentRegionMin();
-        const ImVec2 max_region = ImGui::GetWindowContentRegionMax();
-        const ImVec2 offset = ImGui::GetWindowPos();
-        glm::vec2 bounds[2];
-        bounds[0] = {min_region.x + offset.x, min_region.y + offset.y};
-        bounds[1] = {max_region.x + offset.x, max_region.y + offset.y};
-
-        ImGuizmo::SetRect(bounds[0].x, bounds[0].y, bounds[1].x - bounds[0].x, bounds[1].y - bounds[0].y);
-        ImGuizmo::SetDrawlist();
         ImGuizmo::SetOrthographic(false);
+        ImGuizmo::SetDrawlist();
+
+        ImGuizmo::SetRect(engine_ui::get().get_min_bounds().x, engine_ui::get().get_min_bounds().y,
+                          engine_ui::get().get_max_bounds().x - engine_ui::get().get_min_bounds().x,
+                          engine_ui::get().get_max_bounds().y - engine_ui::get().get_min_bounds().y);
 
         const std::shared_ptr<scene::scene>& current_scene = scene::scene_manager::get().get_current_scene();
         if (!current_scene) return;
@@ -81,7 +87,7 @@ namespace luly::ui
 
     void viewport_panel::render_transform_guizmo(glm::mat4& view_matrix, glm::mat4& projection_matrix)
     {
-        engine_ui& engine_ui = engine_ui::get();
+        const engine_ui& engine_ui = engine_ui::get();
 
         const std::shared_ptr<scene::scene_actor>& selected_actor = engine_ui.get_selected_actor();
         if (selected_actor && engine_ui.get_show_guizmos())
@@ -97,10 +103,10 @@ namespace luly::ui
                 engine_ui.get_snap_value()
             };
 
-            ImGuizmo::Manipulate(glm::value_ptr(view_matrix), glm::value_ptr(projection_matrix),
-                                 engine_ui.get_selected_operation(), ImGuizmo::LOCAL,
-                                 glm::value_ptr(transform),
-                                 nullptr, engine_ui.get_use_snap() ? snap_values : nullptr);
+            Manipulate(glm::value_ptr(view_matrix), glm::value_ptr(projection_matrix),
+                       engine_ui.get_selected_operation(), ImGuizmo::LOCAL,
+                       glm::value_ptr(transform),
+                       nullptr, engine_ui.get_use_snap() ? snap_values : nullptr);
 
             // Update transform after ImGuizmo usage.
             if (ImGuizmo::IsUsing())
@@ -187,8 +193,10 @@ namespace luly::ui
 
     void viewport_panel::render_scene_viewport()
     {
-        const ImVec2 scene_view_size = ImGui::GetContentRegionAvail();
-        ImGui::Image(reinterpret_cast<ImTextureID>(engine_ui::get().get_render_target()), scene_view_size, ImVec2{0, 1},
+        ImVec2 viewport_panel_size = ImGui::GetContentRegionAvail();
+        engine_ui::get().set_viewport_size({viewport_panel_size.x, viewport_panel_size.y});
+        ImGui::Image(reinterpret_cast<ImTextureID>(engine_ui::get().get_render_target()), viewport_panel_size,
+                     ImVec2{0, 1},
                      ImVec2{1, 0});
     }
 }

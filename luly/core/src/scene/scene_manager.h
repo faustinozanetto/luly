@@ -23,7 +23,7 @@ namespace luly::scene
         void switch_scene(const std::shared_ptr<scene>& scene, bool update_title = true);
 
         void on_update(float delta_time);
-        void on_resize(const glm::ivec2& dimensions);
+        void on_resize(const glm::ivec2& dimensions) const;
 
     private:
         std::set<std::shared_ptr<scene>> m_scenes_pool;

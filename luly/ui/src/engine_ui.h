@@ -28,14 +28,29 @@ namespace luly::ui
         float get_guizmos_scale() const { return m_guizmos_scale; }
         ImGuizmo::OPERATION get_selected_operation() const { return m_selected_guizmo_operation; }
         const std::vector<std::shared_ptr<ui_panel>>& get_panels() const { return m_panels; }
+        glm::vec2 get_min_bounds() const { return m_viewport_bounds[0]; }
+        glm::vec2 get_max_bounds() const { return m_viewport_bounds[1]; }
+        glm::vec2 get_viewport_size() const { return m_viewport_size; }
 
         /* Setters */
         void set_render_target(uint32_t render_target) { m_render_target = render_target; }
+
+        void set_viewport_min_bounds(const glm::vec2& viewport_min_bounds)
+        {
+            m_viewport_bounds[0] = viewport_min_bounds;
+        }
+
+        void set_viewport_max_bounds(const glm::vec2& viewport_max_bounds)
+        {
+            m_viewport_bounds[1] = viewport_max_bounds;
+        }
 
         void set_selected_actor(const std::shared_ptr<scene::scene_actor>& selected_actor)
         {
             m_selected_actor = selected_actor;
         }
+
+        void set_viewport_size(const glm::vec2& viewport_size) { m_viewport_size = viewport_size; }
 
         void set_show_guizmos(bool show_guizmos) { m_show_guizmos = show_guizmos; }
         void set_use_snap(bool use_snap) { m_use_snap = use_snap; }
@@ -52,7 +67,6 @@ namespace luly::ui
     private:
         void initialize();
         void shutdown();
-
 
         void set_color_scheme();
         void initialize_data();
@@ -74,6 +88,9 @@ namespace luly::ui
         float m_snap_value;
         float m_guizmos_scale;
         ImGuizmo::OPERATION m_selected_guizmo_operation;
+
+        glm::vec2 m_viewport_bounds[2];
+        glm::vec2 m_viewport_size;
 
         std::vector<std::shared_ptr<ui_panel>> m_panels;
         std::shared_ptr<scene::scene_actor> m_selected_actor;

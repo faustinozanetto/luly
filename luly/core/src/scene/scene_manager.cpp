@@ -55,7 +55,7 @@ namespace luly::scene
         }
     }
 
-    void scene_manager::on_resize(const glm::ivec2& dimensions)
+    void scene_manager::on_resize(const glm::ivec2& dimensions) const
     {
         if (m_current_scene)
         {

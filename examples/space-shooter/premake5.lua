@@ -27,6 +27,8 @@ project "space-shooter"
         "%{include_dirs.imgui}",
         "%{include_dirs.imguizmo}",
         "%{include_dirs.tracy}",
+        "%{include_dirs.physx}",
+        "%{include_dirs.physx_omnipvd}",
     }
     
     links {

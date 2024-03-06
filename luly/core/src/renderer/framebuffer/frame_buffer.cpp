@@ -166,6 +166,25 @@ namespace luly::renderer
         initialize();
     }
 
+    int frame_buffer::read_pixel(uint32_t attachment_index, int x, int y) const
+    {
+        LY_ASSERT_MSG(attachment_index < m_attachments.size(), "Invalid attachment index!")
+        glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
+
+        int pixel_data;
+        glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_INT, &pixel_data);
+
+        return pixel_data;
+    }
+
+    void frame_buffer::clear_attachment(uint32_t attachment_index, uint32_t format, uint32_t type,
+                                        const void* value) const
+    {
+        LY_ASSERT_MSG(attachment_index < m_attachments.size(), "Invalid attachment index!")
+
+        glClearTexImage(m_attachments[attachment_index], 0, format, type, value);
+    }
+
     void frame_buffer::attach_texture(const std::shared_ptr<texture>& texture, uint32_t target,
                                       render_buffer_attachment_type attachment, uint32_t texture_target,
                                       bool register_attachment, int mipmaps_level)
@@ -235,11 +254,14 @@ namespace luly::renderer
     {
         LY_PROFILE_FUNCTION;
         glBindTexture(GL_TEXTURE_2D, handle_id);
-        const texture_format format =
-            texture_utils::get_texture_format_from_internal_format(attachment.internal_format);
-        glTexImage2D(GL_TEXTURE_2D, 0, texture_utils::get_texture_internal_format_to_opengl(attachment.internal_format),
-                     attachment.size.x, attachment.size.y, 0,
-                     texture_utils::get_texture_format_to_opengl(format), GL_FLOAT, nullptr);
+
+        const uint32_t format = texture_utils::get_texture_format_to_opengl(
+            texture_utils::get_texture_format_from_internal_format(attachment.internal_format));
+        const uint32_t internal_format = texture_utils::get_texture_internal_format_to_opengl(
+            attachment.internal_format);
+
+        glTexImage2D(GL_TEXTURE_2D, 0, internal_format,
+                     attachment.size.x, attachment.size.y, 0, format, GL_UNSIGNED_BYTE, nullptr);
 
         // Filtering
         if (attachment.filtering != texture_filtering::none)
