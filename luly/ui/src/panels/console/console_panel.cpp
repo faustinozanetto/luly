@@ -52,6 +52,7 @@ namespace luly::ui
                     ImGui::TextUnformatted(message->get_message().c_str());
                     ImGui::TableNextRow();
                 }
+                ImGui::SetScrollHereY(1.0f);
                 ImGui::EndTable();
             }
         }

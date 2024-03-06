@@ -92,6 +92,7 @@ namespace luly::ui
     {
         std::string shader_contents = renderer::shader_factory::read_shader_from_file(
             m_selected_shader->get_file_path());
+
         m_shader_buffer.resize(shader_contents.size() + 1);
         std::ranges::copy(shader_contents, m_shader_buffer.begin());
         m_shader_buffer[shader_contents.size()] = '\0';
@@ -100,26 +101,10 @@ namespace luly::ui
     void shaders_panel::save_shader_changes_to_file() const
     {
         LY_TRACE("Started saving shader changes to file...");
-        std::ofstream shader_file(m_selected_shader->get_file_path(), std::ios::out | std::ios::binary);
+        std::ofstream shader_file(m_selected_shader->get_file_path(), std::ios::out);
         LY_ASSERT_MSG(shader_file.is_open(), "Failed to open shader file!")
 
-        // Write each line from the buffer to the file
-        for (const char* line = m_shader_buffer.data(); *line;)
-        {
-            const char* next_line = std::strchr(line, '\n');
-            if (next_line)
-            {
-                shader_file.write(line, next_line - line); // Write the current line
-                shader_file.write("\r\n", 2); // Append CRLF line ending
-                line = next_line + 1; // Move to the next line
-            }
-            else
-            {
-                // No more newline characters found, write the remaining content
-                shader_file << line;
-                break;
-            }
-        }
+        shader_file << m_shader_buffer.data();
 
         shader_file.close();
         LY_TRACE("Shader changes saved to file successfully!");

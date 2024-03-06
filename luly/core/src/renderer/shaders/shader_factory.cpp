@@ -40,7 +40,7 @@ namespace luly::renderer
         LY_TRACE("Started reading shader from file '{0}'", file_path);
 
         std::string shader_contents;
-        std::ifstream in(file_path, std::ios::in | std::ios::binary);
+        std::ifstream in(file_path, std::ios::in);
 
         LY_ASSERT_MSG(in, "An error occurred while opening shader file '{0}'", file_path);
 
