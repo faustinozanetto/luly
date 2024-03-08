@@ -8,7 +8,6 @@
 #include "utils/ui_utils.h"
 
 #include <glm/gtc/type_ptr.hpp>
-
 #include <imgui_internal.h>
 
 namespace luly::ui
@@ -103,8 +102,9 @@ namespace luly::ui
                 engine_ui.get_snap_value()
             };
 
+            const ImGuizmo::MODE mode = engine_ui.get_use_local_space() ? ImGuizmo::MODE::LOCAL : ImGuizmo::MODE::WORLD;
             Manipulate(glm::value_ptr(view_matrix), glm::value_ptr(projection_matrix),
-                       engine_ui.get_selected_operation(), ImGuizmo::LOCAL,
+                       engine_ui.get_selected_operation(), mode,
                        glm::value_ptr(transform),
                        nullptr, engine_ui.get_use_snap() ? snap_values : nullptr);
 
@@ -183,6 +183,17 @@ namespace luly::ui
                 engine_ui.set_use_snap(!engine_ui.get_use_snap());
             }
             ui_utils::draw_tooltip("Use Snapping");
+
+            ImGui::SameLine();
+            ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
+            ImGui::SameLine();
+
+            if (ImGui::Selectable(ICON_MDI_AXIS, engine_ui.get_use_local_space(), option_flags,
+                                  option_size))
+            {
+                engine_ui.set_use_local_space(!engine_ui.get_use_local_space());
+            }
+            ui_utils::draw_tooltip("Use Local Space");
 
             ImGui::EndGroup();
             ImGui::PopStyleVar();

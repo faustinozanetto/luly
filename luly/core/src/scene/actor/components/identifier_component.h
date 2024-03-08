@@ -7,7 +7,7 @@ namespace luly::scene
     class identifier_component : public base_component
     {
     public:
-        identifier_component() : m_uuid(utils::uuid())
+        identifier_component(const utils::uuid& uuid = utils::uuid()) : m_uuid(uuid)
         {
         }
 

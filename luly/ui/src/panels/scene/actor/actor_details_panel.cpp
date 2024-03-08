@@ -1,6 +1,7 @@
 ﻿#include "actor_details_panel.h"
 
 #include "engine_ui.h"
+#include "components/animations/actor_animation_controller_component_panel.h"
 
 #include "components/common/actor_name_component_panel.h"
 #include "components/common/actor_transform_component_panel.h"
@@ -71,6 +72,8 @@ namespace luly::ui
         ADD_COMPONENT_PANEL(actor_physics_box_collision_component_panel)
         ADD_COMPONENT_PANEL(actor_physics_sphere_collision_component_panel)
         ADD_COMPONENT_PANEL(actor_physics_plane_collision_component_panel)
+        /* Animation Components */
+        ADD_COMPONENT_PANEL(actor_animation_controller_component_panel)
     }
 
     bool actor_details_panel::get_show_panel()

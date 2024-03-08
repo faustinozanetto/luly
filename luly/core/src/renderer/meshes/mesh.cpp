@@ -51,7 +51,9 @@ namespace luly::renderer
                 {"a_tex_coord", vertex_buffer_entry_type::FLOAT2, false},
                 {"a_normal", vertex_buffer_entry_type::FLOAT3, false},
                 {"a_tangent", vertex_buffer_entry_type::FLOAT3, false},
-                {"a_bi_tangent", vertex_buffer_entry_type::FLOAT3, false}
+                {"a_bi_tangent", vertex_buffer_entry_type::FLOAT3, false},
+                {"a_bone_ids", vertex_buffer_entry_type::INT4, false},
+                {"a_weights", vertex_buffer_entry_type::FLOAT4, false}
             };
 
         const auto& vertices_vbo_layout_descriptor = std::make_shared<

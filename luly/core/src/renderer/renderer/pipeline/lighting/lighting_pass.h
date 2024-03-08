@@ -4,6 +4,7 @@
 #include "renderer/meshes/mesh.h"
 #include "renderer/renderer/pass/render_pass.h"
 #include "renderer/shaders/shader.h"
+#include "renderer/textures/texture_2d.h"
 
 #include <glm/glm.hpp>
 

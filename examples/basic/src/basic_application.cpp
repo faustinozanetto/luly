@@ -25,6 +25,7 @@
 #include "scene/actor/components/physics/collision_shapes/physics_sphere_collision_shape_component.h"
 #include "scene/actor/components/rendering/material_component.h"
 #include "scene/actor/components/rendering/model_renderer_component.h"
+#include "scenes/animations_scene.h"
 #include "scenes/pbr_mask_scene.h"
 #include "scenes/physics/physics_joints_scene.h"
 #include "scenes/physics/physics_pyramid_scene.h"
@@ -99,6 +100,7 @@ bool basic_application::on_key_pressed_event(const luly::events::key_pressed_eve
 
 void basic_application::setup_scene()
 {
+    /*
     const std::shared_ptr<physics_pyramid_scene>& physics_pyramid_scene = std::make_shared<class
         physics_pyramid_scene>();
     luly::scene::scene_manager::get().add_scene(physics_pyramid_scene);
@@ -117,8 +119,13 @@ void basic_application::setup_scene()
     const std::shared_ptr<physics_tower_scene>& physics_tower_scene = std::make_shared<class
         physics_tower_scene>();
     luly::scene::scene_manager::get().add_scene(physics_tower_scene);
+    */
 
-    luly::scene::scene_manager::get().switch_scene(physics_pyramid_scene);
+    const std::shared_ptr<animations_scene>& animations_scene = std::make_shared<class
+    animations_scene>();
+    luly::scene::scene_manager::get().add_scene(animations_scene);
+    
+    luly::scene::scene_manager::get().switch_scene(animations_scene);
 }
 
 void basic_application::create_ball(const std::shared_ptr<luly::scene::scene>& scene, float radius, float impulse)

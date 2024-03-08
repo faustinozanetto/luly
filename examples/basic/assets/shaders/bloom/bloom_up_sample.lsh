@@ -7,8 +7,8 @@ layout (location = 1) in vec2 a_tex_coord;
 layout (location = 0) out vec2 o_tex_coord;
 
 void main() {
+    gl_Position = vec4(a_pos.x, a_pos.y, 0.0, 1.0);
     o_tex_coord = a_tex_coord;
-    gl_Position = vec4(a_pos, 1.0f);
 }
 
 #shader fragment
@@ -24,9 +24,16 @@ uniform float u_filter_radius;
 
 void main()
 {
+    // The filter kernel is applied with a radius, specified in texture
+    // coordinates, so that the radius will vary across mip resolutions.
     float x = u_filter_radius;
     float y = u_filter_radius;
 
+    // Take 9 samples around current texel:
+    // a - b - c
+    // d - e - f
+    // g - h - i
+    // === ('e' is the current texel) ===
     vec3 a = texture(u_texture, vec2(o_tex_coord.x - x, o_tex_coord.y + y)).rgb;
     vec3 b = texture(u_texture, vec2(o_tex_coord.x,     o_tex_coord.y + y)).rgb;
     vec3 c = texture(u_texture, vec2(o_tex_coord.x + x, o_tex_coord.y + y)).rgb;
@@ -39,6 +46,10 @@ void main()
     vec3 h = texture(u_texture, vec2(o_tex_coord.x,     o_tex_coord.y - y)).rgb;
     vec3 i = texture(u_texture, vec2(o_tex_coord.x + x, o_tex_coord.y - y)).rgb;
 
+    // Apply weighted distribution, by using a 3x3 tent filter:
+    //  1   | 1 2 1 |
+    // -- * | 2 4 2 |
+    // 16   | 1 2 1 |
     frag_color = e*4.0;
     frag_color += (b+d+f+h)*2.0;
     frag_color += (a+c+g+i);

@@ -5,6 +5,31 @@
 
 namespace luly::ui
 {
+    bool ui_utils::draw_button(const std::string& name)
+    {
+        ImGui::PushID(name.c_str());
+        // Name
+        ImGui::AlignTextToFramePadding();
+        ImGui::Columns(2);
+        ImGui::PushItemWidth(-1);
+        ImGui::TextUnformatted(name.c_str());
+        ImGui::NextColumn();
+
+        // Content
+        bool modified = false;
+        if (ImGui::Button(name.c_str()))
+        {
+            modified = true;
+        }
+
+        // Reset
+        ImGui::Columns(1);
+        ImGui::PopID();
+        ImGui::PopItemWidth();
+
+        return modified;
+    }
+
     void ui_utils::draw_tooltip(const char* text)
     {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(4, 4));
@@ -42,6 +67,7 @@ namespace luly::ui
         // Reset
         ImGui::Columns(1);
         ImGui::PopID();
+        ImGui::PopItemWidth();
     }
 
     bool ui_utils::draw_property(const std::string& name, bool& value)
@@ -65,6 +91,7 @@ namespace luly::ui
         // Reset
         ImGui::Columns(1);
         ImGui::PopID();
+        ImGui::PopItemWidth();
 
         return modified;
     }
@@ -90,12 +117,13 @@ namespace luly::ui
         // Reset
         ImGui::Columns(1);
         ImGui::PopID();
+        ImGui::PopItemWidth();
 
         return modified;
     }
 
     bool ui_utils::draw_property(const std::string& name, float& value, float min, float max, float step,
-                                 float reset_value)
+                                 float reset_value, bool read_only)
     {
         bool modified = false;
         ImGui::PushID(name.c_str());
@@ -108,7 +136,8 @@ namespace luly::ui
 
         // Content
         const std::string id = "##" + name;
-        if (ImGui::DragFloat(id.c_str(), &value, step, min, max, "%.4f"))
+        const ImGuiSliderFlags flags = read_only ? ImGuiSliderFlags_ReadOnly : 0;
+        if (ImGui::DragFloat(id.c_str(), &value, step, min, max, "%.4f", flags))
         {
             modified = true;
         }
@@ -116,6 +145,7 @@ namespace luly::ui
         // Reset
         ImGui::Columns(1);
         ImGui::PopID();
+        ImGui::PopItemWidth();
 
         return modified;
     }
@@ -176,6 +206,8 @@ namespace luly::ui
         // Reset
         ImGui::Columns(1);
         ImGui::PopID();
+        ImGui::PopItemWidth();
+
         return modified;
     }
 
@@ -256,6 +288,8 @@ namespace luly::ui
         // Reset
         ImGui::Columns(1);
         ImGui::PopID();
+        ImGui::PopItemWidth();
+
         return modified;
     }
 
@@ -280,6 +314,8 @@ namespace luly::ui
         // Reset
         ImGui::Columns(1);
         ImGui::PopID();
+        ImGui::PopItemWidth();
+
         return modified;
     }
 
@@ -304,6 +340,8 @@ namespace luly::ui
         // Reset
         ImGui::Columns(1);
         ImGui::PopID();
+        ImGui::PopItemWidth();
+
         return modified;
     }
 
@@ -416,6 +454,7 @@ namespace luly::ui
         // Reset
         ImGui::Columns(1);
         ImGui::PopID();
+
         return modified;
     }
 

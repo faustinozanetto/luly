@@ -27,7 +27,7 @@ void main()
 {
     vec3 hdr_color = texture(u_texture, o_tex_coord).rgb;
     vec3 bloom_color = texture(u_bloom_texture, o_tex_coord).rgb;
-    vec3 result = mix(hdr_color, bloom_color, u_strength);
+    vec3 result = mix(hdr_color, bloom_color, vec3(u_strength));
 
     frag_color = vec4(result, 1.0);
 }

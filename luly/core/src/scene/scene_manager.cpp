@@ -46,12 +46,12 @@ namespace luly::scene
         renderer::scene_renderer::set_outputs();
     }
 
-    void scene_manager::on_update(float delta_time)
+    void scene_manager::on_update(float delta_time) const
     {
         if (m_current_scene)
         {
-            m_current_scene->handle_delete_entities();
             m_current_scene->on_update(delta_time);
+            m_current_scene->handle_delete_entities();
         }
     }
 

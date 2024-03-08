@@ -21,6 +21,7 @@ namespace luly::renderer
         debanding_pass,
         ambient_occlusion_pass,
         debug_pass,
+        antialiasing_pass,
         final_pass,
     };
 

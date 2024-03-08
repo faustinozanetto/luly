@@ -19,6 +19,7 @@
 #include "scene/actor/components/physics/physics_material_component.h"
 #include "scene/actor/components/physics/actors/physics_dynamic_actor_component.h"
 #include "scene/actor/components/physics/collision_shapes/physics_box_collision_shape_component.h"
+#include "scene/actor/components/physics/joints/physics_d6_joint_component.h"
 #include "scene/actor/components/rendering/material_component.h"
 #include "scene/actor/components/rendering/model_renderer_component.h"
 #include "scenes/scene_utils.h"
@@ -83,10 +84,10 @@ void physics_joints_scene::create_fixed_joint_example()
 
 void physics_joints_scene::create_chain()
 {
-    float separation = 2.5f;
-    int length = 5;
-    glm::vec3 start_location = {0, 4, 0};
-    glm::vec3 link_scale = {2.0f, 0.5f, 0.5f};
+    float separation = 1.0f;
+    int length = 15;
+    glm::vec3 start_location = {0, 8, 0};
+    glm::vec3 link_scale = {1.0f, 0.25f, 0.25f};
 
     std::shared_ptr<luly::physics::physics_dynamic_actor> previous_actor = nullptr;
     physx::PxVec3 offset(separation / 2, 0, 0);
@@ -116,23 +117,25 @@ void physics_joints_scene::create_chain()
     {
         /* Setup physics dynamic actor */
         physx::PxTransform curr_trans = start_position * local_transform;
+        
         const std::shared_ptr<luly::physics::physics_dynamic_actor>& dynamic_actor = std::make_shared<
             luly::physics::physics_dynamic_actor>(
             luly::physics::physics_utils::convert_physx_vec3_to_glm(curr_trans.p),
             luly::physics::physics_utils::convert_physx_quat_to_glm(curr_trans.q));
 
+        /* Create the scene actor */
+        const std::shared_ptr<luly::scene::scene_actor>& scene_actor = create_actor("chain actor");
+        
         /* Box collision shape */
         glm::vec3 half_extents = {link_scale.x / 2, link_scale.y / 2, link_scale.z / 2};
         const std::shared_ptr<luly::physics::physics_box_collision>& box_collision_shape = std::make_shared<
             luly::physics::physics_box_collision>(
             dynamic_actor, phys_material, half_extents);
 
+        dynamic_actor->set_kinematic(i == 0);
         dynamic_actor->add_collision_shape(box_collision_shape);
         dynamic_actor->initialize(this);
-
-        /* Create the scene actor */
-        const std::shared_ptr<luly::scene::scene_actor>& scene_actor = create_actor("chain actor");
-
+        
         /* Setup transform */
         glm::vec3 location = luly::physics::physics_utils::convert_physx_vec3_to_glm(
             dynamic_actor->get_physx_rigid_dynamic_actor()->getGlobalPose().p);
@@ -176,7 +179,7 @@ void physics_joints_scene::create_chain()
         joint->set_drive(physx::PxD6Drive::eSLERP, physx::PxD6JointDrive(10.0f, 300.0f, 100.0f, true));
 
         /* Setup joint component */
-        //   scene_actor->add_component<scene::physics_d6_joint_component>(joint);
+        scene_actor->add_component<luly::scene::physics_d6_joint_component>(joint);
 
         // Update the position for the next actor
         previous_actor = dynamic_actor;

@@ -6,10 +6,10 @@
 #include <vector>
 #include <memory>
 
-#include "renderer/textures/texture_2d.h"
-
 namespace luly::renderer
 {
+#define MAX_BONE_INFLUENCE 4
+
     using mesh_index = uint32_t;
 
     struct mesh_vertex
@@ -19,6 +19,9 @@ namespace luly::renderer
         glm::vec3 normals;
         glm::vec3 tangent;
         glm::vec3 bi_tangent;
+
+        int bone_ids[MAX_BONE_INFLUENCE];
+        float weights[MAX_BONE_INFLUENCE];
     };
 
     class mesh

@@ -8,9 +8,17 @@ layout (location = 1) in vec2 a_tex_coord;
 layout (location = 2) in vec3 a_normal;
 layout (location = 3) in vec3 a_tangent;
 layout (location = 4) in vec3 a_bi_tangent;
+layout (location = 5) in ivec4 a_bone_ids;
+layout (location = 6) in vec4 a_weights;
+
+const int MAX_BONES = 100;
+const int MAX_BONE_INFLUENCE = 4;
 
 layout (location = 0) uniform mat4 u_transform_matrix;
 layout (location = 1) uniform mat3 u_normal_matrix;
+
+uniform mat4 u_final_bone_matrices[MAX_BONES];
+uniform int u_is_skeletal;
 
 struct geometry_out {
     vec3 view_space_frag_pos;
@@ -31,14 +39,34 @@ void main() {
     T = normalize(T - dot(T, N) * N);
     vec3 B = cross(N, T);
 
+    vec4 computed_position = vec4(0.0);
+    if (u_is_skeletal == 1) {
+        for (int i = 0; i < MAX_BONE_INFLUENCE; i++)
+        {
+            if (a_bone_ids[i] == -1)
+            continue;
+
+            if (a_bone_ids[i] >= MAX_BONES)
+            {
+                computed_position = vec4(a_pos, 1.0f);
+                break;
+            }
+            vec4 local_position = u_final_bone_matrices[a_bone_ids[i]] * vec4(a_pos, 1.0f);
+            computed_position += local_position * a_weights[i];
+            // vec3 localNormal = mat3(finalBonesMatrices[a_bone_ids[i]]) * norm;
+        }
+    } else {
+        computed_position = vec4(a_pos, 1.0);
+    }
+
     o_geometry.tbn = mat3(T, B, N);
     o_geometry.normal = N;
     o_geometry.tex_coords = a_tex_coord;
-    o_geometry.frag_pos = vec3(u_transform_matrix * vec4(a_pos, 1.0));
-    o_geometry.view_space_frag_pos = vec3(camera.view_matrix * vec4(o_geometry.frag_pos, 1.0));
+    o_geometry.frag_pos = vec3(u_transform_matrix * computed_position);
+    o_geometry.view_space_frag_pos = vec3(camera.view_matrix * computed_position);
     o_actor_id = u_actor_id;
 
-    gl_Position = camera.view_projection_matrix * u_transform_matrix * vec4(a_pos, 1.0);
+    gl_Position = camera.view_projection_matrix * u_transform_matrix * computed_position;
 }
 
 #shader fragment

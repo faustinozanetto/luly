@@ -15,6 +15,129 @@
 #include "scene/actor/components/rendering/model_renderer_component.h"
 #include "scene/actor/components/rendering/skybox_component.h"
 
+namespace YAML
+{
+    template <>
+    struct convert<glm::vec2>
+    {
+        static Node encode(const glm::vec2& rhs)
+        {
+            Node node;
+            node.push_back(rhs.x);
+            node.push_back(rhs.y);
+            node.SetStyle(EmitterStyle::Flow);
+            return node;
+        }
+
+        static bool decode(const Node& node, glm::vec2& rhs)
+        {
+            if (!node.IsSequence() || node.size() != 2)
+                return false;
+
+            rhs.x = node[0].as<float>();
+            rhs.y = node[1].as<float>();
+            return true;
+        }
+    };
+
+    template <>
+    struct convert<glm::vec3>
+    {
+        static Node encode(const glm::vec3& rhs)
+        {
+            Node node;
+            node.push_back(rhs.x);
+            node.push_back(rhs.y);
+            node.push_back(rhs.z);
+            node.SetStyle(EmitterStyle::Flow);
+            return node;
+        }
+
+        static bool decode(const Node& node, glm::vec3& rhs)
+        {
+            if (!node.IsSequence() || node.size() != 3)
+                return false;
+
+            rhs.x = node[0].as<float>();
+            rhs.y = node[1].as<float>();
+            rhs.z = node[2].as<float>();
+            return true;
+        }
+    };
+
+    template <>
+    struct convert<glm::vec4>
+    {
+        static Node encode(const glm::vec4& rhs)
+        {
+            Node node;
+            node.push_back(rhs.x);
+            node.push_back(rhs.y);
+            node.push_back(rhs.z);
+            node.push_back(rhs.w);
+            node.SetStyle(EmitterStyle::Flow);
+            return node;
+        }
+
+        static bool decode(const Node& node, glm::vec4& rhs)
+        {
+            if (!node.IsSequence() || node.size() != 4)
+                return false;
+
+            rhs.x = node[0].as<float>();
+            rhs.y = node[1].as<float>();
+            rhs.z = node[2].as<float>();
+            rhs.w = node[3].as<float>();
+            return true;
+        }
+    };
+
+    template <>
+    struct convert<glm::quat>
+    {
+        static Node encode(const glm::quat& rhs)
+        {
+            Node node;
+            node.push_back(rhs.x);
+            node.push_back(rhs.x);
+            node.push_back(rhs.y);
+            node.push_back(rhs.z);
+            node.SetStyle(EmitterStyle::Flow);
+            return node;
+        }
+
+        static bool decode(const Node& node, glm::quat& rhs)
+        {
+            if (!node.IsSequence() || node.size() != 4)
+                return false;
+
+            rhs.w = node[0].as<float>();
+            rhs.x = node[1].as<float>();
+            rhs.y = node[2].as<float>();
+            rhs.z = node[3].as<float>();
+            return true;
+        }
+    };
+
+
+    template <>
+    struct convert<luly::utils::uuid>
+    {
+        static Node encode(const luly::utils::uuid& rhs)
+        {
+            Node node;
+            node.push_back(rhs);
+            return node;
+        }
+
+        static bool decode(const Node& node, luly::utils::uuid& rhs)
+        {
+            rhs = node.as<luly::utils::uuid>();
+            return true;
+        }
+    };
+}
+
 namespace luly::scene
 {
     YAML::Emitter& operator <<(YAML::Emitter& out, const glm::vec2& vec)
@@ -73,6 +196,49 @@ namespace luly::scene
         file << out.c_str();
 
         LY_TRACE("Scene serialized successfully!");
+    }
+
+    bool scene_serializer::deserialize(const std::string& file_path)
+    {
+        LY_TRACE("Started deserializing scene from file: '{}'...", file_path);
+
+        std::ifstream stream(file_path);
+        std::stringstream string_stream;
+        string_stream << stream.rdbuf();
+
+        YAML::Node data = YAML::Load(string_stream.str());
+        if (!data["scene"]) return false;
+
+        std::string scene_name = data["scene"].as<std::string>();
+        LY_TRACE("Found scene name: '{}'.", scene_name);
+
+        YAML::Node actors = data["actors"];
+        if (actors)
+        {
+            for (auto actor : actors)
+            {
+                // 1. Deserialize uuid and name component.
+                std::string name;
+                utils::uuid identifier = actor["actor"].as<utils::uuid>();
+                YAML::Node name_component = actor["name_component"];
+                if (name_component)
+                {
+                    name = name_component["name"].as<std::string>();
+                }
+
+                // 2. Create scene actor.
+                std::shared_ptr<scene_actor> scene_actor = m_scene->create_actor_with_uuid(name, identifier);
+
+                // 3. Deserialize all the other components
+                if (YAML::Node transform_component = actor["transform_component"])
+                {
+                    class transform_component& tc = scene_actor->get_component<class transform_component>();
+                    tc.get_transform()->set_location(transform_component["location"].as<glm::vec3>());
+                    tc.get_transform()->set_rotation(transform_component["rotation"].as<glm::quat>());
+                    tc.get_transform()->set_scale(transform_component["scale"].as<glm::vec3>());
+                }
+            }
+        }
     }
 
     void scene_serializer::serialize_actor(YAML::Emitter& out, const std::shared_ptr<scene_actor>& scene_actor)

@@ -24,9 +24,10 @@ namespace luly::renderer
         m_samples_count = 6;
         m_filter_radius = 0.005f;
         m_strength = 0.02f;
+        m_saved_viewport_size = renderer::get_viewport_size();
 
         generate_fbo(renderer::get_viewport_size());
-        generate_mips();
+        generate_mips(renderer::get_viewport_size());
         attach_mip_texture();
 
         // Load shaders
@@ -59,7 +60,8 @@ namespace luly::renderer
 
         m_fbo->un_bind();
 
-        renderer::set_viewport_size(renderer::get_viewport_size());
+        // Reset viewport size.
+        renderer::set_viewport_size(m_saved_viewport_size);
     }
 
     void bloom_pass::set_outputs()
@@ -74,8 +76,9 @@ namespace luly::renderer
     void bloom_pass::on_resize(const glm::ivec2& dimensions)
     {
         LY_PROFILE_FUNCTION;
+        m_saved_viewport_size = dimensions;
         generate_fbo(dimensions);
-        generate_mips();
+        generate_mips(dimensions);
         attach_mip_texture();
     }
 
@@ -85,11 +88,11 @@ namespace luly::renderer
         m_fbo = std::make_shared<frame_buffer>(dimensions.x, dimensions.y);
     }
 
-    void bloom_pass::generate_mips()
+    void bloom_pass::generate_mips(const glm::ivec2& dimensions)
     {
         LY_PROFILE_FUNCTION;
-        glm::ivec2 viewport_size_int = renderer::get_viewport_size();
-        auto viewport_size = glm::vec2(viewport_size_int);
+        glm::ivec2 viewport_size_int = dimensions;
+        glm::vec2 viewport_size = glm::vec2(viewport_size_int);
 
         m_mips.clear();
         m_mips.resize(m_samples_count);
@@ -100,11 +103,12 @@ namespace luly::renderer
             viewport_size *= 0.5f;
             viewport_size_int /= 2;
 
-            bloom_pass_mip_data.size = viewport_size_int;
+            bloom_pass_mip_data.int_size = viewport_size_int;
+            bloom_pass_mip_data.size = viewport_size;
 
             texture_specification mip_texture_specification;
-            mip_texture_specification.width = bloom_pass_mip_data.size.x;
-            mip_texture_specification.height = bloom_pass_mip_data.size.y;
+            mip_texture_specification.width = viewport_size.x;
+            mip_texture_specification.height = viewport_size.y;
             mip_texture_specification.channels = 3;
             mip_texture_specification.mip_map_levels = 1;
             mip_texture_specification.internal_format = texture_internal_format::r11g11b10;
@@ -116,13 +120,14 @@ namespace luly::renderer
         }
     }
 
-    void bloom_pass::attach_mip_texture()
+    void bloom_pass::attach_mip_texture() const
     {
         LY_PROFILE_FUNCTION;
         // Attach first bloom mip texture to rbo.
         m_fbo->attach_texture(m_mips[0].texture, GL_FRAMEBUFFER,
                               render_buffer_attachment_type::color, GL_TEXTURE_2D,
                               true, 0);
+
         m_fbo->initialize();
     }
 
@@ -132,7 +137,8 @@ namespace luly::renderer
         m_down_sample_shader->bind();
 
         const render_pass_input& skybox_pass_input = m_inputs.at("skybox_pass_input");
-        const render_pass_output& skybox_pass_output = skybox_pass_input.render_pass->get_output("skybox_output");
+        const render_pass_output& skybox_pass_output = skybox_pass_input.render_pass->get_output(
+            "skybox_output");
 
         // Bind skybox pass output.
         renderer::bind_texture(0, skybox_pass_output.output);
@@ -148,10 +154,7 @@ namespace luly::renderer
             // Attach bloom mip texture to rbo.
             m_fbo->attach_texture(current_bloom_mip.texture, GL_FRAMEBUFFER, render_buffer_attachment_type::color,
                                   GL_TEXTURE_2D, false, 0);
-
-            // Draw screen mesh
             renderer::submit_mesh(m_screen_mesh);
-
             // Set current mip resolution as srcResolution for next iteration
             m_down_sample_shader->set_vec_float2("u_source_res", current_bloom_mip.size);
             // Set current mip as texture input for next iteration
@@ -186,6 +189,7 @@ namespace luly::renderer
             m_fbo->attach_texture(next_bloom_mip.texture, GL_FRAMEBUFFER,
                                   render_buffer_attachment_type::color, GL_TEXTURE_2D, false, 0);
 
+
             // Draw screen mesh
             renderer::submit_mesh(m_screen_mesh);
         }
@@ -202,7 +206,8 @@ namespace luly::renderer
         m_composition_shader->bind();
 
         const render_pass_input& skybox_pass_input = m_inputs.at("skybox_pass_input");
-        const render_pass_output& skybox_pass_output = skybox_pass_input.render_pass->get_output("skybox_output");
+        const render_pass_output& skybox_pass_output = skybox_pass_input.render_pass->get_output(
+            "skybox_output");
 
         m_composition_shader->set_float("u_strength", m_strength);
 

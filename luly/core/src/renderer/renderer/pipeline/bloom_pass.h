@@ -3,11 +3,13 @@
 #include "renderer/meshes/mesh.h"
 #include "renderer/renderer/pass/render_pass.h"
 #include "renderer/shaders/shader.h"
+#include "renderer/textures/texture_2d.h"
 
 namespace luly::renderer
 {
     struct bloom_pass_mip_data
     {
+        glm::ivec2 int_size;
         glm::ivec2 size;
         std::shared_ptr<texture_2d> texture;
     };
@@ -35,8 +37,8 @@ namespace luly::renderer
 
     private:
         void generate_fbo(const glm::ivec2& dimensions);
-        void generate_mips();
-        void attach_mip_texture();
+        void generate_mips(const glm::ivec2& dimensions);
+        void attach_mip_texture() const;
 
         void perform_down_sample();
         void perform_up_sample();
@@ -48,6 +50,7 @@ namespace luly::renderer
 
         std::shared_ptr<mesh> m_screen_mesh;
         std::vector<bloom_pass_mip_data> m_mips;
+        glm::ivec2 m_saved_viewport_size;
         int m_samples_count;
         float m_filter_radius;
         float m_strength;

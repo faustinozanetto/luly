@@ -16,7 +16,7 @@ namespace luly::physics
         physx::PxRigidActor* rigid_actor_b = m_physics_actor_b ? m_physics_actor_b->get_physx_rigid_actor() : nullptr;
 
         m_physx_d6_joint = PxD6JointCreate(*physics, rigid_actor_a, t0, rigid_actor_b, t1);
-        LY_ASSERT_MSG(m_physx_d6_joint, "Failed to create PhysX d6 joint!");
+        LY_ASSERT_MSG(m_physx_d6_joint, "Failed to create PhysX d6 joint!")
     }
 
     physics_d6_joint::~physics_d6_joint()

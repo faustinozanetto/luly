@@ -24,6 +24,7 @@ namespace luly::ui
         const std::shared_ptr<scene::scene_actor>& get_selected_actor() const { return m_selected_actor; }
         bool get_show_guizmos() const { return m_show_guizmos; }
         bool get_use_snap() const { return m_use_snap; }
+        bool get_use_local_space() const { return m_use_local_space; }
         float get_snap_value() const { return m_snap_value; }
         float get_guizmos_scale() const { return m_guizmos_scale; }
         ImGuizmo::OPERATION get_selected_operation() const { return m_selected_guizmo_operation; }
@@ -54,6 +55,7 @@ namespace luly::ui
 
         void set_show_guizmos(bool show_guizmos) { m_show_guizmos = show_guizmos; }
         void set_use_snap(bool use_snap) { m_use_snap = use_snap; }
+        void set_use_local_space(bool use_local_space) { m_use_local_space = use_local_space; }
         void set_snap_value(float snap_value) { m_snap_value = snap_value; }
         void set_guizmos_scale(float guizmos_scale) { m_guizmos_scale = guizmos_scale; }
         void set_selected_operation(ImGuizmo::OPERATION operation) { m_selected_guizmo_operation = operation; }
@@ -87,6 +89,7 @@ namespace luly::ui
 
         bool m_show_guizmos;
         bool m_use_snap;
+        bool m_use_local_space;
         float m_snap_value;
         float m_guizmos_scale;
         ImGuizmo::OPERATION m_selected_guizmo_operation;

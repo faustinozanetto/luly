@@ -12,6 +12,7 @@ namespace luly::scene
         scene_serializer(const std::shared_ptr<scene>& scene);
 
         void serialize(const std::string& file_path);
+        bool deserialize(const std::string& file_path);
 
     private:
         void serialize_actor(YAML::Emitter& out, const std::shared_ptr<scene_actor>& scene_actor);

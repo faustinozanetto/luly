@@ -1,14 +1,14 @@
 ﻿#include "lypch.h"
 #include "ambient_occlusion_pass.h"
 
-#include <random>
-
 #include "assets/asset.h"
 #include "assets/asset_factory.h"
 #include "renderer/meshes/mesh_factory.h"
 #include "renderer/renderer/renderer.h"
 #include "renderer/shaders/shader_factory.h"
 #include "renderer/textures/texture_factory.h"
+
+#include <random>
 
 namespace luly::renderer
 {

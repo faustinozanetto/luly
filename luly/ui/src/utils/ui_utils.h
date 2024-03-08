@@ -16,13 +16,15 @@ namespace luly::ui
     class ui_utils
     {
     public:
+        static bool draw_button(const std::string& name);
+        
         static void draw_tooltip(const char* text);
         static void draw_property(const std::string& name);
         static void draw_property(const std::string& name, const std::string& content);
         static bool draw_property(const std::string& name, bool& value);
-        static bool draw_property(const std::string& name, int& value, int min, int max, int reset_value = 1.0f);
-        static bool draw_property(const std::string& name, float& value, float min, float max, float step = 0.1f,
-                                  float reset_value = 1.0f);
+        static bool draw_property(const std::string& name, int& value, int min = 0, int max = 1, int reset_value = 1.0f);
+        static bool draw_property(const std::string& name, float& value, float min = 0.0f, float max = 1.0f, float step = 0.1f,
+                                  float reset_value = 1.0f, bool read_only = false);
         static bool draw_property(const std::string& name, glm::vec2& value, float min, float max, float step = 0.1f,
                                   float reset_value = 1.0f);
         static bool draw_property(const std::string& name, glm::vec3& value, float min, float max, float step = 0.1f,

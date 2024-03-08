@@ -67,6 +67,19 @@ namespace luly::scene
         return actor;
     }
 
+    std::shared_ptr<scene_actor> scene::create_actor_with_uuid(const std::string& name, const utils::uuid& uuid)
+    {
+        entt::entity actor_handle = m_actors_registry->create();
+        const auto& actor = std::make_shared<scene_actor>(actor_handle, this);
+        actor->add_component<name_component>(name);
+        actor->add_component<identifier_component>(uuid);
+        actor->add_component<transform_component>();
+
+        m_actors_map.insert({actor_handle, actor});
+
+        return actor;
+    }
+
     void scene::delete_actor(entt::entity handle)
     {
         std::string actor_name = m_actors_registry->get<name_component>(handle).get_name();

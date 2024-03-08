@@ -2,6 +2,7 @@
 
 #include "engine_ui.h"
 #include "renderer/renderer/renderer.h"
+#include "renderer/renderer/pipeline/antialiasing_pass.h"
 #include "renderer/renderer/pipeline/bloom_pass.h"
 #include "renderer/renderer/pipeline/debanding_pass.h"
 #include "renderer/renderer/pipeline/debug_pass.h"
@@ -70,6 +71,15 @@ namespace luly::ui
                 ImGui::TreePop();
             }
             ImGui::Separator();
+
+            /*
+            if (draw_render_pass_details(
+                renderer::scene_renderer::get_render_pass<renderer::antialiasing_pass>(
+                    renderer::render_pass_type::antialiasing_pass)))
+            {
+                ImGui::TreePop();
+            }
+            ImGui::Separator();*/
 
             const std::shared_ptr<renderer::bloom_pass>& bloom_pass = renderer::scene_renderer::get_render_pass<
                 renderer::bloom_pass>(

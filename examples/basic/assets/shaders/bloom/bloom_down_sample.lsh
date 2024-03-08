@@ -7,8 +7,8 @@ layout (location = 1) in vec2 a_tex_coord;
 layout (location = 0) out vec2 o_tex_coord;
 
 void main() {
+    gl_Position = vec4(a_pos.x, a_pos.y, 0.0, 1.0);
     o_tex_coord = a_tex_coord;
-    gl_Position = vec4(a_pos, 1.0f);
 }
 
 #shader fragment
@@ -50,6 +50,13 @@ void main()
     float x = source_texel_size.x;
     float y = source_texel_size.y;
 
+    // Take 13 samples around current texel:
+    // a - b - c
+    // - j - k -
+    // d - e - f
+    // - l - m -
+    // g - h - i
+    // === ('e' is the current texel) ===
     vec3 a = texture(u_texture, vec2(o_tex_coord.x - 2*x, o_tex_coord.y + 2*y)).rgb;
     vec3 b = texture(u_texture, vec2(o_tex_coord.x,       o_tex_coord.y + 2*y)).rgb;
     vec3 c = texture(u_texture, vec2(o_tex_coord.x + 2*x, o_tex_coord.y + 2*y)).rgb;

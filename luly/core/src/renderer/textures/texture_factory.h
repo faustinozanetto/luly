@@ -1,12 +1,11 @@
 ﻿#pragma once
 
 #include "texture.h"
+#include "texture_2d.h"
+#include "texture_cubemap.h"
 
 #include <memory>
 #include <string>
-
-#include "texture_2d.h"
-#include "texture_cubemap.h"
 
 namespace luly::renderer
 {

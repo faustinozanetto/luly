@@ -2,6 +2,8 @@
 
 #include <time/app_time.h>
 
+#include "utils/ui_utils.h"
+
 namespace luly::ui
 {
     bool profiling_panel::s_show = true;
@@ -27,7 +29,12 @@ namespace luly::ui
             ImGui::Text("Delta Time: %.6f ms", app_time::get_delta_time());
             ImGui::Text("Frame Time: %.6f ms", app_time::get_frame_time());
             ImGui::Text("Time: %.4f s", app_time::get_time());
-            ImGui::Text("Time Scale: %.2f x", app_time::get_time_scale());
+
+            float time_scale = app_time::get_time_scale();
+            if (ui_utils::draw_property("Time Scale", time_scale, 0.01f, 5.0f, 0.001f))
+            {
+                app_time::set_time_scale(time_scale);
+            }
 
             ImGui::PlotLines("Frame Times", frame_times.data(), static_cast<int>(app_time::get_frame_times().size()), 0,
                              nullptr, -0.5f, 0.5f, ImVec2(0, 80.0f));

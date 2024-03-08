@@ -1,12 +1,11 @@
 ﻿#pragma once
 
-#include <PxScene.h>
-
 #include "renderer/camera/camera_manager.h"
 #include "utils/uuid.h"
+
 #include <entt/entt.hpp>
 #include <unordered_set>
-
+#include <PxScene.h>
 
 namespace luly::scene
 {
@@ -34,6 +33,7 @@ namespace luly::scene
 
         /* Methods */
         std::shared_ptr<scene_actor> create_actor(const std::string& name);
+        std::shared_ptr<scene_actor> create_actor_with_uuid(const std::string& name, const utils::uuid& uuid);
         void delete_actor(entt::entity handle);
         void handle_delete_entities() const;
 

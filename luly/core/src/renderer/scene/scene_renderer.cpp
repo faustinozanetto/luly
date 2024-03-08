@@ -9,6 +9,7 @@
 #include "scene/actor/components/rendering/skybox_component.h"
 #include "application/application.h"
 #include "renderer/renderer/debug/debug_renderer.h"
+#include "renderer/renderer/pipeline/antialiasing_pass.h"
 #include "renderer/renderer/pipeline/bloom_pass.h"
 #include "renderer/renderer/pipeline/debanding_pass.h"
 #include "renderer/renderer/pipeline/debug_pass.h"
@@ -113,6 +114,11 @@ namespace luly::renderer
         tonemapping_render_pass->add_input({bloom_render_pass, "bloom_pass_input"});
         s_data.passes.insert({render_pass_type::tonemapping_pass, tonemapping_render_pass});
 
+        /*
+        const auto& antialiasing_render_pass = std::make_shared<antialiasing_pass>();
+        antialiasing_render_pass->add_input({tonemapping_render_pass, "tonemapping_pass_input"});
+        s_data.passes.insert({render_pass_type::antialiasing_pass, antialiasing_render_pass});
+*/
         const auto& debanding_render_pass = std::make_shared<debanding_pass>();
         debanding_render_pass->add_input({tonemapping_render_pass, "tonemapping_pass_input"});
         s_data.passes.insert({render_pass_type::debanding_pass, debanding_render_pass});
