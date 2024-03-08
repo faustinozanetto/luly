@@ -32,3 +32,9 @@
 [submodule "third_party/yaml-cpp"]
 	path = third_party/yaml-cpp
 	url = https://github.com/jbeder/yaml-cpp
+[submodule "third_party/openal"]
+	path = third_party/openal
+	url = https://github.com/kcat/openal-soft
+[submodule "third_party/dr_libs"]
+	path = third_party/dr_libs
+	url = https://github.com/mackron/dr_libs

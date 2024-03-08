@@ -2,6 +2,7 @@
 #version 450
 
 #include "common/camera.lsh"
+#include "common/geometry.lsh"
 
 layout (location = 0) in vec3 a_pos;
 layout (location = 1) in vec2 a_tex_coord;
@@ -11,14 +12,8 @@ layout (location = 4) in vec3 a_bi_tangent;
 layout (location = 5) in ivec4 a_bone_ids;
 layout (location = 6) in vec4 a_weights;
 
-const int MAX_BONES = 100;
-const int MAX_BONE_INFLUENCE = 4;
-
 layout (location = 0) uniform mat4 u_transform_matrix;
 layout (location = 1) uniform mat3 u_normal_matrix;
-
-uniform mat4 u_final_bone_matrices[MAX_BONES];
-uniform int u_is_skeletal;
 
 struct geometry_out {
     vec3 view_space_frag_pos;
@@ -39,25 +34,7 @@ void main() {
     T = normalize(T - dot(T, N) * N);
     vec3 B = cross(N, T);
 
-    vec4 computed_position = vec4(0.0);
-    if (u_is_skeletal == 1) {
-        for (int i = 0; i < MAX_BONE_INFLUENCE; i++)
-        {
-            if (a_bone_ids[i] == -1)
-            continue;
-
-            if (a_bone_ids[i] >= MAX_BONES)
-            {
-                computed_position = vec4(a_pos, 1.0f);
-                break;
-            }
-            vec4 local_position = u_final_bone_matrices[a_bone_ids[i]] * vec4(a_pos, 1.0f);
-            computed_position += local_position * a_weights[i];
-            // vec3 localNormal = mat3(finalBonesMatrices[a_bone_ids[i]]) * norm;
-        }
-    } else {
-        computed_position = vec4(a_pos, 1.0);
-    }
+    vec4 computed_position = compute_geometry_position(a_pos, a_bone_ids, a_weights, u_is_skeletal);
 
     o_geometry.tbn = mat3(T, B, N);
     o_geometry.normal = N;

@@ -31,6 +31,8 @@ includedirs {
     "%{include_dirs.physx}",
     "%{include_dirs.physx_omnipvd}",
     "%{include_dirs.yaml_cpp}",
+    "%{include_dirs.openal}",
+    "%{include_dirs.dr_libs}",
 }
 
 links {
@@ -38,7 +40,7 @@ links {
     "glfw",
     "glad",
     "yaml-cpp",
-    "stb"
+    "stb",
 }
 
 filter "configurations:debug"
@@ -47,6 +49,7 @@ runtime "Debug"
 symbols "on"
 links {
     "%{library_dirs.assimp_debug}",
+    "%{library_dirs.openal_debug}",
     "%{library_dirs.physx_debug}",
     "%{library_dirs.physx_common_debug}",
     "%{library_dirs.physx_foundation_debug}",
@@ -61,6 +64,7 @@ runtime "Release"
 optimize "on"
 links {
     "%{library_dirs.assimp_release}",
+    "%{library_dirs.openal_release}",
     "%{library_dirs.physx_release}",
     "%{library_dirs.physx_common_release}",
     "%{library_dirs.physx_foundation_release}",

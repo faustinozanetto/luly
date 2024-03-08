@@ -1,0 +1,28 @@
+﻿const int MAX_BONES = 100;
+const int MAX_BONE_INFLUENCE = 4;
+
+uniform mat4 u_final_bone_matrices[MAX_BONES];
+uniform int u_is_skeletal;
+
+vec4 compute_geometry_position(vec3 vertex_position, ivec4 bone_ids, vec4 bone_weights, int is_skeletal) {
+    vec4 computed_position = vec4(0.0);
+    if (is_skeletal == 1) {
+        for (int i = 0; i < MAX_BONE_INFLUENCE; i++)
+        {
+            if (bone_ids[i] == -1)
+                continue;
+
+            if (bone_ids[i] >= MAX_BONES)
+            {
+                computed_position = vec4(vertex_position, 1.0f);
+                break;
+            }
+            vec4 local_position = u_final_bone_matrices[bone_ids[i]] * vec4(vertex_position, 1.0);
+            computed_position += local_position * bone_weights[i];
+        }
+    } else {
+        computed_position = vec4(vertex_position, 1.0);
+    }
+    
+    return computed_position;
+}

@@ -52,6 +52,7 @@ namespace luly::scene
     private:
         void initialize_physx_scene();
         void update_lights() const;
+        void update_animation_controllers(float delta_time) const;
 
         // Common
         std::string m_name;

@@ -11,8 +11,10 @@ include_dirs["imguizmo"] = "%{wks.location}/third_party/imguizmo"
 include_dirs["entt"] = "%{wks.location}/third_party/entt/single_include"
 include_dirs["tracy"] = "%{wks.location}/third_party/tracy/public"
 include_dirs["yaml_cpp"] = "%{wks.location}/third_party/yaml-cpp/include"
+include_dirs["openal"] = "%{wks.location}/third_party/openal/include"
 include_dirs["physx"] = "%{wks.location}/third_party/physx/physx/include"
 include_dirs["physx_omnipvd"] = "%{wks.location}/third_party/physx/physx/pvdruntime/include"
+include_dirs["dr_libs"] = "%{wks.location}/third_party/dr_libs"
 
 library_dirs = {}
 
@@ -36,3 +38,6 @@ library_dirs["physx_pvd_runtime_release"] = "%{wks.location}/third_party/physx/p
 
 library_dirs["physx_pvd_sdk_debug"] = "%{wks.location}/third_party/physx/physx/bin/win.x86_64.vc143.mt/debug/PhysXPvdSDK_static_64.lib"
 library_dirs["physx_pvd_sdk_release"] = "%{wks.location}/third_party/physx/physx/bin/win.x86_64.vc143.mt/release/PhysXPvdSDK_static_64.lib"
+
+library_dirs["openal_debug"] = "%{wks.location}/third_party/openal/build/Debug/OpenAL32.lib"
+library_dirs["openal_release"] = "%{wks.location}/third_party/openal/build/Release/OpenAL32.lib"

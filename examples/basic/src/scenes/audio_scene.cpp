@@ -1,8 +1,10 @@
-﻿#include "animations_scene.h"
+﻿#include "audio_scene.h"
 
 #include "scene_utils.h"
 #include "assets/asset.h"
 #include "assets/asset_factory.h"
+#include "audio/audio_clip.h"
+#include "audio/audio_factory.h"
 #include "renderer/animations/animation_clip.h"
 #include "renderer/animations/animation_controller.h"
 #include "renderer/materials/material_specification_builder.h"
@@ -13,34 +15,35 @@
 #include "scene/actor/scene_actor.h"
 #include "scene/actor/components/transform_component.h"
 #include "scene/actor/components/animations/animation_controller_component.h"
+#include "scene/actor/components/audio/audio_emitter_component.h"
 #include "scene/actor/components/rendering/material_component.h"
 #include "scene/actor/components/rendering/model_renderer_component.h"
 
-animations_scene::animations_scene() : scene("Animations Scene")
+audio_scene::audio_scene() : scene("Audio Scene")
 {
     initialize();
 }
 
-animations_scene::~animations_scene()
+audio_scene::~audio_scene()
 {
 }
 
-void animations_scene::on_update(float delta_time)
+void audio_scene::on_update(float delta_time)
 {
     scene::on_update(delta_time);
 }
 
-void animations_scene::initialize()
+void audio_scene::initialize()
 {
     scene_utils::create_environment(this);
-    create_animated_model();
+    create_audio_actor();
     scene_utils::create_floor(this);
     scene_utils::create_point_light(this, {2, 4, 2}, {0.2f, 0.2f, 0.2f});
 }
 
-void animations_scene::create_animated_model()
+void audio_scene::create_audio_actor()
 {
-    const std::shared_ptr<luly::scene::scene_actor>& actor = create_actor("Animated Model");
+    const std::shared_ptr<luly::scene::scene_actor>& actor = create_actor("Audio Model");
 
     // 1 . Create model.
     const std::shared_ptr<luly::renderer::model>& model =
@@ -48,7 +51,7 @@ void animations_scene::create_animated_model()
             "assets/models/TomCat/TomCatDanceSamba.fbx");
     const std::shared_ptr<luly::assets::asset>& model_asset = luly::assets::asset_factory::create_asset<
         luly::renderer::model>(
-        "animated-model", luly::assets::asset_type::model, model);
+        "animated-2-model", luly::assets::asset_type::model, model);
     actor->add_component<luly::scene::model_renderer_component>(
         model_asset->get_data<luly::renderer::model>());
     actor->get_component<luly::scene::transform_component>().get_transform()->set_scale(glm::vec3(0.2f));
@@ -82,4 +85,11 @@ void animations_scene::create_animated_model()
     const std::shared_ptr<luly::renderer::animation_controller>& animation_controller = std::make_shared<
         luly::renderer::animation_controller>(animation_clip);
     actor->add_component<luly::scene::animation_controller_component>(animation_controller);
+
+    // 4. Load audio clip
+    const std::shared_ptr<luly::audio::audio_clip>& audio_clip =
+        luly::audio::audio_factory::create_audio_clip_from_file("assets/audio/nuclear-bombs.wav");
+    const std::shared_ptr<luly::audio::audio_emitter>& audio_emitter = std::make_shared<luly::audio::audio_emitter>();
+    audio_emitter->set_audio_clip(audio_clip);
+    actor->add_component<luly::scene::audio_emitter_component>(audio_emitter);
 }

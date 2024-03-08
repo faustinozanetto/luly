@@ -1,13 +1,18 @@
 #shader vertex
 #version 450
 
+#include "common/geometry.lsh"
+
 layout (location = 0) in vec3 a_pos;
+layout (location = 5) in ivec4 a_bone_ids;
+layout (location = 6) in vec4 a_weights;
         
 layout (location = 0) uniform mat4 u_transform;
 
 void main()
 {
-    gl_Position = u_transform * vec4(a_pos, 1.0);
+    vec4 computed_position = compute_geometry_position(a_pos, a_bone_ids, a_weights, u_is_skeletal);
+    gl_Position = u_transform * computed_position;
 }
   
 #shader geometry

@@ -126,7 +126,8 @@ namespace luly::renderer
             m_geometry_shader->set_int("u_actor_id", static_cast<int>(actor));
 
             // Check if has animation_controller_component, if so, we need to upload final bone matrices
-            if (registry->any_of<scene::animation_controller_component>(actor))
+            const bool has_animation_controller = registry->any_of<scene::animation_controller_component>(actor);
+            if (has_animation_controller)
             {
                 scene::animation_controller_component& animation_controller_component = registry->get<
                     scene::animation_controller_component>(actor);
@@ -138,9 +139,8 @@ namespace luly::renderer
                     m_geometry_shader->set_mat4("u_final_bone_matrices[" + std::to_string(i) + "]",
                                                 final_bone_matrices[i]);
                 }
-
-                m_geometry_shader->set_int("u_is_skeletal", 1);
             }
+            m_geometry_shader->set_int("u_is_skeletal", has_animation_controller ? 1 : 0);
 
             // Check if has material_component
             if (registry->any_of<scene::material_component>(actor))

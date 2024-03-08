@@ -11,6 +11,8 @@ namespace luly::renderer
 {
     animation_clip::animation_clip(const std::string& animation_path, const std::shared_ptr<model>& model)
     {
+        LY_TRACE("Started loading animation clip from file...");
+        LY_TRACE("  - File path: '{}'", animation_path);
         Assimp::Importer import;
         const aiScene* assimp_scene = import.ReadFile(
             animation_path,
@@ -22,14 +24,21 @@ namespace luly::renderer
             LY_ASSERT_MSG(false, "An error occurred while loading animation from file.")
         }
 
+        LY_ASSERT_MSG(assimp_scene->mNumAnimations > 0, "Animation file does not contain animations!")
+
         const aiAnimation* animation = assimp_scene->mAnimations[0];
         m_duration = animation->mDuration;
         m_ticks_per_second = animation->mTicksPerSecond;
         aiMatrix4x4 global_transformation = assimp_scene->mRootNode->mTransformation;
         global_transformation = global_transformation.Inverse();
 
+        LY_TRACE("  - Duration: {}", m_duration);
+        LY_TRACE("  - TPS: {}", m_ticks_per_second);
+
         parse_hierarchy(m_root_node, assimp_scene->mRootNode);
         parse_missing_bones(animation, model);
+
+        LY_TRACE("Animation loaded from file successfully!");
     }
 
     animation_clip::~animation_clip()
@@ -71,7 +80,7 @@ namespace luly::renderer
         int& model_bones_count = model->get_bones_count();
 
         //reading channels(bones engaged in an animation and their keyframes)
-        for (int i = 0; i < size; i++)
+        for (uint32_t i = 0; i < size; i++)
         {
             const aiNodeAnim* channel = assimp_animation->mChannels[i];
             std::string bone_name = channel->mNodeName.data;

@@ -7,6 +7,7 @@
 #include <events/base_event.h>
 #include <memory>
 
+#include "audio/audio_context.h"
 #include "events/window/window_resize_event.h"
 
 // Entry point used in applications.
@@ -41,6 +42,8 @@ namespace luly::core
         std::shared_ptr<renderer::window> m_window;
         std::string m_initial_title;
         float m_frame_delay;
+
+        std::shared_ptr<audio::audio_context> m_audio_context;
 
         friend int ::main(int argc, char** argv);
         static application* s_instance;

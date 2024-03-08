@@ -31,6 +31,7 @@ project "basic"
         "%{include_dirs.physx}",
         "%{include_dirs.physx_omnipvd}",
         "%{include_dirs.yaml_cpp}",
+        "%{include_dirs.openal}",
     }
     
     links {

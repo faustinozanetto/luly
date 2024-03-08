@@ -5,6 +5,7 @@
 #include "actor/components/transform_component.h"
 #include "actor/components/base_component.h"
 #include "actor/components/identifier_component.h"
+#include "actor/components/animations/animation_controller_component.h"
 #include "actor/components/lights/directional_light_component.h"
 #include "actor/components/lights/point_light_component.h"
 #include "actor/components/lights/spot_light_component.h"
@@ -102,6 +103,7 @@ namespace luly::scene
     void scene::on_update(float delta_time)
     {
         update_lights();
+        update_animation_controllers(delta_time);
     }
 
     void scene::handle_delete_entities() const
@@ -200,6 +202,15 @@ namespace luly::scene
             auto& spot_light = spot_light_component.get_spot_light();
 
             spot_light->set_position(transform->get_location());
+        }
+    }
+
+    void scene::update_animation_controllers(float delta_time) const
+    {
+        const auto& view = m_actors_registry->view<animation_controller_component>();
+        for (auto [actor, animation_controller_component] : view.each())
+        {
+            animation_controller_component.get_animation_controller()->on_update(delta_time);
         }
     }
 }

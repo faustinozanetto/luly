@@ -26,6 +26,7 @@
 #include "scene/actor/components/rendering/material_component.h"
 #include "scene/actor/components/rendering/model_renderer_component.h"
 #include "scenes/animations_scene.h"
+#include "scenes/audio_scene.h"
 #include "scenes/pbr_mask_scene.h"
 #include "scenes/physics/physics_joints_scene.h"
 #include "scenes/physics/physics_pyramid_scene.h"
@@ -122,9 +123,13 @@ void basic_application::setup_scene()
     */
 
     const std::shared_ptr<animations_scene>& animations_scene = std::make_shared<class
-    animations_scene>();
+        animations_scene>();
     luly::scene::scene_manager::get().add_scene(animations_scene);
-    
+
+    const std::shared_ptr<audio_scene>& audio_scene = std::make_shared<class
+        audio_scene>();
+    luly::scene::scene_manager::get().add_scene(audio_scene);
+
     luly::scene::scene_manager::get().switch_scene(animations_scene);
 }
 
